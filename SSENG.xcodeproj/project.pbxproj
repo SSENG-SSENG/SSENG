@@ -166,7 +166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftformat > /dev/null; then\n  swiftformat \"${SRCROOT}\"\nelse\n  echo \"warning: SwiftFormat not installed. Install using 'brew install swiftformat'\"\nfi\n";
+			shellScript = "if [ -x /opt/homebrew/bin/swiftformat ]; then\n  /opt/homebrew/bin/swiftformat\nelse\n  echo \"warning: SwiftFormat not installed. Install using 'brew install swiftformat'\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

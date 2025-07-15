@@ -6,5 +6,4 @@
 //
 
 import Foundation
-
-struct Test { let x = 1 }
+struct  TestFormat{ let x=1 }
