@@ -4,14 +4,13 @@
 //
 //  Created by 이태윤 on 7/15/25.
 //
-import UIKit
+import MapKit
 import SnapKit
 import Then
-import MapKit
+import UIKit
 
 class MapViewController: UIViewController {
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-  }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
 }
