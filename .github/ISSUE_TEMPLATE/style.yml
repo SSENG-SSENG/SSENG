@@ -1,0 +1,23 @@
+name: 🎨 Style
+description: 코드 포맷, 네이밍, 스타일 변경
+title: "🎨 Style: "
+labels: ["Style"]
+body:
+  - type: input
+    id: branch
+    attributes:
+      label: 브랜치 이름
+      description: 작업할 브랜치 이름을 명확하게 작성해주세요 예) style/
+      placeholder: 예) style/
+    validations:
+      required: true
+  - type: input
+    id: summary
+    attributes:
+      label: 정리한 스타일 내용
+      placeholder: 어떤 스타일 수정을 했나요?
+  - type: textarea
+    id: details
+    attributes:
+      label: 상세 설명
+      description: 포맷팅 도구 사용 여부, 전반적인 정리 내용 등을 간단히 작성해주세요.

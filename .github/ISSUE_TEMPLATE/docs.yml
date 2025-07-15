@@ -1,0 +1,22 @@
+name: 📝 Docs
+description: 문서 관련 작업
+title: "📝 Docs: "
+labels: ["Docs"]
+body:
+  - type: input
+    id: branch
+    attributes:
+      label: 브랜치 이름
+      description: 작업할 브랜치 이름을 명확하게 작성해주세요 예) docs/
+      placeholder: 예) docs/
+    validations:
+      required: true
+  - type: input
+    id: summary
+    attributes:
+      label: 간단 요약
+      placeholder: 어떤 문서를 작업하나요?
+  - type: textarea
+    id: details
+    attributes:
+      label: 문서 변경 상세 설명

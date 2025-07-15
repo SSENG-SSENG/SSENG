@@ -1,0 +1,22 @@
+name: ✨ Feat
+description: 새로운 기능 추가
+title: "✨ Feat: "
+labels: ["Feat"]
+body:
+  - type: input
+    id: branch
+    attributes:
+      label: 브랜치 이름
+      description: 작업할 브랜치 이름을 명확하게 작성해주세요 예) feat/
+      placeholder: 예) feat/
+    validations:
+      required: true
+  - type: input
+    id: summary
+    attributes:
+      label: 간단 요약
+      placeholder: 어떤 기능을 추가하나요?
+  - type: textarea
+    id: details
+    attributes:
+      label: 구현한 기능의 상세 설명
