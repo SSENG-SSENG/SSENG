@@ -10,6 +10,7 @@
 		E70E5FA32E262DFA00F6F2D9 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = E70E5FA22E262DFA00F6F2D9 /* Then */; };
 		E70E5FA62E262E0600F6F2D9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E70E5FA52E262E0600F6F2D9 /* SnapKit */; };
 		E70E5FA92E262E1100F6F2D9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E70E5FA82E262E1100F6F2D9 /* Alamofire */; };
+		E73E19442E269CFA00287735 /* NMapsMap in Frameworks */ = {isa = PBXBuildFile; productRef = E73E19432E269CFA00287735 /* NMapsMap */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E70E5FA92E262E1100F6F2D9 /* Alamofire in Frameworks */,
+				E73E19442E269CFA00287735 /* NMapsMap in Frameworks */,
 				E70E5FA32E262DFA00F6F2D9 /* Then in Frameworks */,
 				E70E5FA62E262E0600F6F2D9 /* SnapKit in Frameworks */,
 			);
@@ -94,6 +96,7 @@
 				E70E5FA22E262DFA00F6F2D9 /* Then */,
 				E70E5FA52E262E0600F6F2D9 /* SnapKit */,
 				E70E5FA82E262E1100F6F2D9 /* Alamofire */,
+				E73E19432E269CFA00287735 /* NMapsMap */,
 			);
 			productName = SSENG;
 			productReference = E70E5F692E26187400F6F2D9 /* SSENG.app */;
@@ -127,6 +130,7 @@
 				E70E5FA12E262DFA00F6F2D9 /* XCRemoteSwiftPackageReference "Then" */,
 				E70E5FA42E262E0600F6F2D9 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				E70E5FA72E262E1100F6F2D9 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				E73E19422E269CFA00287735 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E70E5F6A2E26187400F6F2D9 /* Products */;
@@ -412,6 +416,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		E73E19422E269CFA00287735 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/navermaps/SPM-NMapsMap";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.22.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -429,6 +441,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E70E5FA72E262E1100F6F2D9 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		E73E19432E269CFA00287735 /* NMapsMap */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E73E19422E269CFA00287735 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */;
+			productName = NMapsMap;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
