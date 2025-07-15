@@ -6,4 +6,5 @@
 //
 
 import Foundation
-struct Test{let x=1}
+
+struct Test { let x = 1 }

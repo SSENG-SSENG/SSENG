@@ -151,6 +151,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		E70E60242E265FB400F6F2D9 /* SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -165,7 +166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftformat > /dev/null; then\n  swiftformat \"${SRCROOT}\"\nelse\n  echo \"warning: SwiftFormat not installed. Install using 'brew install swiftformat'\"\nfi\n";
+			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftformat > /dev/null; then\n  swiftformat \"${SRCROOT}\"\nelse\n  echo \"warning: SwiftFormat not installed. Install using 'brew install swiftformat'\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
