@@ -12,9 +12,11 @@ import UIKit
 
 class MapViewController: UIViewController {
   // 맵 뷰
-  private let mapView = NMFMapView()
+  private let mapView = NMFMapView().then {
+    $0.positionMode = .normal
+  }
 
-  // 현위치 추적용
+  // 위치
   let locationManager = CLLocationManager()
 
   // 킥보드 등록 버튼
@@ -84,12 +86,14 @@ class MapViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    mapView.addCameraDelegate(delegate: self)
+    locationManager.delegate = self
+
     setupUI()
     setupConstraints()
     setupButtonActions()
 
     locationManager.requestWhenInUseAuthorization()
-    locationManager.startUpdatingLocation()
   }
 
   // 화면이 켜졌을때 네이게이션바 안보이게 설정
@@ -161,7 +165,31 @@ class MapViewController: UIViewController {
   @objc private func didTabReloadButton() {}
 
   // 위치 추적 버튼 액션
-  @objc private func didTapLocationButton() {}
+  @objc private func didTapLocationButton() {
+    locationManager.startUpdatingLocation()
+  }
+}
+
+extension MapViewController: CLLocationManagerDelegate {
+  func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    guard let location = locations.last else { return }
+    let latLng = NMGLatLng(lat: location.coordinate.latitude, lng: location.coordinate.longitude)
+
+    let cameraPosition = NMFCameraPosition(latLng, zoom: 16)
+    let cameraUpdate = NMFCameraUpdate(position: cameraPosition)
+
+    mapView.moveCamera(cameraUpdate)
+    mapView.positionMode = .direction
+
+    print("카메라 업데이트: \(cameraUpdate)")
+  }
+}
+
+extension MapViewController: NMFMapViewCameraDelegate {
+  func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
+    print("카메라 이동: \(reason)")
+    locationManager.stopUpdatingLocation()
+  }
 }
 
 // TODO: - 지도 API 받아오지 못 했을 경우 에러처리
