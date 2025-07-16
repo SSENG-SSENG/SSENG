@@ -12,8 +12,9 @@ class MypageViewcontroller: UIViewController {
   private lazy var tableView = UITableView(frame: .zero, style: .insetGrouped).then {
     $0.delegate = self
     $0.dataSource = self
-    $0.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     $0.register(UserInfoCell.self, forCellReuseIdentifier: UserInfoCell.identifier)
+    $0.register(KickboardRegisterCell.self, forCellReuseIdentifier: KickboardRegisterCell.identifier)
+    $0.register(KickboardHistoryCell.self, forCellReuseIdentifier: KickboardHistoryCell.identifier)
   }
 
   override func viewDidLoad() {
@@ -34,12 +35,8 @@ class MypageViewcontroller: UIViewController {
 extension MypageViewcontroller: UITableViewDelegate {}
 
 extension MypageViewcontroller: UITableViewDataSource {
-  func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    if indexPath.section == 0 {
-      return UITableView.automaticDimension
-    } else {
-      return 60
-    }
+  func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
+    UITableView.automaticDimension
   }
 
   // 섹션의 개수를 반환하는 메서드
@@ -67,15 +64,27 @@ extension MypageViewcontroller: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    if indexPath.section == 0 {
+    switch indexPath.section {
+    case 0:
       guard let cell = tableView.dequeueReusableCell(withIdentifier: UserInfoCell.identifier, for: indexPath) as? UserInfoCell else {
         return UITableViewCell()
       }
       return cell
-    } else {
-      let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-      cell.textLabel?.text = "Section: \(indexPath.section) Row: \(indexPath.row)"
+
+    case 1:
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: KickboardRegisterCell.identifier, for: indexPath) as? KickboardRegisterCell else {
+        return UITableViewCell()
+      }
       return cell
+
+    case 2:
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: KickboardHistoryCell.identifier, for: indexPath) as? KickboardHistoryCell else {
+        return UITableViewCell()
+      }
+      return cell
+
+    default:
+      return UITableViewCell()
     }
   }
 }

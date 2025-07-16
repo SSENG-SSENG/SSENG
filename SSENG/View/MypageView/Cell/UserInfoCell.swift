@@ -50,6 +50,8 @@ class UserInfoCell: UITableViewCell {
   }
 
   private func configureUI() {
+    selectionStyle = .none
+
     [userImageView, userNameLabel, ridingStatusLabel, logoutButton].forEach { contentView.addSubview($0) }
   }
 
