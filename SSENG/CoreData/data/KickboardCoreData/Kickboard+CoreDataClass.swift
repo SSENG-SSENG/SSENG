@@ -6,10 +6,8 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(Kickboard)
-public class Kickboard: NSManagedObject {
-
-}
+public class Kickboard: NSManagedObject {}
