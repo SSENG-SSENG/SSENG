@@ -34,7 +34,6 @@ class MapViewController: UIViewController {
     $0.setImage(UIImage(systemName: "arrow.clockwise"), for: .normal)
     $0.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 22, weight: .medium), forImageIn: .normal)
     $0.tintColor = .main
-    $0.layer.cornerRadius = 8
     $0.backgroundColor = .clear
     $0.clipsToBounds = true
   }
@@ -49,7 +48,6 @@ class MapViewController: UIViewController {
     $0.setImage(UIImage(systemName: "location"), for: .normal)
     $0.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 22, weight: .medium), forImageIn: .normal)
     $0.tintColor = .main
-    $0.layer.cornerRadius = 8
     $0.backgroundColor = .clear
     $0.clipsToBounds = true
   }
@@ -59,9 +57,27 @@ class MapViewController: UIViewController {
     $0.setImage(UIImage(systemName: "plus"), for: .normal)
     $0.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 22, weight: .medium), forImageIn: .normal)
     $0.tintColor = .main
-    $0.layer.cornerRadius = 8
-    $0.backgroundColor = .clear
-    $0.clipsToBounds = true
+    $0.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+    $0.layer.cornerRadius = 12
+    $0.clipsToBounds = false
+    $0.layer.shadowColor = UIColor.black.cgColor
+    $0.layer.shadowOpacity = 0.2
+    $0.layer.shadowOffset = CGSize(width: 0, height: 2)
+    $0.layer.shadowRadius = 4
+  }
+
+  // 마이페이지 버튼
+  private let myPageButton = UIButton().then {
+    $0.setImage(UIImage(systemName: "person"), for: .normal)
+    $0.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 22, weight: .medium), forImageIn: .normal)
+    $0.tintColor = .main
+    $0.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+    $0.layer.cornerRadius = 12
+    $0.clipsToBounds = false
+    $0.layer.shadowColor = UIColor.black.cgColor
+    $0.layer.shadowOpacity = 0.2
+    $0.layer.shadowOffset = CGSize(width: 0, height: 2)
+    $0.layer.shadowRadius = 4
   }
 
   override func viewDidLoad() {
@@ -75,7 +91,7 @@ class MapViewController: UIViewController {
   }
 
   private func setupUI() {
-    [mapView, controlStackView, addKickBoardButton].forEach { view.addSubview($0) }
+    [mapView, controlStackView, addKickBoardButton, myPageButton].forEach { view.addSubview($0) }
     [reloadButton, dividerView, locationButton].forEach { controlStackView.addArrangedSubview($0) }
   }
 
@@ -97,10 +113,16 @@ class MapViewController: UIViewController {
     }
 
     dividerView.snp.makeConstraints {
-      $0.height.equalTo(1) // 얇은 선
+      $0.height.equalTo(1)
     }
 
     addKickBoardButton.snp.makeConstraints {
+      $0.leading.equalToSuperview().inset(20)
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+      $0.size.equalTo(50)
+    }
+
+    myPageButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(20)
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
       $0.size.equalTo(50)
