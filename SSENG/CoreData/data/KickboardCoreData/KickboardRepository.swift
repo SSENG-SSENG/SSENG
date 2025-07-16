@@ -41,8 +41,8 @@ final class KickboardRepository {
   }
 
   // 킥보드 반납
-  func returnKickboard(location: String, newLocation: String, detailLocation: String) {
-    guard let kb = readKickboard(by: location) else { return }
+  func returnKickboard(id: String, newLocation: String, detailLocation: String) {
+    guard let kb = readKickboard(by: id) else { return }
 
     kb.isRented = false
     kb.location = newLocation
@@ -50,8 +50,8 @@ final class KickboardRepository {
     CoreDataStack.shared.saveContext()
   }
 
-  func deleteKickboard(by location: String) {
-    guard let kb = readKickboard(by: location) else { return }
+  func deleteKickboard(by id: String) {
+    guard let kb = readKickboard(by: id) else { return }
 
     context.delete(kb)
     CoreDataStack.shared.saveContext()
