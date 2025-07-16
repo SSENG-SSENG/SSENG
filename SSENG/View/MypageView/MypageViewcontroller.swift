@@ -13,15 +13,17 @@ class MypageViewcontroller: UIViewController {
     $0.delegate = self
     $0.dataSource = self
     $0.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+    $0.register(UserInfoCell.self, forCellReuseIdentifier: UserInfoCell.identifier)
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupUI()
+    configureUI()
   }
 
-  private func setupUI() {
+  private func configureUI() {
     view.addSubview(tableView)
+    view.backgroundColor = .systemBackground
 
     tableView.snp.makeConstraints {
       $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
@@ -32,6 +34,14 @@ class MypageViewcontroller: UIViewController {
 extension MypageViewcontroller: UITableViewDelegate {}
 
 extension MypageViewcontroller: UITableViewDataSource {
+  func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    if indexPath.section == 0 {
+      return UITableView.automaticDimension
+    } else {
+      return 60
+    }
+  }
+
   // 섹션의 개수를 반환하는 메서드
   func numberOfSections(in _: UITableView) -> Int {
     3
@@ -39,23 +49,33 @@ extension MypageViewcontroller: UITableViewDataSource {
 
   // 섹션의 title을 반환하는 메서드
   func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
-    if section == 0 {
-      return "1번째 섹션"
-    } else if section == 1 {
-      return "2번째 섹션"
-    } else if section == 2 {
-      return "3번째 섹션"
+    switch section {
+    case 1: return "등록한 킥보드"
+    case 2: return "킥보드 이용 내역"
+    default: return nil
     }
-    return nil
   }
 
-  func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-    5
+  // 섹션에 몇 개의 row(셀)이 들어갈지 결정하는 메서드
+  func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
+    switch section {
+    case 0: return 1
+    case 1: return 2
+    case 2: return 5
+    default: return 0
+    }
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-    cell.textLabel?.text = "Section: \(indexPath.section) Row: \(indexPath.row)"
-    return cell
+    if indexPath.section == 0 {
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: UserInfoCell.identifier, for: indexPath) as? UserInfoCell else {
+        return UITableViewCell()
+      }
+      return cell
+    } else {
+      let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+      cell.textLabel?.text = "Section: \(indexPath.section) Row: \(indexPath.row)"
+      return cell
+    }
   }
 }

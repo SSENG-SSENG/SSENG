@@ -11,13 +11,13 @@ import UIKit
 
 class KickboardHistoryCell: UITableViewCell {
   static let identifier = "KickboardHistoryCell"
-  
+
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    
   }
-  
-  required init?(coder: NSCoder) {
+
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 }
