@@ -27,11 +27,17 @@ final class KickboardRepository {
     return newID
   }
 
-  // 킥보드 조회(위치 기반)
+  // 킥보드 조회
   func readKickboard(by id: String) -> Kickboard? {
     let fetch = Kickboard.fetchRequest()
     fetch.predicate = NSPredicate(format: "id == %@", id)
     return (try? CoreDataStack.shared.context.fetch(fetch))?.first
+  }
+
+  // 모든 킥보드 조회
+  func readAllKickboards() -> [Kickboard] {
+    let fetch = Kickboard.fetchRequest()
+    return (try? CoreDataStack.shared.context.fetch(fetch)) ?? []
   }
 
   // 킥보드 대여
