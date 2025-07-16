@@ -11,7 +11,7 @@ final class HistoryRepository {
   private let context = CoreDataStack.shared.context
 
   // 내역 등록
-  func createHistory(userId: String, duration: Int, startTime: String, type: Int) {
+  func createHistory(userId: String, duration: Int16, startTime: String, type: Int16) {
     let history = History(context: context)
     history.userId = userId
     history.duration = duration

@@ -11,18 +11,20 @@ final class KickboardRepository {
   private let context = CoreDataStack.shared.context
 
   // 킥보드 등록
-  func registKickboard(registerDate: String, location: String, detailLocation: String, type: String) {
+  func registKickboard(registerDate: String, location: String, detailLocation: String, type: Int16) -> String {
     let kb = Kickboard(context: context)
-    kb.id = UUID().uuidString
+    let newID = UUID().uuidString
+    kb.id = newID
     kb.registerDate = registerDate
     kb.location = location
     kb.detailLocation = detailLocation
     kb.type = type
-    kb.battery = Int.random(in: 80 ... 100) // 배터리 잔량 50~100 사이의 랜덤 값
+    kb.battery = Int16(Int.random(in: 80 ... 100)) // 배터리 잔량 50~100 사이의 랜덤 값
     kb.batteryTime = "약 \(round(Double(kb.battery)) * 1.2) 분"
     kb.isRented = false // 초기 상태는 대여 가능
 
     CoreDataStack.shared.saveContext()
+    return newID
   }
 
   // 킥보드 조회(위치 기반)
