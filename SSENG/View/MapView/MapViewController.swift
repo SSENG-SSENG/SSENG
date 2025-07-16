@@ -12,7 +12,7 @@ import UIKit
 
 class MapViewController: UIViewController {
   // 맵 뷰
-  private let mapView = NMFMapView().then {
+  let mapView = NMFMapView().then {
     $0.positionMode = .normal
   }
 
@@ -87,6 +87,7 @@ class MapViewController: UIViewController {
     super.viewDidLoad()
 
     mapView.addCameraDelegate(delegate: self)
+    mapView.touchDelegate = self
     locationManager.delegate = self
 
     setupUI()
@@ -150,10 +151,7 @@ class MapViewController: UIViewController {
   }
 
   // 킥보드 등록 버튼 액션
-  @objc private func didTabAddKickBoardButton() {
-    let addKickBoardVC = KickBoardViewController()
-    navigationController?.pushViewController(addKickBoardVC, animated: true)
-  }
+  @objc private func didTabAddKickBoardButton() {}
 
   // 마이페이지 버튼 액션
   @objc private func didTabMyPageButton() {
@@ -189,6 +187,15 @@ extension MapViewController: NMFMapViewCameraDelegate {
   func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
     print("카메라 이동: \(reason)")
     locationManager.stopUpdatingLocation()
+  }
+}
+
+extension MapViewController: NMFMapViewTouchDelegate {
+  func mapView(_: NMFMapView, didLongTapMap latlng: NMGLatLng, point _: CGPoint) {
+    print("롱 탭: \(latlng.lat), \(latlng.lng)")
+
+    let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
+    navigationController?.pushViewController(addKickBoardVC, animated: true)
   }
 }
 
