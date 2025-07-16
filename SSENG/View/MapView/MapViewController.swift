@@ -147,7 +147,7 @@ class MapViewController: UIViewController {
 
   // 킥보드 등록 버튼 액션
   @objc private func didTabAddKickBoardButton() {
-    let addKickBoardVC = KickBoardViewController()
+    let addKickBoardVC = RegisterViewController()
     navigationController?.pushViewController(addKickBoardVC, animated: true)
   }
 
