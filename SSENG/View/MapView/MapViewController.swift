@@ -230,7 +230,7 @@ class MapViewController: UIViewController {
         let image = UIImage(resource: .bikeFull)
         marker.iconImage = NMFOverlayImage(image: image)
       } else if kickboard.battery >= 31 {
-        let image = UIImage(resource: .bikeMidlde)
+        let image = UIImage(resource: .bikeMiddle)
         marker.iconImage = NMFOverlayImage(image: image)
       } else {
         let image = UIImage(resource: .bikeLow)
