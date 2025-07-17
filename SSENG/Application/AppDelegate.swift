@@ -12,7 +12,24 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     // Override point for customization after application launch.
-    true
+    checkCoreData()
+    return true
+  }
+
+  // MARK: - Core Data Check
+
+  private func checkCoreData() {
+    let repository = KickboardRepository()
+    let kickboards = repository.readAllKickboards()
+
+    if kickboards.isEmpty {
+      print("🔵 CoreData: 저장된 킥보드 데이터가 없습니다.")
+    } else {
+      print("🟢 CoreData: \(kickboards.count)개의 킥보드 데이터가 저장되어 있습니다.")
+      for kickboard in kickboards {
+        print("  - ID: \(kickboard.id ?? "N/A"), 타입: \(kickboard.type), 위치: \(kickboard.location ?? "N/A"), 배터리: \(kickboard.battery)%")
+      }
+    }
   }
 
   // MARK: UISceneSession Lifecycle

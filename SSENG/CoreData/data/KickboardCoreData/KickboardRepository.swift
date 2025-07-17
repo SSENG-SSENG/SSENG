@@ -19,7 +19,7 @@ final class KickboardRepository {
     kb.location = location
     kb.detailLocation = detailLocation
     kb.type = type
-    kb.battery = Int16(Int.random(in: 80 ... 100)) // 배터리 잔량 50~100 사이의 랜덤 값
+    kb.battery = Int16(Int.random(in: 20 ... 100)) // 배터리 잔량 50~100 사이의 랜덤 값
     kb.batteryTime = "약 \(round(Double(kb.battery)) * 1.2) 분"
     kb.isRented = false // 초기 상태는 대여 가능
 
@@ -27,11 +27,17 @@ final class KickboardRepository {
     return newID
   }
 
-  // 킥보드 조회(위치 기반)
+  // 킥보드 조회
   func readKickboard(by id: String) -> Kickboard? {
     let fetch = Kickboard.fetchRequest()
     fetch.predicate = NSPredicate(format: "id == %@", id)
     return (try? CoreDataStack.shared.context.fetch(fetch))?.first
+  }
+
+  // 모든 킥보드 조회
+  func readAllKickboards() -> [Kickboard] {
+    let fetch = Kickboard.fetchRequest()
+    return (try? CoreDataStack.shared.context.fetch(fetch)) ?? []
   }
 
   // 킥보드 대여
