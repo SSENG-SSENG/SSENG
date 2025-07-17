@@ -9,9 +9,9 @@ import Then
 import UIKit
 
 class SignViewController: UIViewController {
+  // 동의 여부
   private var isAgreed = false
 
-  // MARK: 컴포넌트 초기화
 
   // |=============|
   // |---앱 로고---|
@@ -27,6 +27,7 @@ class SignViewController: UIViewController {
   // |--가입 버튼--|
   // |=============|
 
+  // MARK: 컴포넌트 초기화
   private let appLogoImageView = UIImageView().then {
     $0.image = UIImage(named: "Logo")
     $0.contentMode = .scaleAspectFit
@@ -51,6 +52,7 @@ class SignViewController: UIViewController {
 
   private let pwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 입력하세요."
+    $0.isSecureTextEntry = true
     // TODO: 띄어쓰기 등 비밀번호 표준 정규표현식 적용하기
   }
 
@@ -161,14 +163,13 @@ class SignViewController: UIViewController {
   // 컴포넌트 레이아웃
   private func setupConstraints() {
     let insetSize = 40
-    // appLogoImageView.snp.makeConstraints {
-    //   $0.top.equalTo(view.safeAreaLayoutGuide)
-    //   $0.trailing.leading.equalToSuperview()
-    // }
+    appLogoImageView.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide)
+      $0.trailing.leading.equalToSuperview()
+    }
 
     idStackView.snp.makeConstraints {
-      // $0.top.equalTo(appLogoImageView.snp.bottom)
-      $0.top.equalTo(view.safeAreaLayoutGuide)
+      $0.top.equalTo(appLogoImageView.snp.bottom)
       $0.leading.trailing.equalToSuperview().inset(insetSize)
     }
 
@@ -214,11 +215,12 @@ class SignViewController: UIViewController {
     }
   }
 
+  // 가입 버튼 상태 체크
   private func updateSubmitButtonState() {
-    let allFieldsFilled =
+    let isFiledFilled =
       !(idTextField.text ?? "").isEmpty && !(pwTextField.text ?? "").isEmpty && !(rePwTextField.text ?? "").isEmpty
       && !(nickNameTextField.text ?? "").isEmpty
-    let canSubmit = allFieldsFilled && isAgreed
+    let canSubmit = isFiledFilled && isAgreed
     
     submitButton.isEnabled = canSubmit
     submitButton.alpha = canSubmit ? 1.0 : 0.5
@@ -241,8 +243,9 @@ class SignViewController: UIViewController {
   }
 
   @objc func didTapSubmitButton(_ sender: UIButton) {
-    // TODO: 1. coredata에 정보 넣기
-    // TODO: 2. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
+    // TODO: 1. coredata에 정보 넣기(이미 있는 아이디인지 확인도 하고 이미 있으면 변경 요청)
+    // TODO: 2. 빈 칸(변경 필요한 칸) 파악되면 하이라이팅
+    // TODO: 3. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
     navigationController?.popViewController(animated: true)
   }
   
