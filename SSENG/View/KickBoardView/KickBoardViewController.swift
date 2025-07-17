@@ -118,7 +118,8 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
     marker.mapView = mapView.mapView
 
-    let cameraUpdate = NMFCameraUpdate(scrollTo: marker.position, zoomTo: 16)
+    let cameraTarget = NMGLatLng(lat: latitude - 0.0005, lng: longitude) // 위로 약간 보정
+    let cameraUpdate = NMFCameraUpdate(scrollTo: cameraTarget, zoomTo: 16)
     mapView.mapView.moveCamera(cameraUpdate)
   }
 
