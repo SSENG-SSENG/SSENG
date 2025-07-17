@@ -9,6 +9,9 @@ class KickBoardViewController: UIViewController {
   private var selectedType: Int = 1
   private var didRegister: Bool = false // 등록 여부 상태 변수
 
+  // didRegister값 추적을 위한 Delegate 연결
+  weak var delegate: KickBoardViewControllerDelegate?
+
   // MARK: - UI Components
 
   private let bottomModalView = UIView().then {
@@ -181,6 +184,8 @@ class KickBoardViewController: UIViewController {
     showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
       self?.dismiss(animated: true, completion: nil)
     }
+    delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
+    navigationController?.popViewController(animated: true)
   }
 
   @objc private func didTapClose() {
