@@ -11,9 +11,6 @@ import Then
 import UIKit
 
 class MapViewController: UIViewController {
-  // 등록 여부
-  var ride: Bool?
-
   // 맵 뷰
   let mapView = NMFMapView().then {
     $0.positionMode = .normal
@@ -232,29 +229,28 @@ extension MapViewController: NMFMapViewCameraDelegate {
 extension MapViewController: NMFMapViewTouchDelegate {
   func mapView(_: NMFMapView, didLongTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("롱 탭: \(latlng.lat), \(latlng.lng)")
-    ride = true
-    if let riding = ride {
-      if riding {
-        let marker = NMFMarker()
-        marker.position = NMGLatLng(lat: latlng.lat, lng: latlng.lng)
-        marker.mapView = mapView
-        print("킥보드 등록완료!")
-        marker.touchHandler = { [weak self] _ in
-          self?.showKickBoardView()
-          return true
-        }
-        ride = nil
-      } else {
-        print("킥보드 등록 취소!")
-      }
-    } else { return }
-    //    let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
-    //    navigationController?.pushViewController(addKickBoardVC, animated: true)
+    let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
+    addKickBoardVC.delegate = self
+    navigationController?.pushViewController(addKickBoardVC, animated: true)
   }
 
   func mapView(_: NMFMapView, didTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("숏 탭: \(latlng.lat), \(latlng.lng)")
     hiddenKickBoardView()
+  }
+}
+
+// 킥보드 등록 완료 됐는지 추적
+extension MapViewController: KickBoardViewControllerDelegate {
+  func didRegisterKickBoard(at latitude: Double, longitude: Double) {
+    let marker = NMFMarker()
+    marker.position = NMGLatLng(lat: latitude, lng: longitude)
+    marker.mapView = mapView
+    print("킥보드 등록완료!")
+    marker.touchHandler = { [weak self] _ in
+      self?.showKickBoardView()
+      return true
+    }
   }
 }
 
