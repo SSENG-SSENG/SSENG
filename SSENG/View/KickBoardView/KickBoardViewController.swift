@@ -250,11 +250,9 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
   private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-
     alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
       completion?()
     })
-
     alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
 
     present(alert, animated: true)
