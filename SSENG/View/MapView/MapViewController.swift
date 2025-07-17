@@ -12,8 +12,13 @@ import Then
 import UIKit
 
 class MapViewController: UIViewController {
+  // 선택된 마커
+  var selected: SelectedMarkerModel = .all
   // 마커 저장 배열
-  private var kickboardMarkers: [NMFMarker] = []
+  private var allMarkers: [NMFMarker] = []
+  private var kickBoardMarkers: [NMFMarker] = []
+  private var bikeMarkers: [NMFMarker] = []
+  
   // 맵 뷰
   let mapView = NMFMapView().then {
     $0.positionMode = .normal
@@ -138,6 +143,10 @@ class MapViewController: UIViewController {
   var rideKickBoardViewHiddenConstraint: [Constraint] = []
   var controlStackViewConstraint: [Constraint] = []
 
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -269,10 +278,10 @@ class MapViewController: UIViewController {
 
   // 킥보드 전체 데이터 받아와서 킥보드 마커 등록
   private func allKickBoardMarker() {
-    for marker in kickboardMarkers {
+    for marker in allMarkers {
       marker.mapView = nil
     }
-    kickboardMarkers.removeAll()
+    allMarkers.removeAll()
     let kickBoardRepository = KickboardRepository()
     let kickboards = kickBoardRepository.readAllKickboards()
     if kickboards.isEmpty {
@@ -327,7 +336,7 @@ class MapViewController: UIViewController {
       self?.showKickBoardView(kickBoard: kickboard)
       return true
     }
-    kickboardMarkers.append(marker)
+    allMarkers.append(marker)
   }
 
   // 배터리 상태에 따라 아이콘과 텍스트를 반환하는 메서드
