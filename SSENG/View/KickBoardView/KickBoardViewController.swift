@@ -3,7 +3,7 @@ import SnapKit
 import Then
 import UIKit
 
-class KickBoardViewController: UIViewController {
+class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   private let latitude: Double
   private let longitude: Double
   private var selectedType: Int = 1
@@ -22,11 +22,6 @@ class KickBoardViewController: UIViewController {
     $0.layer.shadowOpacity = 0.2
     $0.layer.shadowOffset = CGSize(width: 0, height: -2)
     $0.layer.shadowRadius = 8
-  }
-
-  private let closeButton = UIButton(type: .system).then {
-    $0.setImage(UIImage(systemName: "xmark"), for: .normal)
-    $0.tintColor = .darkGray
   }
 
   private lazy var modalLabel = UILabel().then {
@@ -75,6 +70,7 @@ class KickBoardViewController: UIViewController {
     self.latitude = latitude
     self.longitude = longitude
     super.init(nibName: nil, bundle: nil)
+    modalPresentationStyle = .overFullScreen // 전체 화면으로 설정
   }
 
   @available(*, unavailable)
@@ -84,17 +80,17 @@ class KickBoardViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .white
+    view.backgroundColor = .clear // 배경을 투명하게 하여 아래 뷰가 보이도록
 
     setupMapView()
     setupModalUI()
     setupActions()
     updateButtonSelection()
+    setupDismissTapGesture()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    // 뷰가 사라질 때 등록 여부를 확인하는 if문
     if didRegister {
       print("✅ 등록 완료 후 화면이 닫힙니다.")
     } else {
@@ -106,6 +102,7 @@ class KickBoardViewController: UIViewController {
 
   private func setupMapView() {
     let mapView = NMFNaverMapView()
+    mapView.showZoomControls = false
     view.addSubview(mapView)
     mapView.snp.makeConstraints {
       $0.edges.equalToSuperview()
@@ -114,6 +111,9 @@ class KickBoardViewController: UIViewController {
     let marker = NMFMarker()
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
     marker.mapView = mapView.mapView
+
+    let cameraUpdate = NMFCameraUpdate(scrollTo: marker.position, zoomTo: 16) // 줌 레벨 16으로 조정
+    mapView.mapView.moveCamera(cameraUpdate)
   }
 
   private func setupModalUI() {
@@ -123,17 +123,12 @@ class KickBoardViewController: UIViewController {
       $0.bottom.equalToSuperview()
     }
 
-    for item in [closeButton, modalLabel, typeSelectionLabel, typeSelectionStackView, registerButton] {
+    for item in [modalLabel, typeSelectionLabel, typeSelectionStackView, registerButton] {
       bottomModalView.addSubview(item)
     }
 
-    closeButton.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(16)
-      $0.trailing.equalToSuperview().inset(16)
-    }
-
     modalLabel.snp.makeConstraints {
-      $0.top.equalTo(closeButton.snp.bottom).offset(4)
+      $0.top.equalToSuperview().offset(24)
       $0.leading.trailing.equalToSuperview().inset(20)
     }
 
@@ -159,13 +154,18 @@ class KickBoardViewController: UIViewController {
 
   private func setupActions() {
     registerButton.addTarget(self, action: #selector(didTapRegister), for: .touchUpInside)
-    closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+  }
+
+  private func setupDismissTapGesture() {
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapBackground))
+    tapGesture.delegate = self
+    view.addGestureRecognizer(tapGesture)
   }
 
   // MARK: - Actions
 
   @objc private func didTapRegister() {
-    didRegister = true // 등록 버튼 클릭 시 상태를 true로 변경
+    didRegister = true
 
     let locationString = "\(latitude)/\(longitude)"
     let dateFormatter = DateFormatter()
@@ -182,13 +182,13 @@ class KickBoardViewController: UIViewController {
     print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 타입=\(selectedType)")
 
     showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
-      self?.dismiss(animated: true, completion: nil)
+      guard let self else { return }
+      delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
+      self.navigationController?.popViewController(animated: true)
     }
-    delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
-    navigationController?.popViewController(animated: true)
   }
 
-  @objc private func didTapClose() {
+  @objc private func didTapBackground() {
     dismiss(animated: true, completion: nil)
   }
 
@@ -197,31 +197,45 @@ class KickBoardViewController: UIViewController {
     updateButtonSelection()
   }
 
+  // MARK: - UIGestureRecognizerDelegate
+
+  func gestureRecognizer(_: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+    // 모달 뷰 안쪽을 터치한 경우에는 제스처를 무시합니다.
+    !bottomModalView.frame.contains(touch.location(in: view))
+  }
+
   // MARK: - Helpers
 
   private func createTypeButton(title: String, imageName: String, tag: Int) -> UIButton {
     let button = UIButton(type: .custom)
-    button.setTitle(title, for: .normal)
+    button.tag = tag
 
-    // 이미지 로드 및 리사이즈
+    var config = UIButton.Configuration.plain()
+    config.title = title
+    config.imagePlacement = .top
+    config.imagePadding = 8
+    config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+      var outgoing = incoming
+      outgoing.font = .systemFont(ofSize: 16, weight: .semibold)
+      return outgoing
+    }
+
     if let originalImage = UIImage(named: imageName) {
-      let newSize = CGSize(width: 50, height: 50) // 원하는 이미지 크기로 조절
+      let newSize = CGSize(width: 50, height: 50)
       let renderer = UIGraphicsImageRenderer(size: newSize)
       let resizedImage = renderer.image { _ in
         originalImage.draw(in: CGRect(origin: .zero, size: newSize))
       }
-      button.setImage(resizedImage, for: .normal)
+      config.image = resizedImage
     }
 
-    button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+    button.configuration = config
     button.setTitleColor(.black, for: .normal)
     button.layer.cornerRadius = 12
     button.layer.borderWidth = 1
     button.layer.borderColor = UIColor.lightGray.cgColor
     button.backgroundColor = .white
-    button.tag = tag
     button.addTarget(self, action: #selector(didTapTypeButton), for: .touchUpInside)
-    button.alignTextBelow(spacing: 8)
     return button
   }
 
@@ -240,27 +254,5 @@ class KickBoardViewController: UIViewController {
       completion?()
     })
     present(alert, animated: true)
-  }
-}
-
-// UIButton Extension for text alignment
-extension UIButton {
-  func alignTextBelow(spacing: CGFloat) {
-    guard let image = imageView?.image else {
-      return
-    }
-    guard let titleLabel else {
-      return
-    }
-    guard let titleText = titleLabel.text else {
-      return
-    }
-
-    let titleSize = titleText.size(withAttributes: [
-      NSAttributedString.Key.font: titleLabel.font as Any
-    ])
-
-    titleEdgeInsets = UIEdgeInsets(top: spacing, left: -image.size.width, bottom: -image.size.height, right: 0)
-    imageEdgeInsets = UIEdgeInsets(top: -(titleSize.height + spacing), left: 0, bottom: 0, right: -titleSize.width)
   }
 }
