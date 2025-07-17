@@ -18,6 +18,21 @@ class MypageViewcontroller: UIViewController {
     $0.register(KickboardHistoryCell.self, forCellReuseIdentifier: KickboardHistoryCell.identifier)
   }
 
+  private lazy var toggleButton = UIButton(type: .system).then {
+    $0.setTitle("아아~", for: .normal)
+    $0.addTarget(self, action: #selector(toggleSection), for: .touchUpInside)
+  }
+
+  private var isKickboardSectionExpanded = true // 나중에 삭제 예정
+
+  @objc private func toggleSection() {
+    isKickboardSectionExpanded.toggle()
+    tableView.reloadSections( // 섹션 reload
+      IndexSet(integer: 1), // 갱신할 섹션 번호
+      with: .automatic // 애니메이션 방식
+    )
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     configureUI()
@@ -75,6 +90,14 @@ extension MypageViewcontroller: UITableViewDataSource {
       $0.bottom.equalToSuperview().inset(4)
     }
 
+    if section == 1 {
+      container.addSubview(toggleButton)
+      toggleButton.snp.makeConstraints {
+        $0.trailing.equalToSuperview()
+        $0.centerY.equalTo(label)
+      }
+    }
+
     return container
   }
 
@@ -82,7 +105,7 @@ extension MypageViewcontroller: UITableViewDataSource {
   func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
     switch section {
     case 0: return 1
-    case 1: return 2
+    case 1: return isKickboardSectionExpanded ? 2 : 0
     case 2: return 5
     default: return 0
     }
