@@ -16,14 +16,28 @@ class UserInfoCell: UITableViewCell {
   }
 
   private let userNameLabel = UILabel().then {
-    $0.text = "사용자 이름"
+    $0.text = "Mori"
   }
 
-  private let ridingStatusLabel = UILabel().then {
-    $0.text = "킥보드 탑승 중" // 이거는 Label로 우선 하고, Image로 변경하던지.. 고민좀
+  private let statusDotView = UIView().then {
+    $0.layer.cornerRadius = 4
+    $0.clipsToBounds = true
+    $0.backgroundColor = .systemGreen
+    // $0.backgroundColor = isRiding ? .systemGreen : .lightGray
   }
 
-//  private let editButton = UIButton().then {}
+  private let statusTextLabel = UILabel().then {
+    $0.text = "탑승 중"
+    // $0.text = isRiding ? "탑승 중" : "미탑승"
+    $0.font = .systemFont(ofSize: 14)
+    $0.textColor = .label
+  }
+
+  private lazy var ridingStatusStackView = UIStackView(arrangedSubviews: [statusDotView, statusTextLabel]).then {
+    $0.axis = .horizontal
+    $0.spacing = 6
+    $0.alignment = .center
+  }
 
   private let logoutButton = UIButton().then {
     $0.setTitle("로그아웃", for: .normal)
@@ -53,7 +67,7 @@ class UserInfoCell: UITableViewCell {
   private func configureUI() {
     selectionStyle = .none
 
-    [userImageView, userNameLabel, ridingStatusLabel, logoutButton].forEach { contentView.addSubview($0) }
+    [userImageView, userNameLabel, ridingStatusStackView, logoutButton].forEach { contentView.addSubview($0) }
   }
 
   private func configureLayout() {
@@ -68,10 +82,14 @@ class UserInfoCell: UITableViewCell {
       $0.trailing.lessThanOrEqualTo(logoutButton.snp.leading).offset(-8) // 최소 8만큼 떨어지도록
     }
 
-    ridingStatusLabel.snp.makeConstraints {
+    ridingStatusStackView.snp.makeConstraints {
       $0.top.equalTo(userNameLabel.snp.bottom).offset(8)
       $0.leading.equalTo(userNameLabel)
       $0.trailing.lessThanOrEqualTo(logoutButton.snp.leading).offset(-8)
+    }
+
+    statusDotView.snp.makeConstraints {
+      $0.width.height.equalTo(10)
     }
 
     logoutButton.snp.makeConstraints {
