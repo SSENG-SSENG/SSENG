@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     } else {
       print("🟢 CoreData: \(kickboards.count)개의 킥보드 데이터가 저장되어 있습니다.")
       for kickboard in kickboards {
-        print("  - ID: \(kickboard.id ?? "N/A"), 위치: \(kickboard.location ?? "N/A"), 배터리: \(kickboard.battery)%")
+        print("  - ID: \(kickboard.id ?? "N/A"), 타입: \(kickboard.type), 위치: \(kickboard.location ?? "N/A"), 배터리: \(kickboard.battery)%")
       }
     }
   }
