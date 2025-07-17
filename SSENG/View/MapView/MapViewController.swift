@@ -4,14 +4,16 @@
 //
 //  Created by 이태윤 on 7/15/25.
 //
+import CoreData
 import CoreLocation
 import NMapsMap
 import SnapKit
 import Then
 import UIKit
-import CoreData
 
 class MapViewController: UIViewController {
+  // 마커 저장 배열
+  private var kickboardMarkers: [NMFMarker] = []
   // 맵 뷰
   let mapView = NMFMapView().then {
     $0.positionMode = .normal
@@ -95,7 +97,7 @@ class MapViewController: UIViewController {
     setupUI()
     setupConstraints()
     setupButtonActions()
-
+    allKickBoardMarker()
     locationManager.requestWhenInUseAuthorization()
   }
 
@@ -187,17 +189,67 @@ class MapViewController: UIViewController {
   }
 
   // 킥보드 전체 데이터 받아와서 킥보드 마커 등록
-  private func setAnnotations() {
-    let kickboards = repository.readAllKickboards()
-
-    kickboards.forEach {
-      let annotation = MKPointAnnotation()
-      annotation.coordinate = CLLocationCoordinate2D(
-        latitude: Double($0.latitude)!, longitude: Double($0.longitude)!)
-      annotation.title = $0.name
-      mapView.addAnnotation(annotation)
+  private func allKickBoardMarker() {
+    for marker in kickboardMarkers {
+      marker.mapView = nil
+    }
+    kickboardMarkers.removeAll()
+    let kickBoardRepository = KickboardRepository()
+    let kickboards = kickBoardRepository.readAllKickboards()
+    if kickboards.isEmpty {
+      // TODO: - 팝업창으로 띄우기
+      print("🔵 CoreData: 저장된 킥보드 데이터가 없습니다.")
+    } else {
+      for kickboard in kickboards {
+        addKickboardMarkers(kickboard: kickboard)
+      }
+      print("킥보드 마커 등록 완료")
     }
   }
+
+  // 킥보드 마커 추가
+  func addKickboardMarkers(kickboard: Kickboard) {
+    let marker = NMFMarker()
+    guard let latLng = kickboard.location?.split(separator: "/") else { return }
+    marker.position = NMGLatLng(lat: Double(latLng[0]) ?? 0.0, lng: Double(latLng[1]) ?? 0.0)
+    if kickboard.type == 1 {
+      if kickboard.battery >= 70 {
+        let image = UIImage(resource: .kickboardFull)
+        marker.iconImage = NMFOverlayImage(image: image)
+      } else if kickboard.battery >= 31 {
+        let image = UIImage(resource: .kickBoardMiddle)
+        marker.iconImage = NMFOverlayImage(image: image)
+      } else {
+        let image = UIImage(resource: .kickboardLow)
+        marker.iconImage = NMFOverlayImage(image: image)
+      }
+    } else {
+      let image = UIImage(resource: .bike)
+      marker.iconImage = NMFOverlayImage(image: image)
+      if kickboard.battery >= 70 {
+        let image = UIImage(resource: .bikeFull)
+        marker.iconImage = NMFOverlayImage(image: image)
+      } else if kickboard.battery >= 31 {
+        let image = UIImage(resource: .bikeMidlde)
+        marker.iconImage = NMFOverlayImage(image: image)
+      } else {
+        let image = UIImage(resource: .bikeLow)
+        marker.iconImage = NMFOverlayImage(image: image)
+      }
+    }
+    marker.iconTintColor = .black
+    marker.isForceShowIcon = true
+    marker.width = 42.5
+    marker.height = 42.5
+    marker.captionOffset = 8
+    marker.mapView = mapView
+    marker.touchHandler = { [weak self] _ in
+      self?.showKickBoardView()
+      return true
+    }
+    kickboardMarkers.append(marker)
+  }
+
   // MARK: - Action
 
   private func setupButtonActions() {
@@ -213,10 +265,14 @@ class MapViewController: UIViewController {
   }
 
   // 새로고침 버튼 액션
-  @objc private func didTabReloadButton() {}
+  @objc private func didTabReloadButton() {
+    print("Reload Tapped")
+    allKickBoardMarker()
+  }
 
   // 위치 추적 버튼 액션
   @objc private func didTapLocationButton() {
+    print("Location Tapped")
     locationManager.startUpdatingLocation()
   }
 }
@@ -233,7 +289,7 @@ extension MapViewController: CLLocationManagerDelegate {
     let cameraUpdate = NMFCameraUpdate(position: cameraPosition)
 
     mapView.moveCamera(cameraUpdate)
-    mapView.positionMode = .direction
+    mapView.positionMode = .compass
 
     print("카메라 업데이트: \(cameraUpdate)")
   }
@@ -272,15 +328,8 @@ extension MapViewController: NMFMapViewTouchDelegate {
 
 extension MapViewController: KickBoardViewControllerDelegate {
   // 킥보드 등록 완료 됐는지 추적하여 완료 됐을경우 킥보드 마커 등록
-  func didRegisterKickBoard(at latitude: Double, longitude: Double) {
-    let marker = NMFMarker()
-    marker.position = NMGLatLng(lat: latitude, lng: longitude)
-    marker.mapView = mapView
-    print("킥보드 등록완료!")
-    marker.touchHandler = { [weak self] _ in
-      self?.showKickBoardView()
-      return true
-    }
+  func didRegisterKickBoard(at _: Double, longitude _: Double) {
+    allKickBoardMarker()
   }
 }
 
