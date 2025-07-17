@@ -69,6 +69,7 @@ class MapViewController: UIViewController {
     $0.clipsToBounds = true
   }
 
+  // 킥보드 정보 뷰
   private let rideKickBoardView = UIView().then {
     $0.backgroundColor = .white
     $0.layer.cornerRadius = 16
@@ -109,11 +110,13 @@ class MapViewController: UIViewController {
     navigationController?.setNavigationBarHidden(false, animated: false)
   }
 
+  // 뷰 추가
   private func setupUI() {
     [mapView, controlStackView, myPageButton, rideKickBoardView].forEach { view.addSubview($0) }
     [reloadButton, dividerView, locationButton].forEach { controlStackView.addArrangedSubview($0) }
   }
 
+  // 제약조건
   private func setupConstraints() {
     mapView.snp.makeConstraints {
       $0.directionalEdges.equalToSuperview()
@@ -154,6 +157,7 @@ class MapViewController: UIViewController {
     }
   }
 
+  // 킥보드 정보창 띄우기
   private func showKickBoardView() {
     for constraint in rideKickBoardViewHiddenConstraint {
       constraint.isActive = false
@@ -167,6 +171,7 @@ class MapViewController: UIViewController {
     print("마커 클릭됨!")
   }
 
+  // 킥보드정보 창 가리기
   private func hiddenKickBoardView() {
     for constraint in rideKickBoardViewShowConstraint {
       constraint.isActive = false
@@ -203,7 +208,10 @@ class MapViewController: UIViewController {
   }
 }
 
+// MARK: - Location Delegate
+
 extension MapViewController: CLLocationManagerDelegate {
+  // 현재 위치 움직임 감지
   func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     guard let location = locations.last else { return }
     let latLng = NMGLatLng(lat: location.coordinate.latitude, lng: location.coordinate.longitude)
@@ -218,7 +226,10 @@ extension MapViewController: CLLocationManagerDelegate {
   }
 }
 
+// MARK: - Camera Delegate
+
 extension MapViewController: NMFMapViewCameraDelegate {
+  // 카메라 이동 됐을때
   func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
     print("카메라 이동: \(reason)")
     hiddenKickBoardView()
@@ -226,7 +237,10 @@ extension MapViewController: NMFMapViewCameraDelegate {
   }
 }
 
+// MARK: - Touch Delegate
+
 extension MapViewController: NMFMapViewTouchDelegate {
+  // 지도를 길게 눌렀을때
   func mapView(_: NMFMapView, didLongTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("롱 탭: \(latlng.lat), \(latlng.lng)")
     let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
@@ -234,14 +248,17 @@ extension MapViewController: NMFMapViewTouchDelegate {
     navigationController?.pushViewController(addKickBoardVC, animated: true)
   }
 
+  // 지도를 짧게 눌렀을때
   func mapView(_: NMFMapView, didTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("숏 탭: \(latlng.lat), \(latlng.lng)")
     hiddenKickBoardView()
   }
 }
 
-// 킥보드 등록 완료 됐는지 추적
+// MARK: - KickBoardView Delegate
+
 extension MapViewController: KickBoardViewControllerDelegate {
+  // 킥보드 등록 완료 됐는지 추적하여 완료 됐을경우 킥보드 마커 등록
   func didRegisterKickBoard(at latitude: Double, longitude: Double) {
     let marker = NMFMarker()
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
