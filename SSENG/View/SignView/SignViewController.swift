@@ -11,6 +11,7 @@ import UIKit
 class SignViewController: UIViewController {
   // 동의 여부
   private var isAgreed = false
+  private let repository = UserRepository()
 
 
   // |=============|
@@ -246,6 +247,9 @@ class SignViewController: UIViewController {
     // TODO: 1. coredata에 정보 넣기(이미 있는 아이디인지 확인도 하고 이미 있으면 변경 요청)
     // TODO: 2. 빈 칸(변경 필요한 칸) 파악되면 하이라이팅
     // TODO: 3. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
+    if repository.readUser(by: idTextField.text ?? "ID Data Error") != nil {
+      
+    }
     navigationController?.popViewController(animated: true)
   }
   
