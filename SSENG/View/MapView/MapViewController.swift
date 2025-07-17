@@ -169,9 +169,22 @@ extension MapViewController: NMFMapViewCameraDelegate {
 extension MapViewController: NMFMapViewTouchDelegate {
   func mapView(_: NMFMapView, didLongTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("롱 탭: \(latlng.lat), \(latlng.lng)")
+    var ride: Bool? = nil
+    ride = true
+    if let riding = ride {
+      if riding {
+        let marker = NMFMarker()
+        marker.position = NMGLatLng(lat: latlng.lat, lng: latlng.lng)
+        marker.mapView = mapView
+        print("킥보드 등록완료!")
+        ride = nil
+      } else {
+        print("킥보드 등록 취소!")
+      }
 
-    let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
-    navigationController?.pushViewController(addKickBoardVC, animated: true)
+    } else { return }
+//    let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
+//    navigationController?.pushViewController(addKickBoardVC, animated: true)
   }
 }
 
