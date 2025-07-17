@@ -118,8 +118,8 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
     marker.mapView = mapView.mapView
 
-    let cameraTarget = NMGLatLng(lat: latitude - 0.0005, lng: longitude) // 위로 약간 보정
-    let cameraUpdate = NMFCameraUpdate(scrollTo: cameraTarget, zoomTo: 16)
+    let cameraTarget = NMGLatLng(lat: latitude - 0.0004, lng: longitude) // 위로 약간 보정
+    let cameraUpdate = NMFCameraUpdate(scrollTo: cameraTarget, zoomTo: 18)
     mapView.mapView.moveCamera(cameraUpdate)
   }
 
@@ -211,7 +211,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
     print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 상세위치=\(detailLocation), 타입=\(selectedType)")
 
-    showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
+    showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습니다.") { [weak self] in
       guard let self else { return }
       delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
       self.navigationController?.popViewController(animated: true)
