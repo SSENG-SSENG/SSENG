@@ -40,6 +40,7 @@ class UserInfoCell: UITableViewCell {
 
   override func layoutSubviews() {
     super.layoutSubviews()
+    applyDefaultCardStyle() // 기본 스타일(간격 및 테두리)
     userImageView.layer.cornerRadius = userImageView.frame.width / 2
     userImageView.clipsToBounds = true
   }

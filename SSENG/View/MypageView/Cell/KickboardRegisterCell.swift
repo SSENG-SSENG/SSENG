@@ -17,6 +17,11 @@ class KickboardRegisterCell: UITableViewCell {
     configureUI()
   }
 
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    applyDefaultCardStyle() // 기본 스타일(간격 및 테두리)
+  }
+
   @available(*, unavailable)
   required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
