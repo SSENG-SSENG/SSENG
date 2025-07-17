@@ -5,7 +5,7 @@
 //  Created by 이태윤 on 7/18/25.
 //
 
-enum SelectedMarkerModel {
+enum SelectedMarkerModel: String {
   case all
   case kickBoard
   case bike

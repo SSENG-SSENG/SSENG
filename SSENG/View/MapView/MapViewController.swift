@@ -15,6 +15,9 @@ class MapViewController: UIViewController {
   // 선택된 마커
   var selected: SelectedMarkerModel = .all
 
+  // UserDefaults 값
+  private let selectedMarkerKey = "SelectedMarkerType"
+
   // 마커 저장 배열
   private var allMarkers: [NMFMarker] = []
   private var kickBoardMarkers: [NMFMarker] = []
@@ -229,8 +232,7 @@ class MapViewController: UIViewController {
     setupConstraints()
     setupButtonActions()
     allKickBoardMarker()
-
-    handleMarkerFilterButton(allMarkerButton)
+    loadSelectedMarkerKey()
     locationManager.requestWhenInUseAuthorization()
   }
 
@@ -356,6 +358,26 @@ class MapViewController: UIViewController {
 // MARK: - Method
 
 extension MapViewController {
+  // 유저 디폴트 값 불러오기
+  private func loadSelectedMarkerKey() {
+    if let saved = UserDefaults.standard.string(forKey: selectedMarkerKey),
+       let savedModel = SelectedMarkerModel(rawValue: saved)
+    {
+      selected = savedModel
+
+      // 버튼 UI도 반영해줘야 하니까 switch로 처리
+      switch savedModel {
+      case .all: handleMarkerFilterButton(allMarkerButton)
+      case .kickBoard: handleMarkerFilterButton(kickBoardMarkerButton)
+      case .bike: handleMarkerFilterButton(bikeMarkerButton)
+      case .none: handleMarkerFilterButton(noneMarkerButton)
+      }
+    } else {
+      // 기본값은 all
+      handleMarkerFilterButton(allMarkerButton)
+    }
+  }
+
   // 킥보드 정보창 띄우기
   private func showKickBoardView(kickBoard: Kickboard) {
     for constraint in rideKickBoardViewHiddenConstraint {
@@ -561,6 +583,9 @@ extension MapViewController {
     default: break
     }
 
+    // UesrDefaults에 필터링 상태 저장
+    UserDefaults.standard.set(selected.rawValue, forKey: selectedMarkerKey)
+    // 마커 업데이트
     updateVisibleMarkers()
   }
 
