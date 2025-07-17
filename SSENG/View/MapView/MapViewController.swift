@@ -11,6 +11,9 @@ import Then
 import UIKit
 
 class MapViewController: UIViewController {
+  // 등록 여부
+  var ride: Bool?
+
   // 맵 뷰
   let mapView = NMFMapView().then {
     $0.positionMode = .normal
@@ -69,6 +72,20 @@ class MapViewController: UIViewController {
     $0.clipsToBounds = true
   }
 
+  private let rideKickBoardView = UIView().then {
+    $0.backgroundColor = .white
+    $0.layer.cornerRadius = 16
+    $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+    $0.layer.shadowColor = UIColor.black.cgColor
+    $0.layer.shadowOpacity = 0.3
+    $0.layer.shadowOffset = CGSize(width: 0, height: -2)
+    $0.layer.shadowRadius = 6
+  }
+
+  var rideKickBoardViewShowConstraint: [Constraint] = []
+  var rideKickBoardViewHiddenConstraint: [Constraint] = []
+  var controlStackViewConstraint: [Constraint] = []
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -96,14 +113,8 @@ class MapViewController: UIViewController {
   }
 
   private func setupUI() {
-    [mapView, controlStackView, myPageButton].forEach { view.addSubview($0) }
+    [mapView, controlStackView, myPageButton, rideKickBoardView].forEach { view.addSubview($0) }
     [reloadButton, dividerView, locationButton].forEach { controlStackView.addArrangedSubview($0) }
-  }
-
-  private func setupButtonActions() {
-    myPageButton.addTarget(self, action: #selector(didTabMyPageButton), for: .touchUpInside)
-    reloadButton.addTarget(self, action: #selector(didTabReloadButton), for: .touchUpInside)
-    locationButton.addTarget(self, action: #selector(didTapLocationButton), for: .touchUpInside)
   }
 
   private func setupConstraints() {
@@ -113,7 +124,8 @@ class MapViewController: UIViewController {
 
     controlStackView.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(20)
-      $0.bottom.equalToSuperview().inset(80)
+      $0.bottom.equalToSuperview().inset(80).priority(.low)
+      $0.bottom.lessThanOrEqualTo(rideKickBoardView.snp.top).offset(-20)
       $0.width.equalTo(50)
       $0.height.equalTo(100)
     }
@@ -127,6 +139,56 @@ class MapViewController: UIViewController {
       $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
       $0.size.equalTo(50)
     }
+
+    rideKickBoardView.snp.makeConstraints {
+      $0.leading.trailing.equalToSuperview()
+      $0.height.equalTo(200)
+    }
+
+    rideKickBoardViewShowConstraint = rideKickBoardView.snp.prepareConstraints {
+      $0.bottom.equalToSuperview()
+    }
+
+    rideKickBoardViewHiddenConstraint = rideKickBoardView.snp.prepareConstraints {
+      $0.top.equalTo(view.snp.bottom)
+    }
+    for constraint in rideKickBoardViewHiddenConstraint {
+      constraint.isActive = true
+    }
+  }
+
+  private func showKickBoardView() {
+    for constraint in rideKickBoardViewHiddenConstraint {
+      constraint.isActive = false
+    }
+    for constraint in rideKickBoardViewShowConstraint {
+      constraint.isActive = true
+    }
+    UIView.animate(withDuration: 0.3) {
+      self.view.layoutIfNeeded()
+    }
+    print("마커 클릭됨!")
+  }
+
+  private func hiddenKickBoardView() {
+    for constraint in rideKickBoardViewShowConstraint {
+      constraint.isActive = false
+    }
+    for constraint in rideKickBoardViewHiddenConstraint {
+      constraint.isActive = true
+    }
+    UIView.animate(withDuration: 0.3) {
+      self.view.layoutIfNeeded()
+    }
+    print("사용자 이벤트 발생 탭 또는 스크롤됨! ")
+  }
+
+  // MARK: - Action
+
+  private func setupButtonActions() {
+    myPageButton.addTarget(self, action: #selector(didTabMyPageButton), for: .touchUpInside)
+    reloadButton.addTarget(self, action: #selector(didTabReloadButton), for: .touchUpInside)
+    locationButton.addTarget(self, action: #selector(didTapLocationButton), for: .touchUpInside)
   }
 
   // 마이페이지 버튼 액션
@@ -162,6 +224,7 @@ extension MapViewController: CLLocationManagerDelegate {
 extension MapViewController: NMFMapViewCameraDelegate {
   func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
     print("카메라 이동: \(reason)")
+    hiddenKickBoardView()
     locationManager.stopUpdatingLocation()
   }
 }
@@ -169,7 +232,6 @@ extension MapViewController: NMFMapViewCameraDelegate {
 extension MapViewController: NMFMapViewTouchDelegate {
   func mapView(_: NMFMapView, didLongTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("롱 탭: \(latlng.lat), \(latlng.lng)")
-    var ride: Bool? = nil
     ride = true
     if let riding = ride {
       if riding {
@@ -177,14 +239,22 @@ extension MapViewController: NMFMapViewTouchDelegate {
         marker.position = NMGLatLng(lat: latlng.lat, lng: latlng.lng)
         marker.mapView = mapView
         print("킥보드 등록완료!")
+        marker.touchHandler = { [weak self] _ in
+          self?.showKickBoardView()
+          return true
+        }
         ride = nil
       } else {
         print("킥보드 등록 취소!")
       }
-
     } else { return }
-//    let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
-//    navigationController?.pushViewController(addKickBoardVC, animated: true)
+    //    let addKickBoardVC = KickBoardViewController(latitude: latlng.lat, longitude: latlng.lng)
+    //    navigationController?.pushViewController(addKickBoardVC, animated: true)
+  }
+
+  func mapView(_: NMFMapView, didTapMap latlng: NMGLatLng, point _: CGPoint) {
+    print("숏 탭: \(latlng.lat), \(latlng.lng)")
+    hiddenKickBoardView()
   }
 }
 
