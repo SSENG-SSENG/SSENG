@@ -22,10 +22,13 @@ final class KickboardRepository {
     kb.battery = Int16(Int.random(in: 80 ... 100)) // 배터리 잔량 50~100 사이의 랜덤 값
     kb.batteryTime = "약 \(round(Double(kb.battery)) * 1.2) 분"
     kb.isRented = false // 초기 상태는 대여 가능
+    // 등록한 유저 아이디
 
     CoreDataStack.shared.saveContext()
     return newID
   }
+
+  // 등록한 킥보드 조회
 
   // 킥보드 조회(위치 기반)
   func readKickboard(by id: String) -> Kickboard? {
