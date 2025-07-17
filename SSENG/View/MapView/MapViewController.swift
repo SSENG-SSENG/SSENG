@@ -132,8 +132,6 @@ class MapViewController: UIViewController {
     $0.setTitle("대여하기", for: .normal)
     $0.layer.cornerRadius = 8
     $0.backgroundColor = .main
-    $0.layer.borderWidth = 1
-    $0.layer.borderColor = UIColor.black.cgColor
   }
 
   var rideKickBoardViewShowConstraint: [Constraint] = []
