@@ -10,6 +10,8 @@ import Then
 import UIKit
 
 class UserInfoCell: UITableViewCell {
+  static let identifier = "UserInfoCell"
+
   private let userImageView = UIImageView().then {
     $0.image = UIImage(named: "UserDefaultImage")
     $0.contentMode = .scaleAspectFit
@@ -44,8 +46,6 @@ class UserInfoCell: UITableViewCell {
     $0.setTitleColor(.systemRed, for: .normal)
   }
 
-  static let identifier = "UserInfoCell"
-
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     configureUI()
@@ -73,7 +73,7 @@ class UserInfoCell: UITableViewCell {
   private func configureLayout() {
     userImageView.snp.makeConstraints {
       $0.top.leading.equalToSuperview().offset(16)
-      $0.width.height.equalTo(UIScreen.main.bounds.width * 0.18) // 기기 화면 너비의 18%로 자동 조정
+      $0.width.height.equalTo(min(UIScreen.main.bounds.width * 0.18, 64)) // 기기 화면 너비의 18%로 자동 조정(최대 64)
     }
 
     userNameLabel.snp.makeConstraints {

@@ -12,6 +12,28 @@ import UIKit
 class KickboardHistoryCell: UITableViewCell {
   static let identifier = "KickboardHistoryCell"
 
+  private let kickboardImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+    $0.image = UIImage(named: "UserDefaultImage") // 예시 이미지
+  }
+
+  private let uuidLabel = UILabel().then {
+    $0.text = "uuid 값"
+    $0.font = .systemFont(ofSize: 14, weight: .medium)
+    $0.textColor = .label
+  }
+
+  private let dateLabel = UILabel().then { // 킥보드 이용 날짜 및 시간
+    $0.text = "2025년 09월 02일. 14시34분 ~ 15시 50분 (1시간16분)"
+    $0.font = .systemFont(ofSize: 13)
+    $0.textColor = .secondaryLabel
+  }
+
+  private lazy var stackView = UIStackView(arrangedSubviews: [uuidLabel, dateLabel]).then {
+    $0.axis = .vertical
+    $0.spacing = 4
+  }
+
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     configureUI()
@@ -20,6 +42,8 @@ class KickboardHistoryCell: UITableViewCell {
   override func layoutSubviews() {
     super.layoutSubviews()
     applyDefaultCardStyle() // 기본 스타일(간격 및 테두리)
+    kickboardImageView.layer.cornerRadius = kickboardImageView.frame.width / 2
+    kickboardImageView.clipsToBounds = true
   }
 
   @available(*, unavailable)
@@ -29,5 +53,19 @@ class KickboardHistoryCell: UITableViewCell {
 
   private func configureUI() {
     selectionStyle = .none
+
+    [kickboardImageView, stackView].forEach { contentView.addSubview($0) }
+
+    kickboardImageView.snp.makeConstraints {
+      $0.top.leading.equalToSuperview().offset(16)
+      $0.width.height.equalTo(min(UIScreen.main.bounds.width * 0.14, 48)) // 기기 화면 너비의 14%로 자동 조정(최대 48)
+      $0.bottom.lessThanOrEqualToSuperview().offset(-16) // 최소 16 떨어져야함
+    }
+
+    stackView.snp.makeConstraints {
+      $0.top.bottom.lessThanOrEqualToSuperview().inset(16)
+      $0.leading.equalTo(kickboardImageView.snp.trailing).offset(12)
+      $0.trailing.equalToSuperview().offset(-16)
+    }
   }
 }
