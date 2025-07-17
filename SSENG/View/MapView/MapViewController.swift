@@ -18,7 +18,7 @@ class MapViewController: UIViewController {
   private var allMarkers: [NMFMarker] = []
   private var kickBoardMarkers: [NMFMarker] = []
   private var bikeMarkers: [NMFMarker] = []
-  
+
   // 맵 뷰
   let mapView = NMFMapView().then {
     $0.positionMode = .normal
@@ -143,10 +143,11 @@ class MapViewController: UIViewController {
   var rideKickBoardViewHiddenConstraint: [Constraint] = []
   var controlStackViewConstraint: [Constraint] = []
 
-  required init?(coder: NSCoder) {
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
