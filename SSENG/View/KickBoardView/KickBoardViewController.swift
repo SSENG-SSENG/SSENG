@@ -7,6 +7,7 @@ class KickBoardViewController: UIViewController {
   private let latitude: Double
   private let longitude: Double
   private var selectedType: Int = 1
+  private var didRegister: Bool = false // 등록 여부 상태 변수
 
   // MARK: - UI Components
 
@@ -18,6 +19,11 @@ class KickBoardViewController: UIViewController {
     $0.layer.shadowOpacity = 0.2
     $0.layer.shadowOffset = CGSize(width: 0, height: -2)
     $0.layer.shadowRadius = 8
+  }
+
+  private let closeButton = UIButton(type: .system).then {
+    $0.setImage(UIImage(systemName: "xmark"), for: .normal)
+    $0.tintColor = .darkGray
   }
 
   private lazy var modalLabel = UILabel().then {
@@ -79,7 +85,18 @@ class KickBoardViewController: UIViewController {
 
     setupMapView()
     setupModalUI()
+    setupActions()
     updateButtonSelection()
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    // 뷰가 사라질 때 등록 여부를 확인하는 if문
+    if didRegister {
+      print("✅ 등록 완료 후 화면이 닫힙니다.")
+    } else {
+      print("❌ 등록이 취소되었거나, 사용자가 화면을 닫았습니다.")
+    }
   }
 
   // MARK: - UI Setup
@@ -103,13 +120,17 @@ class KickBoardViewController: UIViewController {
       $0.bottom.equalToSuperview()
     }
 
-    bottomModalView.addSubview(modalLabel)
-    bottomModalView.addSubview(typeSelectionLabel)
-    bottomModalView.addSubview(typeSelectionStackView)
-    bottomModalView.addSubview(registerButton)
+    for item in [closeButton, modalLabel, typeSelectionLabel, typeSelectionStackView, registerButton] {
+      bottomModalView.addSubview(item)
+    }
+
+    closeButton.snp.makeConstraints {
+      $0.top.equalToSuperview().offset(16)
+      $0.trailing.equalToSuperview().inset(16)
+    }
 
     modalLabel.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(20)
+      $0.top.equalTo(closeButton.snp.bottom).offset(4)
       $0.leading.trailing.equalToSuperview().inset(20)
     }
 
@@ -131,13 +152,18 @@ class KickBoardViewController: UIViewController {
       $0.height.equalTo(44)
       $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
     }
+  }
 
+  private func setupActions() {
     registerButton.addTarget(self, action: #selector(didTapRegister), for: .touchUpInside)
+    closeButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
   }
 
   // MARK: - Actions
 
   @objc private func didTapRegister() {
+    didRegister = true // 등록 버튼 클릭 시 상태를 true로 변경
+
     let locationString = "\(latitude)/\(longitude)"
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
@@ -155,6 +181,10 @@ class KickBoardViewController: UIViewController {
     showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
       self?.dismiss(animated: true, completion: nil)
     }
+  }
+
+  @objc private func didTapClose() {
+    dismiss(animated: true, completion: nil)
   }
 
   @objc private func didTapTypeButton(_ sender: UIButton) {
