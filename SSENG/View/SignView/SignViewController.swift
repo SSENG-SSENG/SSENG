@@ -9,6 +9,8 @@ import Then
 import UIKit
 
 class SignViewController: UIViewController {
+  private var isAgreed = false
+
   // MARK: 컴포넌트 초기화
 
   // |=============|
@@ -74,7 +76,7 @@ class SignViewController: UIViewController {
   }
 
   private let nickNameTextField = UITextField().then {
-    $0.placeholder = "닉네임 최대"
+    $0.placeholder = "최대 8자"
   }
 
   private let nickNameViewStack = UIStackView().then {
@@ -82,16 +84,20 @@ class SignViewController: UIViewController {
   }
 
   private let termsAgreeCheckBox = UIButton(type: .custom).then {
-    $0.setImage(UIImage(named: "uncheck"), for: .normal)
-    $0.setImage(UIImage(named: "check"), for: .selected)
+    $0.setImage(UIImage(systemName: "square"), for: .normal)
+    $0.setImage(UIImage(systemName: "checkmark.square"), for: .selected)
+    $0.tintColor = .main
   }
 
   private let termsViewButton = UIButton(type: .system).then {
-    $0.setTitle("이용약관", for: .normal)
+    $0.setTitle("이용 약관", for: .normal)
+    $0.setTitleColor(.main, for: .normal)
+    $0.titleLabel?.font = .systemFont(ofSize: 18, weight: .regular)
   }
 
   private let termsTextLabel = UILabel().then {
     $0.text = "에 동의합니다."
+    $0.font = .systemFont(ofSize: 18, weight: .regular)
   }
 
   private let termsStackView = UIStackView().then {
@@ -100,15 +106,21 @@ class SignViewController: UIViewController {
 
   private let submitButton = UIButton(type: .system).then {
     $0.setTitle("가입하기", for: .normal)
+    $0.setTitleColor(.white, for: .normal)
+    $0.backgroundColor = .main
+    $0.layer.cornerRadius = 8
+
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .black
+    view.backgroundColor = .systemBackground
 
     setupUI()
     setupConstraints()
     setupButtonActions()
+    addTextFieldObservers()
+    updateSubmitButtonState()
   }
 
   // 뷰, 스택
@@ -120,34 +132,35 @@ class SignViewController: UIViewController {
       rePwStackView,
       nickNameViewStack,
       termsStackView,
-      submitButton
+      submitButton,
     ].forEach {
       view.addSubview($0)
     }
 
-    for item in [idLabel, idTextField] {
-      idStackView.addArrangedSubview(item)
+    [idLabel, idTextField].forEach {
+      idStackView.addArrangedSubview($0)
     }
 
-    for item in [pwLabel, pwTextField] {
-      pwStackView.addArrangedSubview(item)
+    [pwLabel, pwTextField].forEach {
+      pwStackView.addArrangedSubview($0)
     }
 
-    for item in [rePwLabel, rePwTextField] {
-      rePwStackView.addArrangedSubview(item)
+    [rePwLabel, rePwTextField].forEach {
+      rePwStackView.addArrangedSubview($0)
     }
 
-    for item in [nickNameLabel, nickNameTextField] {
-      nickNameViewStack.addArrangedSubview(item)
+    [nickNameLabel, nickNameTextField].forEach {
+      nickNameViewStack.addArrangedSubview($0)
     }
 
-    for item in [termsAgreeCheckBox, termsViewButton, termsTextLabel] {
-      termsStackView.addArrangedSubview(item)
+    [termsAgreeCheckBox, termsViewButton, termsTextLabel].forEach {
+      termsStackView.addArrangedSubview($0)
     }
   }
 
   // 컴포넌트 레이아웃
   private func setupConstraints() {
+    let insetSize = 40
     // appLogoImageView.snp.makeConstraints {
     //   $0.top.equalTo(view.safeAreaLayoutGuide)
     //   $0.trailing.leading.equalToSuperview()
@@ -156,39 +169,92 @@ class SignViewController: UIViewController {
     idStackView.snp.makeConstraints {
       // $0.top.equalTo(appLogoImageView.snp.bottom)
       $0.top.equalTo(view.safeAreaLayoutGuide)
-      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.leading.trailing.equalToSuperview().inset(insetSize)
     }
 
     pwStackView.snp.makeConstraints {
-      $0.top.equalTo(idStackView.snp.bottom)
-      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.top.equalTo(idStackView.snp.bottom).offset(8)
+      $0.leading.trailing.equalToSuperview().inset(insetSize)
     }
 
     rePwStackView.snp.makeConstraints {
-      $0.top.equalTo(pwStackView.snp.bottom)
-      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.top.equalTo(pwStackView.snp.bottom).offset(8)
+      $0.leading.trailing.equalToSuperview().inset(insetSize)
     }
 
     nickNameViewStack.snp.makeConstraints {
-      $0.top.equalTo(rePwStackView.snp.bottom)
-      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.top.equalTo(rePwStackView.snp.bottom).offset(8)
+      $0.leading.trailing.equalToSuperview().inset(insetSize)
     }
 
+    termsStackView.setCustomSpacing(4, after: termsAgreeCheckBox)
     termsStackView.snp.makeConstraints {
-      $0.top.equalTo(nickNameLabel.snp.bottom)
-      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.top.equalTo(nickNameViewStack.snp.bottom).offset(8)
+      $0.centerX.equalToSuperview()
     }
 
     submitButton.snp.makeConstraints {
-      $0.top.equalTo(termsStackView.snp.bottom)
-      $0.leading.trailing.equalToSuperview()
+      $0.top.equalTo(termsStackView.snp.bottom).offset(8)
+      $0.height.equalTo(40)
+      $0.leading.trailing.equalToSuperview().inset(insetSize)
+      $0.centerX.equalToSuperview()
     }
   }
 
-  // 버튼 기능 초기화
+  // MARK: 버튼 addTarget
   private func setupButtonActions() {
-    // TODO:
+    termsAgreeCheckBox.addTarget(self, action: #selector(didTapCheckbox(_:)), for: .touchUpInside)
+    termsViewButton.addTarget(self, action: #selector(didTapTersmView(_:)), for: .touchUpInside)
+    submitButton.addTarget(self, action: #selector(didTapSubmitButton(_:)), for: .touchUpInside)
+  }
+  
+  private func addTextFieldObservers() {
+    [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach {
+      $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    }
+  }
+
+  private func updateSubmitButtonState() {
+    let allFieldsFilled =
+      !(idTextField.text ?? "").isEmpty && !(pwTextField.text ?? "").isEmpty && !(rePwTextField.text ?? "").isEmpty
+      && !(nickNameTextField.text ?? "").isEmpty
+    let canSubmit = allFieldsFilled && isAgreed
+    
+    submitButton.isEnabled = canSubmit
+    submitButton.alpha = canSubmit ? 1.0 : 0.5
   }
 
   // MARK: 버튼 팡숀
+  @objc func didTapCheckbox(_ sender: UIButton) {
+    sender.isSelected.toggle()
+    isAgreed = sender.isSelected
+    updateSubmitButtonState()
+    print(sender.isSelected)
+  }
+  
+  @objc func didTapTersmView(_ sender: UIButton) {
+    let vc = TermsViewController()
+    vc.delegate = self
+    let nav = UINavigationController(rootViewController: vc)
+    nav.modalPresentationStyle = .formSheet
+    present(nav, animated: true)
+  }
+
+  @objc func didTapSubmitButton(_ sender: UIButton) {
+    // TODO: 1. coredata에 정보 넣기
+    // TODO: 2. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
+    navigationController?.popViewController(animated: true)
+  }
+  
+  @objc private func textFieldDidChange(_ sender: UITextField) {
+      updateSubmitButtonState()
+  } 
+}
+
+extension SignViewController: TermsViewControllerDelegate {
+  func termsViewControllerDidAgree(_ controller: TermsViewController) {
+    termsAgreeCheckBox.isSelected = true
+    isAgreed = true
+    updateSubmitButtonState()
+  }
 }
