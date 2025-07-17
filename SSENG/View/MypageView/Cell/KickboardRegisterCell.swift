@@ -12,9 +12,11 @@ import UIKit
 class KickboardRegisterCell: UITableViewCell {
   static let identifier = "KickboardRegisterCell"
 
+  private let containerView = UIView()
+
   private let kickboardImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
-    $0.image = UIImage(named: "UserDefaultImage") // 예시 이미지
+    $0.image = UIImage(named: "Logo") // 예시 이미지
   }
 
   private let uuidLabel = UILabel().then {
@@ -37,13 +39,17 @@ class KickboardRegisterCell: UITableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     configureUI()
+    configureLayout()
   }
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    applyDefaultCardStyle() // 기본 스타일(간격 및 테두리)
-    kickboardImageView.layer.cornerRadius = kickboardImageView.frame.width / 2
-    kickboardImageView.clipsToBounds = true
+    DispatchQueue.main.async {
+      self.kickboardImageView.layer.cornerRadius = self.kickboardImageView.frame.width / 2
+      self.kickboardImageView.layer.borderWidth = 0.5
+      self.kickboardImageView.layer.borderColor = UIColor.lightGray.cgColor
+      self.kickboardImageView.clipsToBounds = true
+    }
   }
 
   @available(*, unavailable)
@@ -54,7 +60,19 @@ class KickboardRegisterCell: UITableViewCell {
   private func configureUI() {
     selectionStyle = .none
 
-    [kickboardImageView, stackView].forEach { contentView.addSubview($0) }
+    contentView.addSubview(containerView)
+    [kickboardImageView, stackView].forEach { containerView.addSubview($0) }
+  }
+
+  private func configureLayout() {
+    containerView.snp.makeConstraints {
+      $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0))
+    }
+
+    containerView.layer.cornerRadius = 12
+    containerView.layer.borderWidth = 1
+    containerView.layer.borderColor = UIColor.lightGray.cgColor
+    containerView.backgroundColor = .white
 
     kickboardImageView.snp.makeConstraints {
       $0.top.leading.equalToSuperview().offset(16)
@@ -63,7 +81,7 @@ class KickboardRegisterCell: UITableViewCell {
     }
 
     stackView.snp.makeConstraints {
-      $0.top.bottom.lessThanOrEqualToSuperview().inset(16)
+      $0.centerY.equalToSuperview()
       $0.leading.equalTo(kickboardImageView.snp.trailing).offset(12)
       $0.trailing.equalToSuperview().offset(-16)
     }

@@ -12,8 +12,10 @@ import UIKit
 class UserInfoCell: UITableViewCell {
   static let identifier = "UserInfoCell"
 
+  private let containerView = UIView()
+
   private let userImageView = UIImageView().then {
-    $0.image = UIImage(named: "UserDefaultImage")
+    $0.image = UIImage(named: "Logo")
     $0.contentMode = .scaleAspectFit
   }
 
@@ -54,9 +56,12 @@ class UserInfoCell: UITableViewCell {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    applyDefaultCardStyle() // 기본 스타일(간격 및 테두리)
-    userImageView.layer.cornerRadius = userImageView.frame.width / 2
-    userImageView.clipsToBounds = true
+    DispatchQueue.main.async {
+      self.userImageView.layer.cornerRadius = self.userImageView.frame.width / 2
+      self.userImageView.layer.borderWidth = 0.5
+      self.userImageView.layer.borderColor = UIColor.lightGray.cgColor
+      self.userImageView.clipsToBounds = true
+    }
   }
 
   @available(*, unavailable)
@@ -67,10 +72,20 @@ class UserInfoCell: UITableViewCell {
   private func configureUI() {
     selectionStyle = .none
 
-    [userImageView, userNameLabel, ridingStatusStackView, logoutButton].forEach { contentView.addSubview($0) }
+    contentView.addSubview(containerView)
+    [userImageView, userNameLabel, ridingStatusStackView, logoutButton].forEach { containerView.addSubview($0) }
   }
 
   private func configureLayout() {
+    containerView.snp.makeConstraints {
+      $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0))
+    }
+
+    containerView.layer.cornerRadius = 12
+    containerView.layer.borderWidth = 1
+    containerView.layer.borderColor = UIColor.lightGray.cgColor
+    containerView.backgroundColor = .white
+
     userImageView.snp.makeConstraints {
       $0.top.leading.equalToSuperview().offset(16)
       $0.width.height.equalTo(min(UIScreen.main.bounds.width * 0.18, 64)) // 기기 화면 너비의 18%로 자동 조정(최대 64)
