@@ -9,6 +9,7 @@ import UIKit
 
 protocol TermsViewControllerDelegate: AnyObject {
   func termsViewControllerDidAgree(_ controller: TermsViewController)
+  func termsViewControllerDidReject(_ controller: TermsViewController)
 }
 
 class TermsViewController: UIViewController {
@@ -112,6 +113,7 @@ class TermsViewController: UIViewController {
   
   // 모달 Reject 버튼(거부) 눌렀을 때 기능
   @objc private func didTapNo() {
+    delegate?.termsViewControllerDidReject(self)
     dismiss(animated: true, completion: nil)
   }
 }

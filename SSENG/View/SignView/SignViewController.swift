@@ -239,12 +239,13 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let pw = pwTextField.text ?? ""
     let rePw = rePwTextField.text ?? ""
     let nickname = nickNameTextField.text ?? ""
-    let allValid = isValidID(id)
-        && isValidPW(pw)
-        && !rePw.isEmpty
-        // && pw == rePw
-        && isValidNickname(nickname)
-        && isAgreed
+    let allValid =
+      isValidID(id)
+      && isValidPW(pw)
+      && !rePw.isEmpty
+      // && pw == rePw
+      && isValidNickname(nickname)
+      && isAgreed
 
     submitButton.isEnabled = allValid
     submitButton.alpha = allValid ? 1.0 : 0.5
@@ -281,8 +282,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let trimmed = nick.replacingOccurrences(of: " ", with: "")
     return trimmed.range(of: #"^[가-힣A-Za-z0-9]{1,8}$"#, options: .regularExpression) != nil
   }
-  
-  public func alertController(on vc:UIViewController, title: String, message: String) {
+
+  public func alertController(on vc: UIViewController, title: String, message: String) {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
     let button = UIAlertAction(title: "확인", style: .default)
     alert.addAction(button)
@@ -306,39 +307,40 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   @objc func didTapSubmitButton(_ sender: UIButton) {
-    // TODO: 1. coredata에 정보 넣기(이미 있는 아이디인지 확인도 하고 이미 있으면 변경 요청)
     // TODO: 2. 빈 칸(변경 필요한 칸) 파악되면 하이라이팅
     // TODO: 3. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
     let id = idTextField.text ?? ""
     let pw = pwTextField.text ?? ""
     let rePw = rePwTextField.text ?? ""
     let nickname = nickNameTextField.text ?? ""
-    
+
     if !isValidID(id) {
       alertController(on: self, title: "아이디 오류", message: "잘못된 아이디입니다.")
       return
     }
-    
+
     if !isValidPW(pw) {
       alertController(on: self, title: "패스워드 오류", message: "잘못된 패스워드입니다.")
       return
     }
-    
+
     if pw != rePw {
       alertController(on: self, title: "패스워드 재확인 오류", message: "패스워드가 같지 않습니다.")
       return
     }
-    
+
     if !isValidNickname(nickname) {
       alertController(on: self, title: "닉네임 오류", message: "잘못된 닉네임입니다.")
       return
     }
-    
-    if repository.readUser(by: idTextField.text ?? "xxxx") != nil {
+
+    if repository.readUser(by: idTextField.text ?? "id-xxxx") != nil {
       alertController(on: self, title: "아이디 중복", message: "중복된 아이디입니다.\n다른 아이디를 사용해 주세요.")
       return
-    } else {
-      
+    }
+    if repository.readUser(by: nickNameTextField.text ?? "name-xxxx") != nil {
+      alertController(on: self, title: "닉네임 중복", message: "중복된 닉네임입니다.\n다른 아이디를 사용해 주세요.")
+      return
     }
     print(idTextField.text ?? "no")
     repository.createUser(id: idTextField.text!, name: nickNameTextField.text!, password: pwTextField.text!)
@@ -354,6 +356,11 @@ extension SignViewController: TermsViewControllerDelegate {
   func termsViewControllerDidAgree(_ controller: TermsViewController) {
     termsAgreeCheckBox.isSelected = true
     isAgreed = true
+    updateSubmitButtonState()
+  }
+  func termsViewControllerDidReject(_ controller: TermsViewController) {
+    termsAgreeCheckBox.isSelected = false
+    isAgreed = false
     updateSubmitButtonState()
   }
 }

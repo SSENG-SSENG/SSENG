@@ -18,6 +18,11 @@ class LoginViewController: UIViewController {
     $0.setTitle("회원가입", for: .normal)
     $0.setTitleColor(.main, for: .normal)
   }
+  
+  private let debugButton = UIButton().then {
+    $0.setTitle("주의! 디버그!", for: .normal)
+    $0.setTitleColor(.main, for: .normal)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -27,10 +32,11 @@ class LoginViewController: UIViewController {
     
     loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
     signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
+    debugButton.addTarget(self, action: #selector(donttouchthis), for: .touchUpInside)
   }
 
   func setupUI() {
-    [loginButton, signUpBUtton].forEach(view.addSubview)
+    [loginButton, signUpBUtton, debugButton].forEach(view.addSubview)
   }
 
   func setupConstraints() {
@@ -39,6 +45,10 @@ class LoginViewController: UIViewController {
     }
     signUpBUtton.snp.makeConstraints {
       $0.top.equalTo(loginButton.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+    }
+    debugButton.snp.makeConstraints {
+      $0.top.equalTo(signUpBUtton.snp.bottom)
       $0.leading.trailing.equalToSuperview()
     }
   }
@@ -51,5 +61,9 @@ class LoginViewController: UIViewController {
   @objc func didTapSignUp() {
     let signUpVC = SignViewController()
     navigationController?.pushViewController(signUpVC, animated: true)
+  }
+  
+  @objc func donttouchthis() {
+    CoreDataStack.shared.deleteAllData()
   }
 }
