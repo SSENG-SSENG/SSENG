@@ -21,7 +21,6 @@
 		E70E5F7E2E26187600F6F2D9 /* Exceptions for "SSENG" folder in "SSENG" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Application/GreenFactory.gpx,
 				Application/Info.plist,
 			);
 			target = E70E5F682E26187400F6F2D9 /* SSENG */;
