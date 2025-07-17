@@ -52,10 +52,16 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     $0.addArrangedSubview(bikeButton)
   }
 
+  private let detailLocationTitleLabel = UILabel().then {
+    $0.text = "상세위치:"
+    $0.font = .systemFont(ofSize: 16, weight: .bold)
+    $0.textAlignment = .center
+  }
+
   private let registerButton = UIButton(type: .system).then {
     $0.setTitle("등록하기", for: .normal)
     $0.titleLabel?.font = .boldSystemFont(ofSize: 18)
-    $0.backgroundColor = .systemBlue
+    $0.backgroundColor = UIColor(named: "MainColor")
     $0.tintColor = .white
     $0.layer.cornerRadius = 10
   }
@@ -112,8 +118,15 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
     marker.mapView = mapView.mapView
 
-    let cameraUpdate = NMFCameraUpdate(scrollTo: marker.position, zoomTo: 16) // 줌 레벨 16으로 조정
+    let cameraTarget = NMGLatLng(lat: latitude - 0.0005, lng: longitude) // 위로 약간 보정
+    let cameraUpdate = NMFCameraUpdate(scrollTo: cameraTarget, zoomTo: 16)
     mapView.mapView.moveCamera(cameraUpdate)
+  }
+
+  private let detailLocationTextField = UITextField().then {
+    $0.placeholder = "상세 위치를 입력해주세요. (예: 약국 앞)"
+    $0.borderStyle = .roundedRect
+    $0.font = .systemFont(ofSize: 14)
   }
 
   private func setupModalUI() {
@@ -123,7 +136,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
       $0.bottom.equalToSuperview()
     }
 
-    for item in [modalLabel, typeSelectionLabel, typeSelectionStackView, registerButton] {
+    for item in [modalLabel, typeSelectionLabel, typeSelectionStackView, detailLocationTitleLabel, detailLocationTextField, registerButton] {
       bottomModalView.addSubview(item)
     }
 
@@ -143,8 +156,19 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
       $0.height.equalTo(100)
     }
 
+    detailLocationTitleLabel.snp.makeConstraints {
+      $0.top.equalTo(typeSelectionStackView.snp.bottom).offset(30) // 간격 조정
+      $0.leading.trailing.equalToSuperview().inset(20)
+    }
+
+    detailLocationTextField.snp.makeConstraints {
+      $0.top.equalTo(detailLocationTitleLabel.snp.bottom).offset(8)
+      $0.leading.trailing.equalToSuperview().inset(40)
+      $0.height.equalTo(44)
+    }
+
     registerButton.snp.makeConstraints {
-      $0.top.equalTo(typeSelectionStackView.snp.bottom).offset(20)
+      $0.top.equalTo(detailLocationTextField.snp.bottom).offset(20)
       $0.centerX.equalToSuperview()
       $0.width.equalTo(200)
       $0.height.equalTo(44)
@@ -165,6 +189,12 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   // MARK: - Actions
 
   @objc private func didTapRegister() {
+    let detailLocation = detailLocationTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+    if detailLocation.isEmpty {
+      addressShowAlert(title: "입력 오류", message: "상세 위치를 입력해주세요.")
+      return
+    }
     didRegister = true
 
     let locationString = "\(latitude)/\(longitude)"
@@ -175,11 +205,11 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     let newID = repository.registKickboard(
       registerDate: nowString,
       location: locationString,
-      detailLocation: "",
+      detailLocation: detailLocation,
       type: Int16(selectedType)
     )
 
-    print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 타입=\(selectedType)")
+    print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 상세위치=\(detailLocation), 타입=\(selectedType)")
 
     showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
       guard let self else { return }
@@ -253,6 +283,17 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
       completion?()
     })
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+
+    present(alert, animated: true)
+  }
+
+  private func addressShowAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+    let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "확인", style: .default) { _ in
+      completion?()
+    })
+
     present(alert, animated: true)
   }
 }
