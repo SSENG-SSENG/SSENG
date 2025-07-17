@@ -184,7 +184,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
       guard let self else { return }
       delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
-      self.dismiss(animated: true, completion: nil)
+      self.navigationController?.popViewController(animated: true)
     }
   }
 
