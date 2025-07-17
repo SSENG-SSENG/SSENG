@@ -8,11 +8,10 @@ import SnapKit
 import Then
 import UIKit
 
-class SignViewController: UIViewController {
+class SignViewController: UIViewController, UITextFieldDelegate {
   // 동의 여부
   private var isAgreed = false
   private let repository = UserRepository()
-
 
   // |=============|
   // |---앱 로고---|
@@ -30,7 +29,7 @@ class SignViewController: UIViewController {
 
   // MARK: 컴포넌트 초기화
   private let appLogoImageView = UIImageView().then {
-    $0.image = UIImage(named: "Logo")
+    // $0.image = UIImage(named: "LogoCroped")
     $0.contentMode = .scaleAspectFit
   }
 
@@ -40,7 +39,14 @@ class SignViewController: UIViewController {
 
   private let idTextField = UITextField().then {
     $0.placeholder = "아이디를 입력하세요."
-    // TODO: 띄어쓰기 등 아이디 표준 정규표현식 적용하기
+    $0.keyboardType = .asciiCapable
+    $0.textContentType = .none
+    $0.autocorrectionType = .no
+    $0.spellCheckingType = .no
+    $0.smartInsertDeleteType = .no
+    $0.autocapitalizationType = .none
+    $0.clearButtonMode = .always
+    $0.returnKeyType = .next
   }
 
   private let idStackView = UIStackView().then {
@@ -53,8 +59,11 @@ class SignViewController: UIViewController {
 
   private let pwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 입력하세요."
+    // $0.isSecureTextEntry = true
+    $0.textContentType = .password
+    $0.clearButtonMode = .always
     $0.isSecureTextEntry = true
-    // TODO: 띄어쓰기 등 비밀번호 표준 정규표현식 적용하기
+    $0.returnKeyType = .next
   }
 
   private let pwStackView = UIStackView().then {
@@ -67,7 +76,11 @@ class SignViewController: UIViewController {
 
   private let rePwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 다시 입력하세요."
-    // TODO: pwTextField와 같은 건지 확인 절차 적용하기
+    // $0.isSecureTextEntry = true
+    $0.textContentType = .password
+    $0.clearButtonMode = .always
+    $0.isSecureTextEntry = true
+    $0.returnKeyType = .next
   }
 
   private let rePwStackView = UIStackView().then {
@@ -124,6 +137,8 @@ class SignViewController: UIViewController {
     setupButtonActions()
     addTextFieldObservers()
     updateSubmitButtonState()
+
+    [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach { $0.delegate = self }
   }
 
   // 뷰, 스택
@@ -164,13 +179,15 @@ class SignViewController: UIViewController {
   // 컴포넌트 레이아웃
   private func setupConstraints() {
     let insetSize = 40
-    appLogoImageView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide)
-      $0.trailing.leading.equalToSuperview()
-    }
+    // appLogoImageView.snp.makeConstraints {
+    //   $0.top.equalTo(view.safeAreaLayoutGuide)
+    //   $0.trailing.leading.equalToSuperview()
+    //   $0.width.equalTo(30)
+    // }
 
     idStackView.snp.makeConstraints {
-      $0.top.equalTo(appLogoImageView.snp.bottom)
+      // $0.top.equalTo(appLogoImageView.snp.bottom)
+      $0.top.equalTo(view.safeAreaLayoutGuide)
       $0.leading.trailing.equalToSuperview().inset(insetSize)
     }
 
@@ -209,7 +226,7 @@ class SignViewController: UIViewController {
     termsViewButton.addTarget(self, action: #selector(didTapTersmView(_:)), for: .touchUpInside)
     submitButton.addTarget(self, action: #selector(didTapSubmitButton(_:)), for: .touchUpInside)
   }
-  
+
   private func addTextFieldObservers() {
     [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach {
       $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
@@ -218,13 +235,58 @@ class SignViewController: UIViewController {
 
   // 가입 버튼 상태 체크
   private func updateSubmitButtonState() {
-    let isFiledFilled =
-      !(idTextField.text ?? "").isEmpty && !(pwTextField.text ?? "").isEmpty && !(rePwTextField.text ?? "").isEmpty
-      && !(nickNameTextField.text ?? "").isEmpty
-    let canSubmit = isFiledFilled && isAgreed
-    
-    submitButton.isEnabled = canSubmit
-    submitButton.alpha = canSubmit ? 1.0 : 0.5
+    let id = idTextField.text ?? ""
+    let pw = pwTextField.text ?? ""
+    let rePw = rePwTextField.text ?? ""
+    let nickname = nickNameTextField.text ?? ""
+    let allValid = isValidID(id)
+        && isValidPW(pw)
+        && !rePw.isEmpty
+        // && pw == rePw
+        && isValidNickname(nickname)
+        && isAgreed
+
+    submitButton.isEnabled = allValid
+    submitButton.alpha = allValid ? 1.0 : 0.5
+  }
+
+  // 정규표현식 및 글자수 제한
+  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String)
+    -> Bool
+  {
+    guard let t = textField.text as NSString? else { return true }
+    let updated = t.replacingCharacters(in: range, with: string)
+    switch textField {
+    case idTextField:
+      return updated.count <= 16
+        && (string.isEmpty || string.range(of: "[^a-z0-9]", options: .regularExpression) == nil)
+    case pwTextField:
+      return updated.count <= 32
+    case rePwTextField:
+      return updated.count <= 32
+    case nickNameTextField:
+      return updated.replacingOccurrences(of: " ", with: "").count <= 8
+    default:
+      return true
+    }
+  }
+
+  func isValidID(_ id: String) -> Bool { id.range(of: #"^[a-z0-9]{4,16}$"#, options: .regularExpression) != nil }
+
+  func isValidPW(_ pw: String) -> Bool {
+    pw.range(of: #"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$&*]).{8,32}$"#, options: .regularExpression) != nil
+  }
+
+  func isValidNickname(_ nick: String) -> Bool {
+    let trimmed = nick.replacingOccurrences(of: " ", with: "")
+    return trimmed.range(of: #"^[가-힣A-Za-z0-9]{1,8}$"#, options: .regularExpression) != nil
+  }
+  
+  public func alertController(on vc:UIViewController, title: String, message: String) {
+    let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    let button = UIAlertAction(title: "확인", style: .default)
+    alert.addAction(button)
+    vc.present(alert, animated: true)
   }
 
   // MARK: 버튼 팡숀
@@ -234,7 +296,7 @@ class SignViewController: UIViewController {
     updateSubmitButtonState()
     print(sender.isSelected)
   }
-  
+
   @objc func didTapTersmView(_ sender: UIButton) {
     let vc = TermsViewController()
     vc.delegate = self
@@ -247,15 +309,45 @@ class SignViewController: UIViewController {
     // TODO: 1. coredata에 정보 넣기(이미 있는 아이디인지 확인도 하고 이미 있으면 변경 요청)
     // TODO: 2. 빈 칸(변경 필요한 칸) 파악되면 하이라이팅
     // TODO: 3. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
-    if repository.readUser(by: idTextField.text ?? "ID Data Error") != nil {
+    let id = idTextField.text ?? ""
+    let pw = pwTextField.text ?? ""
+    let rePw = rePwTextField.text ?? ""
+    let nickname = nickNameTextField.text ?? ""
+    
+    if !isValidID(id) {
+      alertController(on: self, title: "아이디 오류", message: "잘못된 아이디입니다.")
+      return
+    }
+    
+    if !isValidPW(pw) {
+      alertController(on: self, title: "패스워드 오류", message: "잘못된 패스워드입니다.")
+      return
+    }
+    
+    if pw != rePw {
+      alertController(on: self, title: "패스워드 재확인 오류", message: "패스워드가 같지 않습니다.")
+      return
+    }
+    
+    if !isValidNickname(nickname) {
+      alertController(on: self, title: "닉네임 오류", message: "잘못된 닉네임입니다.")
+      return
+    }
+    
+    if repository.readUser(by: idTextField.text ?? "xxxx") != nil {
+      alertController(on: self, title: "아이디 중복", message: "중복된 아이디입니다.\n다른 아이디를 사용해 주세요.")
+      return
+    } else {
       
     }
+    print(idTextField.text ?? "no")
+    repository.createUser(id: idTextField.text!, name: nickNameTextField.text!, password: pwTextField.text!)
     navigationController?.popViewController(animated: true)
   }
-  
+
   @objc private func textFieldDidChange(_ sender: UITextField) {
-      updateSubmitButtonState()
-  } 
+    updateSubmitButtonState()
+  }
 }
 
 extension SignViewController: TermsViewControllerDelegate {

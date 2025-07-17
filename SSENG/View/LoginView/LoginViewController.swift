@@ -24,7 +24,7 @@ class LoginViewController: UIViewController {
     view.backgroundColor = .systemBackground
     setupUI()
     setupConstraints()
-
+    
     loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
     signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
   }
