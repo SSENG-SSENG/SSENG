@@ -20,7 +20,8 @@ class UserInfoCell: UITableViewCell {
   }
 
   private let userNameLabel = UILabel().then {
-    $0.text = "Mori"
+    $0.text = "SSENG~"
+    $0.font = .systemFont(ofSize: 17, weight: .bold)
   }
 
   private let statusDotView = UIView().then {
@@ -88,6 +89,7 @@ class UserInfoCell: UITableViewCell {
 
     userImageView.snp.makeConstraints {
       $0.top.leading.equalToSuperview().offset(16)
+      $0.centerY.equalToSuperview()
       $0.width.height.equalTo(min(UIScreen.main.bounds.width * 0.18, 64)) // 기기 화면 너비의 18%로 자동 조정(최대 64)
     }
 
@@ -109,7 +111,6 @@ class UserInfoCell: UITableViewCell {
 
     logoutButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().offset(-16)
-      $0.top.equalTo(userImageView.snp.bottom).offset(-8)
       $0.bottom.equalToSuperview().offset(-8)
       $0.height.equalTo(32)
       $0.width.greaterThanOrEqualTo(60) // width >= 60

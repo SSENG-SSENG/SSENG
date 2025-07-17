@@ -16,7 +16,7 @@ class KickboardRegisterCell: UITableViewCell {
 
   private let kickboardImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
-    $0.image = UIImage(named: "Logo") // 예시 이미지
+    $0.image = UIImage(named: "bikePadding") // 예시 이미지
   }
 
   private let uuidLabel = UILabel().then {
