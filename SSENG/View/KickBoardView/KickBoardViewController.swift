@@ -181,15 +181,14 @@ class KickBoardViewController: UIViewController {
 
     print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 타입=\(selectedType)")
 
+    // 알림창의 확인 버튼을 눌러야 화면이 전환되도록 수정
     showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
-      self?.dismiss(animated: true, completion: nil)
+      self?.navigationController?.popViewController(animated: true)
     }
-    delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
-    navigationController?.popViewController(animated: true)
   }
 
   @objc private func didTapClose() {
-    dismiss(animated: true, completion: nil)
+    navigationController?.popViewController(animated: true)
   }
 
   @objc private func didTapTypeButton(_ sender: UIButton) {
@@ -201,7 +200,18 @@ class KickBoardViewController: UIViewController {
 
   private func createTypeButton(title: String, imageName: String, tag: Int) -> UIButton {
     let button = UIButton(type: .custom)
-    button.setTitle(title, for: .normal)
+    button.tag = tag
+
+    // UIButton.Configuration 사용
+    var config = UIButton.Configuration.plain()
+    config.title = title
+    config.imagePlacement = .top
+    config.imagePadding = 8
+    config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+      var outgoing = incoming
+      outgoing.font = .systemFont(ofSize: 16, weight: .semibold)
+      return outgoing
+    }
 
     // 이미지 로드 및 리사이즈
     if let originalImage = UIImage(named: imageName) {
@@ -210,18 +220,18 @@ class KickBoardViewController: UIViewController {
       let resizedImage = renderer.image { _ in
         originalImage.draw(in: CGRect(origin: .zero, size: newSize))
       }
-      button.setImage(resizedImage, for: .normal)
+      config.image = resizedImage
     }
 
-    button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+    button.configuration = config
+
+    // 나머지 버튼 설정
     button.setTitleColor(.black, for: .normal)
     button.layer.cornerRadius = 12
     button.layer.borderWidth = 1
     button.layer.borderColor = UIColor.lightGray.cgColor
     button.backgroundColor = .white
-    button.tag = tag
     button.addTarget(self, action: #selector(didTapTypeButton), for: .touchUpInside)
-    button.alignTextBelow(spacing: 8)
     return button
   }
 
@@ -240,27 +250,5 @@ class KickBoardViewController: UIViewController {
       completion?()
     })
     present(alert, animated: true)
-  }
-}
-
-// UIButton Extension for text alignment
-extension UIButton {
-  func alignTextBelow(spacing: CGFloat) {
-    guard let image = imageView?.image else {
-      return
-    }
-    guard let titleLabel else {
-      return
-    }
-    guard let titleText = titleLabel.text else {
-      return
-    }
-
-    let titleSize = titleText.size(withAttributes: [
-      NSAttributedString.Key.font: titleLabel.font as Any
-    ])
-
-    titleEdgeInsets = UIEdgeInsets(top: spacing, left: -image.size.width, bottom: -image.size.height, right: 0)
-    imageEdgeInsets = UIEdgeInsets(top: -(titleSize.height + spacing), left: 0, bottom: 0, right: -titleSize.width)
   }
 }
