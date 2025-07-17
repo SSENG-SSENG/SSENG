@@ -247,10 +247,20 @@ extension MapViewController: KickBoardViewControllerDelegate {
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
     marker.mapView = mapView
     print("킥보드 등록완료!")
+
     marker.touchHandler = { [weak self] _ in
       self?.showKickBoardView()
       return true
     }
+
+    // ✅ 등록한 위치로 바로 카메라 이동
+    let latLng = NMGLatLng(lat: latitude, lng: longitude)
+    let cameraUpdate = NMFCameraUpdate(scrollTo: latLng)
+    cameraUpdate.animation = .easeIn
+    mapView.moveCamera(cameraUpdate)
+
+    // ✅ 등록 확인 후 아래 모달 뷰 보여주기 (옵션)
+    showKickBoardView()
   }
 }
 
