@@ -25,13 +25,17 @@ class KickboardHistoryCell: UITableViewCell {
     $0.textColor = .label
   }
 
-  private let dateLabel = UILabel().then { // 킥보드 이용 날짜 및 시간
-    $0.text = "2025년 09월 02일. 14시34분 ~ 15시 50분 (1시간16분)"
+  private let usageTimeLabel = UILabel().then { // 킥보드 이용 날짜 및 시간
+    $0.text = """
+    2025년 09월 02일
+    14시34분 ~ 15시50분 (1시간 16분)
+    """
     $0.font = .systemFont(ofSize: 13)
     $0.textColor = .secondaryLabel
+    $0.numberOfLines = 0
   }
 
-  private lazy var stackView = UIStackView(arrangedSubviews: [uuidLabel, dateLabel]).then {
+  private lazy var stackView = UIStackView(arrangedSubviews: [uuidLabel, usageTimeLabel]).then {
     $0.axis = .vertical
     $0.spacing = 4
   }
@@ -82,7 +86,6 @@ class KickboardHistoryCell: UITableViewCell {
 
     stackView.snp.makeConstraints {
       $0.centerY.equalToSuperview()
-//      $0.top.bottom.lessThanOrEqualToSuperview().inset(16)
       $0.leading.equalTo(kickboardImageView.snp.trailing).offset(12)
       $0.trailing.equalToSuperview().offset(-16)
     }

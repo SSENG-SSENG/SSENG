@@ -25,13 +25,17 @@ class KickboardRegisterCell: UITableViewCell {
     $0.textColor = .label
   }
 
-  private let registerDateLabel = UILabel().then { // 킥보드 등록 날짜
-    $0.text = "2025년 09월 02일. 14시34분"
+  private let registerDateTimeLabel = UILabel().then { // 킥보드 등록 날짜 및 시간
+    $0.text = """
+    2025년 09월 02일
+    14시 35분
+    """
     $0.font = .systemFont(ofSize: 13)
     $0.textColor = .secondaryLabel
+    $0.numberOfLines = 0
   }
 
-  private lazy var stackView = UIStackView(arrangedSubviews: [uuidLabel, registerDateLabel]).then {
+  private lazy var stackView = UIStackView(arrangedSubviews: [uuidLabel, registerDateTimeLabel]).then {
     $0.axis = .vertical
     $0.spacing = 4
   }
