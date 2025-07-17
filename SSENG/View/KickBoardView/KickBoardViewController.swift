@@ -61,7 +61,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   private let registerButton = UIButton(type: .system).then {
     $0.setTitle("등록하기", for: .normal)
     $0.titleLabel?.font = .boldSystemFont(ofSize: 18)
-    $0.backgroundColor = .systemBlue
+    $0.backgroundColor = UIColor(named: "MainColor")
     $0.tintColor = .white
     $0.layer.cornerRadius = 10
   }
