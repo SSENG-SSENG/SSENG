@@ -9,6 +9,7 @@ import NMapsMap
 import SnapKit
 import Then
 import UIKit
+import CoreData
 
 class MapViewController: UIViewController {
   // 맵 뷰
@@ -185,6 +186,18 @@ class MapViewController: UIViewController {
     print("사용자 이벤트 발생 탭 또는 스크롤됨! ")
   }
 
+  // 킥보드 전체 데이터 받아와서 킥보드 마커 등록
+  private func setAnnotations() {
+    let kickboards = repository.readAllKickboards()
+
+    kickboards.forEach {
+      let annotation = MKPointAnnotation()
+      annotation.coordinate = CLLocationCoordinate2D(
+        latitude: Double($0.latitude)!, longitude: Double($0.longitude)!)
+      annotation.title = $0.name
+      mapView.addAnnotation(annotation)
+    }
+  }
   // MARK: - Action
 
   private func setupButtonActions() {
