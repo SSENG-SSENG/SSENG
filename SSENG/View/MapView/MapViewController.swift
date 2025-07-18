@@ -510,24 +510,24 @@ extension MapViewController {
 
     switch selected {
     case .all:
-      allMarkers.forEach {
-        let position = $0.position
+      for marker in allMarkers {
+        let position = marker.position
         if visibleBounds.hasPoint(position) {
-          $0.mapView = mapView
+          marker.mapView = mapView
         }
       }
     case .kickBoard:
-      kickBoardMarkers.forEach {
-        let position = $0.position
+      for kickBoardMarker in kickBoardMarkers {
+        let position = kickBoardMarker.position
         if visibleBounds.hasPoint(position) {
-          $0.mapView = mapView
+          kickBoardMarker.mapView = mapView
         }
       }
     case .bike:
-      bikeMarkers.forEach {
-        let position = $0.position
+      for bikeMarker in bikeMarkers {
+        let position = bikeMarker.position
         if visibleBounds.hasPoint(position) {
-          $0.mapView = mapView
+          bikeMarker.mapView = mapView
         }
       }
     case .none:
