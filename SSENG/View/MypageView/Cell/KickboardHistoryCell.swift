@@ -136,7 +136,7 @@ class KickboardHistoryCell: UITableViewCell {
       }
 
       // 최종!! "22시02분 ~ 22시43분 (41분)" 으로 표시됨!!
-      timeRangeLabel.text = "\(timeRange) \(durationString)"
+      timeRangeLabel.text = "\(timeRange) (\(durationString))"
     }
   }
 }
