@@ -30,12 +30,14 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   // MARK: 컴포넌트 초기화
 
   private let appLogoImageView = UIImageView().then {
-    // $0.image = UIImage(named: "LogoCroped")
+    $0.image = UIImage(named: "Logo")
     $0.contentMode = .scaleAspectFit
   }
 
   private let idLabel = UILabel().then {
     $0.text = "아이디"
+    $0.font = .systemFont(ofSize: 15, weight: .medium)
+
   }
 
   private let idTextField = UITextField().then {
@@ -52,16 +54,17 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   private let idStackView = UIStackView().then {
     $0.axis = .vertical
+    $0.spacing = 6
   }
 
   private let pwLabel = UILabel().then {
     $0.text = "비밀번호"
+    $0.font = .systemFont(ofSize: 15, weight: .medium)
+
   }
 
   private let pwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 입력하세요."
-    // $0.isSecureTextEntry = true
-    $0.textContentType = .password
     $0.clearButtonMode = .always
     $0.isSecureTextEntry = true
     $0.returnKeyType = .next
@@ -69,16 +72,17 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   private let pwStackView = UIStackView().then {
     $0.axis = .vertical
+    $0.spacing = 6
+
   }
 
   private let rePwLabel = UILabel().then {
     $0.text = "비밀번호 재확인"
+    $0.font = .systemFont(ofSize: 15, weight: .medium)
   }
 
   private let rePwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 다시 입력하세요."
-    // $0.isSecureTextEntry = true
-    $0.textContentType = .password
     $0.clearButtonMode = .always
     $0.isSecureTextEntry = true
     $0.returnKeyType = .next
@@ -86,18 +90,30 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   private let rePwStackView = UIStackView().then {
     $0.axis = .vertical
+    $0.spacing = 6
+
   }
 
   private let nickNameLabel = UILabel().then {
     $0.text = "닉네임"
+    $0.font = .systemFont(ofSize: 15, weight: .medium)
   }
 
   private let nickNameTextField = UITextField().then {
     $0.placeholder = "최대 8자"
+    $0.clearButtonMode = .always
+    $0.autocorrectionType = .no
+    $0.spellCheckingType = .no
+    $0.smartInsertDeleteType = .no
+    $0.autocapitalizationType = .none
+    $0.clearButtonMode = .always
+    $0.returnKeyType = .done
   }
 
   private let nickNameViewStack = UIStackView().then {
     $0.axis = .vertical
+    $0.spacing = 6
+
   }
 
   private let termsAgreeCheckBox = UIButton(type: .custom).then {
@@ -137,6 +153,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     setupButtonActions()
     addTextFieldObservers()
     updateSubmitButtonState()
+    afterFilter()
+    dismissKeyboardController()
 
     [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach { $0.delegate = self }
   }
@@ -150,78 +168,99 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       rePwStackView,
       nickNameViewStack,
       termsStackView,
-      submitButton
+      submitButton,
     ].forEach {
       view.addSubview($0)
     }
 
-    for item in [idLabel, idTextField] {
-      idStackView.addArrangedSubview(item)
+    [idLabel, idTextField].forEach {
+      idStackView.addArrangedSubview($0)
     }
 
-    for item in [pwLabel, pwTextField] {
-      pwStackView.addArrangedSubview(item)
+    [pwLabel, pwTextField].forEach {
+      pwStackView.addArrangedSubview($0)
     }
 
-    for item in [rePwLabel, rePwTextField] {
-      rePwStackView.addArrangedSubview(item)
+    [rePwLabel, rePwTextField].forEach {
+      rePwStackView.addArrangedSubview($0)
     }
 
-    for item in [nickNameLabel, nickNameTextField] {
-      nickNameViewStack.addArrangedSubview(item)
+    [nickNameLabel, nickNameTextField].forEach {
+      nickNameViewStack.addArrangedSubview($0)
     }
 
-    for item in [termsAgreeCheckBox, termsViewButton, termsTextLabel] {
-      termsStackView.addArrangedSubview(item)
+    [termsAgreeCheckBox, termsViewButton, termsTextLabel].forEach {
+      termsStackView.addArrangedSubview($0)
     }
   }
 
   // 컴포넌트 레이아웃
   private func setupConstraints() {
-    let insetSize = 40
-    // appLogoImageView.snp.makeConstraints {
-    //   $0.top.equalTo(view.safeAreaLayoutGuide)
-    //   $0.trailing.leading.equalToSuperview()
-    //   $0.width.equalTo(30)
-    // }
+    let padding: CGFloat = 60
+    let height: CGFloat = 48
+
+    appLogoImageView.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(40)
+      $0.trailing.leading.equalToSuperview()
+      $0.width.equalTo(30)
+      $0.height.equalTo(80)
+    }
+
+    idTextField.snp.makeConstraints {
+      $0.height.equalTo(height)
+    }
 
     idStackView.snp.makeConstraints {
-      // $0.top.equalTo(appLogoImageView.snp.bottom)
-      $0.top.equalTo(view.safeAreaLayoutGuide)
-      $0.leading.trailing.equalToSuperview().inset(insetSize)
+      $0.top.equalTo(appLogoImageView.snp.bottom).offset(30)
+      $0.leading.trailing.equalToSuperview().inset(padding)
+      $0.centerX.equalToSuperview()
+    }
+
+    pwTextField.snp.makeConstraints {
+      $0.height.equalTo(height)
     }
 
     pwStackView.snp.makeConstraints {
-      $0.top.equalTo(idStackView.snp.bottom).offset(8)
-      $0.leading.trailing.equalToSuperview().inset(insetSize)
+      $0.top.equalTo(idStackView.snp.bottom).offset(10)
+      $0.leading.trailing.equalToSuperview().inset(padding)
+      $0.centerX.equalToSuperview()
+    }
+
+    rePwTextField.snp.makeConstraints {
+      $0.height.equalTo(height)
     }
 
     rePwStackView.snp.makeConstraints {
-      $0.top.equalTo(pwStackView.snp.bottom).offset(8)
-      $0.leading.trailing.equalToSuperview().inset(insetSize)
+      $0.top.equalTo(pwStackView.snp.bottom).offset(10)
+      $0.leading.trailing.equalToSuperview().inset(padding)
+      $0.centerX.equalToSuperview()
+    }
+
+    nickNameTextField.snp.makeConstraints {
+      $0.height.equalTo(height)
     }
 
     nickNameViewStack.snp.makeConstraints {
-      $0.top.equalTo(rePwStackView.snp.bottom).offset(8)
-      $0.leading.trailing.equalToSuperview().inset(insetSize)
+      $0.top.equalTo(rePwStackView.snp.bottom).offset(10)
+      $0.leading.trailing.equalToSuperview().inset(padding)
+      $0.centerX.equalToSuperview()
     }
 
     termsStackView.setCustomSpacing(4, after: termsAgreeCheckBox)
     termsStackView.snp.makeConstraints {
-      $0.top.equalTo(nickNameViewStack.snp.bottom).offset(8)
+      $0.top.equalTo(nickNameViewStack.snp.bottom).offset(10)
       $0.centerX.equalToSuperview()
     }
 
     submitButton.snp.makeConstraints {
-      $0.top.equalTo(termsStackView.snp.bottom).offset(8)
-      $0.height.equalTo(40)
-      $0.leading.trailing.equalToSuperview().inset(insetSize)
+      $0.top.equalTo(termsStackView.snp.bottom).offset(24)
+      $0.height.equalTo(height)
+      $0.leading.trailing.equalToSuperview().inset(padding)
       $0.centerX.equalToSuperview()
     }
   }
 
   // MARK: 버튼 addTarget
-
   private func setupButtonActions() {
     termsAgreeCheckBox.addTarget(self, action: #selector(didTapCheckbox(_:)), for: .touchUpInside)
     termsViewButton.addTarget(self, action: #selector(didTapTersmView(_:)), for: .touchUpInside)
@@ -229,8 +268,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   private func addTextFieldObservers() {
-    for item in [idTextField, pwTextField, rePwTextField, nickNameTextField] {
-      item.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach {
+      $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
   }
 
@@ -242,10 +281,10 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let nickname = nickNameTextField.text ?? ""
     let allValid =
       isValidID(id)
-        // && isValidPW(pw)
-        // && !rePw.isEmpty
-        && isValidNickname(nickname)
-        && isAgreed
+      && isValidPW(pw)
+      && !rePw.isEmpty
+      && isValidNickname(nickname)
+      && isAgreed
 
     submitButton.isEnabled = allValid
     submitButton.alpha = allValid ? 1.0 : 0.5
@@ -261,9 +300,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     case idTextField:
       return updated.count <= 16
         && (string.isEmpty || string.range(of: "[^a-z0-9]", options: .regularExpression) == nil)
-    case pwTextField:
-      return updated.count <= 32
-    case rePwTextField:
+    case pwTextField, rePwTextField:
       return updated.count <= 32
     case nickNameTextField:
       return updated.replacingOccurrences(of: " ", with: "").count <= 8
@@ -272,22 +309,39 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     }
   }
 
-  func isValidID(_ id: String) -> Bool { id.range(of: #"^[a-z0-9]{4,16}$"#, options: .regularExpression) != nil }
-
-  func isValidPW(_ pw: String) -> Bool {
-    pw.range(of: #"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$&*]).{8,32}$"#, options: .regularExpression) != nil
+  // 각 칸 정규식
+  private func isValidID(_ id: String) -> Bool {
+    id.range(of: #"^[a-z0-9]{4,16}$"#, options: .regularExpression) != nil
   }
 
-  func isValidNickname(_ nick: String) -> Bool {
+  private func isValidPW(_ pw: String) -> Bool {
+    pw.range(of: #"^[A-Za-z\d!@#$&*]{8,32}$"#, options: .regularExpression) != nil
+  }
+
+  private func isValidNickname(_ nick: String) -> Bool {
     let trimmed = nick.replacingOccurrences(of: " ", with: "")
     return trimmed.range(of: #"^[가-힣A-Za-z0-9]{1,8}$"#, options: .regularExpression) != nil
   }
 
   func alertController(on vc: UIViewController, title: String, message: String) {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-    let button = UIAlertAction(title: "확인", style: .default)
-    alert.addAction(button)
+    alert.addAction(UIAlertAction(title: "확인", style: .default))
     vc.present(alert, animated: true)
+  }
+
+  func afterFilter() {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(textFieldDidChange(_:)),
+      name: UITextField.textDidChangeNotification,
+      object: nil
+    )
+  }
+
+  func dismissKeyboardController() {
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+    tapGesture.cancelsTouchesInView = false
+    view.addGestureRecognizer(tapGesture)
   }
 
   // MARK: 버튼 팡숀
@@ -296,7 +350,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     sender.isSelected.toggle()
     isAgreed = sender.isSelected
     updateSubmitButtonState()
-    print(sender.isSelected)
   }
 
   @objc func didTapTersmView(_: UIButton) {
@@ -315,20 +368,21 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let rePw = rePwTextField.text ?? ""
     let nickname = nickNameTextField.text ?? ""
 
+    // 입력 잘못된 칸 Alert
     if !isValidID(id) {
-      alertController(on: self, title: "아이디 오류", message: "잘못된 아이디입니다.")
+      alertController(on: self, title: "아이디 오류", message: "아이디는 4-16자 영문 소문자와 숫자로만 구성되어야 합니다.")
       return
     }
 
-    // if !isValidPW(pw) {
-    //   alertController(on: self, title: "패스워드 오류", message: "잘못된 패스워드입니다.")
-    //   return
-    // }
+    if !isValidPW(pw) {
+      alertController(on: self, title: "패스워드 오류", message: "비밀번호는 8-32자 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.")
+      return
+    }
 
-    // if pw != rePw {
-    //   alertController(on: self, title: "패스워드 재확인 오류", message: "패스워드가 같지 않습니다.")
-    //   return
-    // }
+    if pw != rePw {
+      alertController(on: self, title: "패스워드 재확인 오류", message: "패스워드가 같지 않습니다.")
+      return
+    }
 
     if !isValidNickname(nickname) {
       alertController(on: self, title: "닉네임 오류", message: "잘못된 닉네임입니다.")
@@ -339,20 +393,52 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       alertController(on: self, title: "아이디 중복", message: "중복된 아이디입니다.\n다른 아이디를 사용해 주세요.")
       return
     }
+
     if repository.readUser(by: nickNameTextField.text ?? "name-xxxx") != nil {
       alertController(on: self, title: "닉네임 중복", message: "중복된 닉네임입니다.\n다른 아이디를 사용해 주세요.")
       return
     }
-    print(idTextField.text ?? "no")
+
     repository.createUser(id: idTextField.text!, name: nickNameTextField.text!, password: pwTextField.text!)
     navigationController?.popViewController(animated: true)
   }
 
-  @objc private func textFieldDidChange(_: UITextField) {
+  @objc private func textFieldDidChange(_ textField: UITextField) {
+    switch textField {
+    case idTextField:
+      if let text = textField.text {
+        let filtered = text.lowercased().filter { $0.isLetter || $0.isNumber }
+        textField.text = String(filtered.prefix(16))
+      }
+
+    case pwTextField, rePwTextField:
+      if let text = textField.text, text.count > 32 {
+        textField.text = String(text.prefix(32))
+      }
+
+    case nickNameTextField:
+      if let text = textField.text {
+        let trimmed = text.replacingOccurrences(of: " ", with: "")
+        let allowed = trimmed.filter { isKorean($0) || $0.isLetter || $0.isNumber }
+        textField.text = String(allowed.prefix(8))
+      }
+    default:
+      break
+    }
     updateSubmitButtonState()
+  }
+
+  @objc func dismissKeyboard() {
+    view.endEditing(true)
+  }
+
+  private func isKorean(_ character: Character) -> Bool {
+    guard let scalar = character.unicodeScalars.first else { return false }
+    return scalar.value >= 0xAC00 && scalar.value <= 0xD7A3
   }
 }
 
+// TermsViewController 데이터 가져오기
 extension SignViewController: TermsViewControllerDelegate {
   func termsViewControllerDidAgree(_: TermsViewController) {
     termsAgreeCheckBox.isSelected = true
