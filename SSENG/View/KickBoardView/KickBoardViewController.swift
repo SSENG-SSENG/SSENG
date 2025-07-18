@@ -26,9 +26,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
   private lazy var modalLabel = UILabel().then {
     $0.text = """
-    선택한 위치:
-    위도: \(String(format: "%.6f", latitude))
-    경도: \(String(format: "%.6f", longitude))
+    위도: \(String(format: "%.6f", latitude)) 경도: \(String(format: "%.6f", longitude))
     """
     $0.font = .systemFont(ofSize: 15, weight: .medium)
     $0.textAlignment = .center
@@ -189,7 +187,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     detailLocationTitleLabel.snp.makeConstraints {
-      $0.top.equalTo(typeSelectionStackView.snp.bottom).offset(30) // 간격 조정
+      $0.top.equalTo(typeSelectionStackView.snp.bottom).offset(20)
       $0.leading.trailing.equalToSuperview().inset(20)
     }
 
@@ -221,34 +219,44 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   // MARK: - Actions
 
   @objc private func didTapRegister() {
-    let detailLocation = detailLocationTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+      let detailLocation = detailLocationTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
-    if detailLocation.isEmpty {
-      addressShowAlert(title: "입력 오류", message: "상세 위치를 입력해주세요.")
-      return
-    }
-    didRegister = true
+      if detailLocation.isEmpty {
+          addressShowAlert(title: "입력 오류", message: "상세 위치를 입력해주세요.")
+          return
+      }
 
-    let locationString = "\(latitude)/\(longitude)"
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-    let nowString = dateFormatter.string(from: Date())
+      didRegister = true
 
-//    let newID = repository.registKickboard(
-//      registerDate: nowString,
-//      location: locationString,
-//      detailLocation: detailLocation,
-//      type: Int16(selectedType)
-//    )
-//
-//    print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 상세위치=\(detailLocation), 타입=\(selectedType)")
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+      let nowString = dateFormatter.string(from: Date())
 
-    showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습니다.") { [weak self] in
-      guard let self else { return }
-      delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
-      self.navigationController?.popViewController(animated: true)
-    }
+      guard let type = selectedType == 1 ? KickboardType.kickboard : selectedType == 2 ? KickboardType.bike : nil else {
+          showAlert(title: "타입 오류", message: "유효한 킥보드 타입을 선택해주세요.")
+          return
+      }
+    
+      let registerId = "TEMP_USER_ID"
+
+      let newID = repository.registKickboard(
+          registerDate: nowString,
+          lat: latitude,
+          lng: longitude,
+          detailLocation: detailLocation,
+          type: type,
+          registerId: registerId
+      )
+
+      print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세위치=\(detailLocation), 타입=\(selectedType)")
+
+      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습니다.") { [weak self] in
+          guard let self else { return }
+          delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
+          self.navigationController?.popViewController(animated: true)
+      }
   }
+
 
   @objc private func didTapBackground() {
     view.endEditing(true) // ✅ 키보드 내리기
