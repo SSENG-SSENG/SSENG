@@ -20,13 +20,11 @@ class KickboardHistoryCell: UITableViewCell {
   }
 
   private let dateLabel = UILabel().then {
-    $0.text = "2025년 07월 18일"
     $0.font = .systemFont(ofSize: 14, weight: .medium)
     $0.textColor = .label
   }
 
   private let timeRangeLabel = UILabel().then {
-    $0.text = "14시34분 ~ 15시50분 (1시간 16분)"
     $0.font = .systemFont(ofSize: 13)
     $0.textColor = .secondaryLabel
     $0.numberOfLines = 0
@@ -93,5 +91,45 @@ class KickboardHistoryCell: UITableViewCell {
 
   // MARK: - configure
 
-  func configure(_: History) {}
+  func configure(_ history: History) {
+    if history.type == KickboardType.bike.rawValue {
+      kickboardImageView.image = UIImage(named: "bikePadding")
+    } else {
+      kickboardImageView.image = UIImage(named: "kickboardPadding")
+    }
+
+    // 탑승 시간 포맷 ("2025-07-18 22:43:00" -> "2025년 07월 18일"
+    if let startTime = history.startTime?.toDate() { // Date 타입 변환
+      let dateFormatter = DateFormatter()
+      dateFormatter.locale = Locale(identifier: "ko_KR")
+      dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+      dateLabel.text = dateFormatter.string(from: startTime)
+
+      // 시작 시간(startTime)부터 총 이용 시간(duration)을 더해서 종료 시간(endTime) 계산
+      let endTime = startTime.addingTimeInterval(TimeInterval(history.duration * 60))
+      /// TimeInterval이 Double랑 동일한 의미인데, 시간 계산 때 의도를 명확하게 하려고 관습적(?)으로 사용한다고 한다.
+      /// "이건 시간이야"라는 명확한 의도전달을 위해. Double과 기능적 차이 x
+      /// addingTimeInterval(_:)는 Date 타입에 초(second) 단위의 Double값을 더해서 새로운 Date를 반환하는 메서드.
+      ///
+      /// startTime = 2025-07-18 22:00:00 같은 Date타입.
+      /// duration = 30(분)
+      /// -> endTime = startTime + 1800초(30분)
+      /// -> endTime = 2025-07-18 22:30:00 (자동 계산됨)
+
+      let timeFormatter = DateFormatter()
+      timeFormatter.locale = Locale(identifier: "ko_KR")
+      timeFormatter.dateFormat = "HH시mm분"
+
+      let timeRange = "\(timeFormatter.string(from: startTime)) ~ \(timeFormatter.string(from: endTime))" // "22시02분 ~ 22시43분" 형태로 생셩
+
+      let durationHour = history.duration / 60 // 시간 분리 (90 / 60 -> 1시간)
+      let durationMin = history.duration % 60 // 분 분리 (90 % 60 -> 30분)
+
+      // 시간, 분 조합해서 "1시간 10분" or "47분" 이런 형식으로 사용
+      let durationString = "(\(durationHour > 0 ? "\(durationHour)시간 " : "")\(durationMin)분)"
+
+      // 최종!! "22시02분 ~ 22시43분 (41분)" 으로 표시됨!!
+      timeRangeLabel.text = "\(timeRange) \(durationString)"
+    }
+  }
 }
