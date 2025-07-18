@@ -66,6 +66,7 @@ final class CoreDataStack {
         print("Failed to delete data for entity: \(name), error: \(error)")
       }
     }
+<<<<<<< HEAD
 
     // 변경 사항 저장 (필요 시)
     saveContext()
@@ -118,5 +119,10 @@ final class CoreDataStack {
         }
       }
     }
+=======
+
+    // 변경 사항 저장 (필요 시)
+    saveContext()
+>>>>>>> develop
   }
 }
