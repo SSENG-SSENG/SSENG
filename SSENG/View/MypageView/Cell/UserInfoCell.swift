@@ -15,8 +15,11 @@ class UserInfoCell: UITableViewCell {
   private let containerView = UIView()
 
   private let userImageView = UIImageView().then {
-    $0.image = UIImage(named: "Logo")
-    $0.contentMode = .scaleAspectFit
+    let symbolConfig = UIImage.SymbolConfiguration(pointSize: 42, weight: .semibold)
+    let image = UIImage(systemName: "person", withConfiguration: symbolConfig)
+    $0.image = image
+    $0.tintColor = .main
+    $0.contentMode = .center
   }
 
   private let userNameLabel = UILabel().then {

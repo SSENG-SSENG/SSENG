@@ -18,6 +18,7 @@ class MypageViewcontroller: UIViewController {
     $0.register(KickboardHistoryCell.self, forCellReuseIdentifier: KickboardHistoryCell.identifier)
   }
 
+  private var section1ToggleButton: UIButton?
   private var isKickboardSectionExpanded = true // 나중에 삭제 예정
 
   // 등록된 킥보드 개수. 나중에 CoreData에서 받아올 예정
@@ -28,12 +29,16 @@ class MypageViewcontroller: UIViewController {
   // 등록한 킥보드 섹션을 열거나 접는 동작
   @objc private func toggleSection() {
     isKickboardSectionExpanded.toggle() // 확장 상태 토글
+
     let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 현재 섹션의 셀 위치들을 미리 만듦
     if isKickboardSectionExpanded {
       tableView.insertRows(at: indexPaths, with: .fade)
     } else {
       tableView.deleteRows(at: indexPaths, with: .fade)
     }
+
+    let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.left"
+    section1ToggleButton?.setImage(UIImage(systemName: iconName), for: .normal)
   }
 
   override func viewDidLoad() {
@@ -102,9 +107,15 @@ extension MypageViewcontroller: UITableViewDataSource {
     // 등록한 킥보드 섹션에만 토글 버튼 추가
     if section == 1 {
       let toggleButton = UIButton(type: .system)
-      toggleButton.setTitle("아아~", for: .normal)
+      let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.left"
+      toggleButton.setImage(UIImage(systemName: iconName), for: .normal)
+      toggleButton.setTitleColor(.secondaryLabel, for: .normal)
       toggleButton.addTarget(self, action: #selector(toggleSection), for: .touchUpInside)
+
+      section1ToggleButton = toggleButton // 상태 저장
+
       container.addSubview(toggleButton)
+
       toggleButton.snp.makeConstraints {
         $0.trailing.equalToSuperview()
         $0.centerY.equalTo(label)
