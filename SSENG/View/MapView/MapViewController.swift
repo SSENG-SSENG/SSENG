@@ -539,7 +539,7 @@ extension MapViewController {
     }
 
     let fullString = NSMutableAttributedString(attachment: imageAttachment)
-    fullString.append(NSAttributedString(string: " \(batteryLevel)% \(batteryTime)"))
+    fullString.append(NSAttributedString(string: " \(batteryLevel)% (\(batteryTime))"))
     return fullString
   }
 
