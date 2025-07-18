@@ -202,14 +202,14 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
     let nowString = dateFormatter.string(from: Date())
 
-    let newID = repository.registKickboard(
-      registerDate: nowString,
-      location: locationString,
-      detailLocation: detailLocation,
-      type: Int16(selectedType)
-    )
-
-    print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 상세위치=\(detailLocation), 타입=\(selectedType)")
+//    let newID = repository.registKickboard(
+//      registerDate: nowString,
+//      location: locationString,
+//      detailLocation: detailLocation,
+//      type: Int16(selectedType)
+//    )
+//
+//    print("✅ 킥보드 등록 완료: ID=\(newID), 위치=\(locationString), 상세위치=\(detailLocation), 타입=\(selectedType)")
 
     showAlert(title: "등록 완료", message: "새로운 킥보드가 성공적으로 등록되었습니다.") { [weak self] in
       guard let self else { return }

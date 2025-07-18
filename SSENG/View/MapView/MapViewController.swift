@@ -23,6 +23,8 @@ class MapViewController: UIViewController {
   private var kickBoardMarkers: [NMFMarker] = []
   private var bikeMarkers: [NMFMarker] = []
 
+  private var pendingKickBoard: Kickboard?
+
   // 맵 뷰
   let mapView = NMFMapView().then {
     $0.positionMode = .normal
@@ -382,6 +384,13 @@ extension MapViewController {
     }
   }
 
+  private func moveMarker(kickBoard: Kickboard) {
+    let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: kickBoard.lat, lng: kickBoard.lng), zoomTo: 16)
+    cameraUpdate.animation = .easeIn
+    cameraUpdate.animationDuration = 0.3
+    mapView.moveCamera(cameraUpdate)
+  }
+
   // 킥보드 정보창 띄우기
   private func showKickBoardView(kickBoard: Kickboard) {
     for constraint in rideKickBoardViewHiddenConstraint {
@@ -398,7 +407,7 @@ extension MapViewController {
 
     print("마커 클릭됨!")
 
-    if kickBoard.type == 1 {
+    if kickBoard.kickboardType == .kickboard {
       typeImageView.image = UIImage(resource: .kickboard)
       priceLabel.text = "분당: 100원"
     } else {
@@ -406,7 +415,7 @@ extension MapViewController {
       priceLabel.text = "분당: 1000원"
     }
 
-    batteryLabel.attributedText = batteryStatusAttributedText(for: Int(kickBoard.battery))
+    batteryLabel.attributedText = batteryStatusText(for: Int(kickBoard.battery), batteryTime: kickBoard.batteryTime)
     detailLocationLabel.text = "\(kickBoard.detailLocation ?? "정보 없음")"
   }
 
@@ -449,7 +458,7 @@ extension MapViewController {
       let marker = createMarker(for: kickboard)
       allMarkers.append(marker)
 
-      if kickboard.type == 1 {
+      if kickboard.kickboardType == .kickboard {
         kickBoardMarkers.append(marker)
       } else {
         bikeMarkers.append(marker)
@@ -460,6 +469,7 @@ extension MapViewController {
     print("킥보드 마커 등록 완료")
   }
 
+  // 마커 필터링 데이터 업데이트
   private func updateVisibleMarkers() {
     for marker in allMarkers {
       marker.mapView = nil
@@ -477,13 +487,12 @@ extension MapViewController {
     }
   }
 
+  // 마커 생성하기
   private func createMarker(for kickboard: Kickboard) -> NMFMarker {
     let marker = NMFMarker()
+    marker.position = NMGLatLng(lat: kickboard.lat, lng: kickboard.lng)
 
-    guard let latLng = kickboard.location?.split(separator: "/") else { return marker }
-    marker.position = NMGLatLng(lat: Double(latLng[0]) ?? 0.0, lng: Double(latLng[1]) ?? 0.0)
-
-    if kickboard.type == 1 {
+    if kickboard.kickboardType == .kickboard {
       if kickboard.battery >= 70 {
         marker.iconImage = NMFOverlayImage(image: UIImage(resource: .kickboardFull))
       } else if kickboard.battery >= 31 {
@@ -508,14 +517,15 @@ extension MapViewController {
     marker.captionOffset = 8
 
     marker.touchHandler = { [weak self] _ in
-      self?.showKickBoardView(kickBoard: kickboard)
+      self?.pendingKickBoard = kickboard
+      self?.moveMarker(kickBoard: kickboard)
       return true
     }
     return marker
   }
 
   // 배터리 상태에 따라 아이콘과 텍스트를 반환하는 메서드
-  private func batteryStatusAttributedText(for batteryLevel: Int) -> NSAttributedString {
+  private func batteryStatusText(for batteryLevel: Int, batteryTime: String) -> NSAttributedString {
     let imageAttachment = NSTextAttachment()
 
     if batteryLevel == 100 {
@@ -529,7 +539,7 @@ extension MapViewController {
     }
 
     let fullString = NSMutableAttributedString(attachment: imageAttachment)
-    fullString.append(NSAttributedString(string: " \(batteryLevel)%"))
+    fullString.append(NSAttributedString(string: " \(batteryLevel)% \(batteryTime)"))
     return fullString
   }
 
@@ -624,11 +634,10 @@ extension MapViewController: CLLocationManagerDelegate {
   // 현재 위치 움직임 감지
   func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     guard let location = locations.last else { return }
-    let latLng = NMGLatLng(lat: location.coordinate.latitude, lng: location.coordinate.longitude)
+    let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: location.coordinate.latitude, lng: location.coordinate.longitude), zoomTo: 16)
 
-    let cameraPosition = NMFCameraPosition(latLng, zoom: 16)
-    let cameraUpdate = NMFCameraUpdate(position: cameraPosition)
-
+    cameraUpdate.animation = .fly
+    cameraUpdate.animationDuration = 0.5
     mapView.moveCamera(cameraUpdate)
     mapView.positionMode = .compass
 
@@ -644,6 +653,14 @@ extension MapViewController: NMFMapViewCameraDelegate {
     print("카메라 이동: \(reason)")
     hiddenKickBoardView()
     locationManager.stopUpdatingLocation()
+  }
+
+  func mapViewCameraIdle(_: NMFMapView) {
+    print("카메라 정지")
+    if let kickboard = pendingKickBoard {
+      showKickBoardView(kickBoard: kickboard)
+      pendingKickBoard = nil
+    }
   }
 }
 
