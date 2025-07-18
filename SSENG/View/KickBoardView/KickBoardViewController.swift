@@ -93,6 +93,38 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     setupActions()
     updateButtonSelection()
     setupDismissTapGesture()
+
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+  }
+
+  @objc private func keyboardWillShow(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+          let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+
+    // 키보드와 텍스트필드 사이 거리 계산
+    let bottomSpace = view.frame.height - bottomModalView.frame.origin.y - bottomModalView.frame.height
+    let overlap = keyboardFrame.height - bottomSpace
+
+    if overlap > 0 {
+      UIView.animate(withDuration: animationDuration) {
+        self.bottomModalView.transform = CGAffineTransform(translationX: 0, y: -overlap - 9)
+      }
+    }
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
+  @objc private func keyboardWillHide(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+
+    UIView.animate(withDuration: animationDuration) {
+      self.bottomModalView.transform = .identity
+    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -219,19 +251,12 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   @objc private func didTapBackground() {
-    dismiss(animated: true, completion: nil)
+    view.endEditing(true) // ✅ 키보드 내리기
   }
 
   @objc private func didTapTypeButton(_ sender: UIButton) {
     selectedType = sender.tag
     updateButtonSelection()
-  }
-
-  // MARK: - UIGestureRecognizerDelegate
-
-  func gestureRecognizer(_: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-    // 모달 뷰 안쪽을 터치한 경우에는 제스처를 무시합니다.
-    !bottomModalView.frame.contains(touch.location(in: view))
   }
 
   // MARK: - Helpers
