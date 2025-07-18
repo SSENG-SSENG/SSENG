@@ -67,7 +67,34 @@ final class CoreDataStack {
       }
     }
 
-    // 변경 사항 저장 (필요 시)
+    saveContext()
+  }
+
+  func deleteCoreDataStore() {
+    let storeName = "SSENG"
+    let fileManager = FileManager.default
+
+    let urls = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+    guard let applicationSupportURL = urls.last else { return }
+
+    let storeURL = applicationSupportURL.appendingPathComponent("\(storeName).sqlite")
+
+    let files = [
+      storeURL,
+      storeURL.appendingPathExtension("-shm"),
+      storeURL.appendingPathExtension("-wal")
+    ]
+
+    for url in files {
+      if fileManager.fileExists(atPath: url.path) {
+        do {
+          try fileManager.removeItem(at: url)
+          print("Deleted: \(url.lastPathComponent)")
+        } catch {
+          print("Error deleting \(url.lastPathComponent): \(error)")
+        }
+      }
+    }
     saveContext()
   }
 }
