@@ -125,8 +125,15 @@ class KickboardHistoryCell: UITableViewCell {
       let durationHour = history.duration / 60 // 시간 분리 (90 / 60 -> 1시간)
       let durationMin = history.duration % 60 // 분 분리 (90 % 60 -> 30분)
 
-      // 시간, 분 조합해서 "1시간 10분" or "47분" 이런 형식으로 사용
-      let durationString = "(\(durationHour > 0 ? "\(durationHour)시간 " : "")\(durationMin)분)"
+      // 시간, 분 조합해서 "1시간" or "35분" or "1시간 35분" 이런 형식으로 사용
+      let durationString: String
+      if durationMin == 0 {
+        durationString = "\(durationHour)시간"
+      } else if durationHour == 0 {
+        durationString = "\(durationMin)분"
+      } else {
+        durationString = "(\(durationHour)시간 \(durationMin)분)"
+      }
 
       // 최종!! "22시02분 ~ 22시43분 (41분)" 으로 표시됨!!
       timeRangeLabel.text = "\(timeRange) \(durationString)"
