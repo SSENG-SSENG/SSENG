@@ -19,23 +19,20 @@ class KickboardHistoryCell: UITableViewCell {
     $0.image = UIImage(named: "kickboardPadding") // 예시 이미지
   }
 
-  private let uuidLabel = UILabel().then {
-    $0.text = "uuid 값"
+  private let dateLabel = UILabel().then {
+    $0.text = "2025년 07월 18일"
     $0.font = .systemFont(ofSize: 14, weight: .medium)
     $0.textColor = .label
   }
 
-  private let usageTimeLabel = UILabel().then { // 킥보드 이용 날짜 및 시간
-    $0.text = """
-    2025년 09월 02일
-    14시34분 ~ 15시50분 (1시간 16분)
-    """
+  private let timeRangeLabel = UILabel().then {
+    $0.text = "14시34분 ~ 15시50분 (1시간 16분)"
     $0.font = .systemFont(ofSize: 13)
     $0.textColor = .secondaryLabel
     $0.numberOfLines = 0
   }
 
-  private lazy var stackView = UIStackView(arrangedSubviews: [uuidLabel, usageTimeLabel]).then {
+  private lazy var stackView = UIStackView(arrangedSubviews: [dateLabel, timeRangeLabel]).then {
     $0.axis = .vertical
     $0.spacing = 4
   }
@@ -93,4 +90,8 @@ class KickboardHistoryCell: UITableViewCell {
       $0.trailing.equalToSuperview().offset(-16)
     }
   }
+
+  // MARK: - configure
+
+  func configure(_: History) {}
 }
