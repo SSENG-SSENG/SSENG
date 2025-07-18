@@ -8,7 +8,7 @@ import SnapKit
 import Then
 import UIKit
 
-class MypageViewcontroller: UIViewController {
+class MypageViewController: UIViewController {
   private lazy var tableView = UITableView(frame: .zero, style: .insetGrouped).then {
     $0.backgroundColor = .systemBackground
     $0.delegate = self
@@ -210,7 +210,7 @@ class MypageViewcontroller: UIViewController {
 
 // MARK: - UITableViewDelegate
 
-extension MypageViewcontroller: UITableViewDelegate {
+extension MypageViewController: UITableViewDelegate {
   // 0번째 섹션 헤더 높이 설정(0으로)
   func tableView(_: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
     section == 0 ? 0 : 32
@@ -219,7 +219,7 @@ extension MypageViewcontroller: UITableViewDelegate {
 
 // MARK: - UITableViewDataSource
 
-extension MypageViewcontroller: UITableViewDataSource {
+extension MypageViewController: UITableViewDataSource {
   // 셀 높이는 자동으로 계산되도록 (AutoLayout 기반)
   func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
     UITableView.automaticDimension

@@ -579,7 +579,7 @@ extension MapViewController {
 
   // 마이페이지 버튼 액션
   @objc private func didTabMyPageButton() {
-    let myPageVC = MypageViewcontroller()
+    let myPageVC = MypageViewController()
     navigationController?.pushViewController(myPageVC, animated: true)
   }
 
