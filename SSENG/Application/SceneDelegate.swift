@@ -14,7 +14,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     guard let windowScene = (scene as? UIWindowScene) else { return }
 
     window = UIWindow(windowScene: windowScene)
-    window?.rootViewController = UINavigationController(rootViewController: LoginViewController()) // 시작 뷰컨트롤러 지정
+    window?.rootViewController = UINavigationController(rootViewController: MypageViewcontroller()) // 시작 뷰컨트롤러 지정
     window?.makeKeyAndVisible()
   }
 

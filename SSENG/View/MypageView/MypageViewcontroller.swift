@@ -21,9 +21,47 @@ class MypageViewcontroller: UIViewController {
   private var section1ToggleButton: UIButton?
   private var isKickboardSectionExpanded = true // 나중에 삭제 예정
 
+  private var user: User? // CoreData에서 가져온 유저 정보
+  private let userRepository = UserRepository() // User 정보 가져올 때 사용
+
   // 등록된 킥보드 개수. 나중에 CoreData에서 받아올 예정
   private var kickboardsCount: Int {
     3
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    fetchUserData()
+    configureUI()
+  }
+
+  // MARK: - 유저 데이터 불러오기
+
+  private func fetchUserData() {
+    guard let userID = UserDefaults.standard.string(forKey: "loggedInUserID") else { // forKey값은 바뀌면 수정. 임시임
+      print("로그인이 잘 되지 않았습니다.")
+      return
+    }
+
+    user = userRepository.readUser(by: userID) // userID를 통해 CoreData에서 읽어옴
+
+    if user == nil {
+      print("CoreData에 해당 ID를 가진 사용자는 없는걸요..? 어찌 로그인 하셨담.. 해커세요?")
+    } else {
+      print("CoreData에 해당 ID를 가진 사용자가 있네요! \(user?.name ?? "")님 환영합니다~")
+    }
+  }
+
+  // MARK: - configureUI
+
+  private func configureUI() {
+    view.addSubview(tableView)
+    view.backgroundColor = .systemBackground
+    tableView.separatorStyle = .none
+
+    tableView.snp.makeConstraints {
+      $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
+    }
   }
 
   // 등록한 킥보드 섹션을 열거나 접는 동작
@@ -39,23 +77,6 @@ class MypageViewcontroller: UIViewController {
 
     let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.right"
     section1ToggleButton?.setImage(UIImage(systemName: iconName), for: .normal)
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    configureUI()
-  }
-
-  // MARK: - configureUI
-
-  private func configureUI() {
-    view.addSubview(tableView)
-    view.backgroundColor = .systemBackground
-    tableView.separatorStyle = .none
-
-    tableView.snp.makeConstraints {
-      $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
-    }
   }
 }
 
