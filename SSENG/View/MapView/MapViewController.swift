@@ -400,7 +400,7 @@ extension MapViewController {
     } else {
       // 약간의 시간차를 두고 다시 시도
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-        guard let self = self, let location = nowLocation.location else {
+        guard let self, let location = nowLocation.location else {
           print(" 위치를 가져오지 못했습니다.")
           return
         }
@@ -665,7 +665,7 @@ extension MapViewController: CLLocationManagerDelegate {
   // 위치권한 확인
   func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
     switch status {
-    case .authorizedWhenInUse, .authorizedAlways:
+    case .authorizedAlways, .authorizedWhenInUse:
       print("위치 권한 허용됨")
       locationMove(nowLocation: manager) // 권한 허용 즉시 위치 이동
     case .denied, .restricted:
