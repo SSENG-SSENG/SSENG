@@ -15,8 +15,11 @@ class UserInfoCell: UITableViewCell {
   private let containerView = UIView()
 
   private let userImageView = UIImageView().then {
-    $0.image = UIImage(named: "Logo")
-    $0.contentMode = .scaleAspectFit
+    let symbolConfig = UIImage.SymbolConfiguration(pointSize: 42, weight: .semibold)
+    let image = UIImage(systemName: "person", withConfiguration: symbolConfig)
+    $0.image = image
+    $0.tintColor = .main
+    $0.contentMode = .center
   }
 
   private let userNameLabel = UILabel().then {
@@ -55,13 +58,12 @@ class UserInfoCell: UITableViewCell {
     configureLayout()
   }
 
+  // MARK: - layoutSubviews
+
   override func layoutSubviews() {
     super.layoutSubviews()
     DispatchQueue.main.async {
-      self.userImageView.layer.cornerRadius = self.userImageView.frame.width / 2
-      self.userImageView.layer.borderWidth = 0.5
-      self.userImageView.layer.borderColor = UIColor.lightGray.cgColor
-      self.userImageView.clipsToBounds = true
+      self.userImageView.makeCircular()
     }
   }
 
@@ -70,12 +72,16 @@ class UserInfoCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
+  // MARK: - configureUI
+
   private func configureUI() {
     selectionStyle = .none
 
     contentView.addSubview(containerView)
     [userImageView, userNameLabel, ridingStatusStackView, logoutButton].forEach { containerView.addSubview($0) }
   }
+
+  // MARK: - configureLayout
 
   private func configureLayout() {
     containerView.snp.makeConstraints {
