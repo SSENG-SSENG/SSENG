@@ -46,13 +46,12 @@ class KickboardRegisterCell: UITableViewCell {
     configureLayout()
   }
 
+  // MARK: - layoutSubviews
+
   override func layoutSubviews() {
     super.layoutSubviews()
     DispatchQueue.main.async {
-      self.kickboardImageView.layer.cornerRadius = self.kickboardImageView.frame.width / 2
-      self.kickboardImageView.layer.borderWidth = 0.5
-      self.kickboardImageView.layer.borderColor = UIColor.lightGray.cgColor
-      self.kickboardImageView.clipsToBounds = true
+      self.kickboardImageView.makeCircular()
     }
   }
 
@@ -61,12 +60,16 @@ class KickboardRegisterCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
+  // MARK: - configureUI
+
   private func configureUI() {
     selectionStyle = .none
 
     contentView.addSubview(containerView)
     [kickboardImageView, stackView].forEach { containerView.addSubview($0) }
   }
+
+  // MARK: - configureLayout
 
   private func configureLayout() {
     containerView.snp.makeConstraints {
