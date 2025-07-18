@@ -24,33 +24,81 @@ class MypageViewcontroller: UIViewController {
   private var user: User? // CoreData에서 가져온 유저 정보
   private let userRepository = UserRepository() // User 정보 가져올 때 사용
 
-  // 등록된 킥보드 개수. 나중에 CoreData에서 받아올 예정
+  private var kickboards: [Kickboard] = [] // CoreData에서 가져온 킥보드 리스트
+  private let kickboardRepository = KickboardRepository() // CoreData에서 킥보드 정보 가져올 때 사용
+
+  // 등록된 킥보드 개수
   private var kickboardsCount: Int {
-    3
+    kickboards.count
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-//    signAndLoginTest()
-    fetchUserData()
+//     signAndLoginTest() // 테스트 데이터 생성
+//     registerKickboardTest() // 테스트 데이터 생성
     configureUI()
   }
 
-//  // MARK: - 회원가입/로그인 임시 테스트 (작동 확인함)
-//  private func signAndLoginTest() {
-//    let userID = "Mori"
-//    if userRepository.readUser(by: userID) == nil {
-//      userRepository.createUser(id: userID, name: "서광용", password: "1234")
-//    }
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    fetchUserData()
+    fetchKickboardData()
+  }
+
+  // MARK: - 회원가입/로그인 임시 테스트 (작동 확인함)
+
 //
-//    // 임시 로그인
-//    UserDefaults.standard.set(userID, forKey: "loggedInUserID")
-//  }
+//    private func signAndLoginTest() {
+//      let userID = "Mori"
+//      if userRepository.readUser(by: userID) == nil {
+//        userRepository.createUser(id: userID, name: "서광용", password: "1234")
+//      }
+//
+//      // 임시 로그인
+//      UserDefaults.standard.set(userID, forKey: "loggedUserID")
+//    }
+
+  // MARK: - 등록한 킥보드 임시 테스트 (테스트 완료)
+
+//
+//    private func registerKickboardTest() {
+//      let context = CoreDataStack.shared.context
+//
+//      // 킥보드 1 (bike 타입)
+//      let kickboard1 = Kickboard(context: context)
+//      kickboard1.type = KickboardType.bike.rawValue
+//      kickboard1.registerDate = "2025-07-18 17:00:00"
+//      kickboard1.id = UUID().uuidString
+//
+//      // 킥보드 2 (kickboard 타입)
+//      let kickboard2 = Kickboard(context: context)
+//      kickboard2.type = KickboardType.kickboard.rawValue
+//      kickboard2.registerDate = "2025-07-18 17:10:00"
+//      kickboard2.id = UUID().uuidString
+//
+//      // 킥보드 3 (bike 타입)
+//      let kickboard3 = Kickboard(context: context)
+//      kickboard3.type = KickboardType.bike.rawValue
+//      kickboard3.registerDate = "2025-07-18 17:20:00"
+//      kickboard3.id = UUID().uuidString
+//
+//      // 공통: 현재 로그인된 사용자 ID 설정
+//      guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
+//        print("로그인된 사용자 ID가 없습니다.")
+//        return
+//      }
+//      for item in [kickboard1, kickboard2, kickboard3] {
+//        item.registerId = userID
+//      }
+//
+//      CoreDataStack.shared.saveContext()
+//      print("테스트 킥보드 3개 등록 완료")
+//    }
 
   // MARK: - 유저 데이터 불러오기
 
   private func fetchUserData() {
-    guard let userID = UserDefaults.standard.string(forKey: "loggedInUserID") else { // forKey값은 바뀌면 수정. 임시임
+    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else { // forKey값은 바뀌면 수정. 임시임
       print("로그인이 잘 되지 않았습니다.")
       return
     }
@@ -62,6 +110,18 @@ class MypageViewcontroller: UIViewController {
     } else {
       print("CoreData에 해당 ID를 가진 사용자가 있네요! \(user?.name ?? "")님 환영합니다~")
     }
+  }
+
+  // MARK: - 등록된 킥보드 데이터 불러오기
+
+  private func fetchKickboardData() {
+    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
+      print("등록된 킥보드를 불러오지 못했습니다.")
+      return
+    }
+
+    kickboards = kickboardRepository.readRegistedKickboard(by: userID)
+    print("불러온 킥보드 개수: \(kickboards.count)")
   }
 
   // MARK: - configureUI
@@ -185,6 +245,8 @@ extension MypageViewcontroller: UITableViewDataSource {
       guard let cell = tableView.dequeueReusableCell(withIdentifier: KickboardRegisterCell.identifier, for: indexPath) as? KickboardRegisterCell else {
         return UITableViewCell()
       }
+      let kickboard = kickboards[indexPath.row] // 현재 row에 맞는 데이터 가져오기
+      cell.configure(kickboard)
       return cell
 
     case 2:
