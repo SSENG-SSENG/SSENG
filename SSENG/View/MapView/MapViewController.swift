@@ -679,13 +679,14 @@ extension MapViewController: CLLocationManagerDelegate {
 
   // 현재 위치 움직임 감지
   func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    mapView.positionMode = .direction
+
     guard let location = locations.last else { return }
     let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: location.coordinate.latitude, lng: location.coordinate.longitude), zoomTo: 16)
 
     cameraUpdate.animation = .fly
     cameraUpdate.animationDuration = 0.5
     mapView.moveCamera(cameraUpdate)
-    mapView.positionMode = .direction
 
     print("카메라 업데이트: \(cameraUpdate)")
   }
