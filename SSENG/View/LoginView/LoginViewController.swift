@@ -110,20 +110,20 @@ class LoginViewController: UIViewController {
   }
 
   func setupUI() {
-    [appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton].forEach {
-      view.addSubview($0)
+    for item in [appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton] {
+      view.addSubview(item)
     }
 
-    [idLabel, idTextField].forEach {
-      idStackView.addArrangedSubview($0)
+    for item in [idLabel, idTextField] {
+      idStackView.addArrangedSubview(item)
     }
 
-    [pwLabel, pwTextField].forEach {
-      pwStackView.addArrangedSubview($0)
+    for item in [pwLabel, pwTextField] {
+      pwStackView.addArrangedSubview(item)
     }
 
-    [autoLoginAgreeCheckBox, autoLoginAgreeLabel].forEach {
-      autoLoginStackView.addArrangedSubview($0)
+    for item in [autoLoginAgreeCheckBox, autoLoginAgreeLabel] {
+      autoLoginStackView.addArrangedSubview(item)
     }
   }
 
@@ -168,7 +168,6 @@ class LoginViewController: UIViewController {
       $0.leading.trailing.equalToSuperview().inset(padding)
       $0.height.equalTo(height)
       $0.centerX.equalToSuperview()
-
     }
 
     signUpBUtton.snp.makeConstraints {
@@ -193,8 +192,8 @@ class LoginViewController: UIViewController {
   }
 
   private func addTextFieldObsevers() {
-    [idTextField, pwTextField].forEach {
-      $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    for item in [idTextField, pwTextField] {
+      item.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
   }
 
@@ -217,14 +216,14 @@ class LoginViewController: UIViewController {
   }
 
   func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String)
-  -> Bool
+    -> Bool
   {
     guard let t = textField.text as NSString? else { return true }
     let updated = t.replacingCharacters(in: range, with: string)
     switch textField {
     case idTextField:
       return updated.count <= 16
-      && (string.isEmpty || string.range(of: "[^a-z0-9]", options: .regularExpression) == nil)
+        && (string.isEmpty || string.range(of: "[^a-z0-9]", options: .regularExpression) == nil)
     case pwTextField:
       return updated.count <= 32
     default:
@@ -297,6 +296,7 @@ class LoginViewController: UIViewController {
       if let text = textField.text, text.count > 32 {
         textField.text = String(text.prefix(32))
       }
+
     default:
       break
     }
