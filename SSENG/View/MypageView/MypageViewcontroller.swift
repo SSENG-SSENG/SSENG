@@ -109,7 +109,7 @@ extension MypageViewcontroller: UITableViewDataSource {
       let toggleButton = UIButton(type: .system)
       let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.left"
       toggleButton.setImage(UIImage(systemName: iconName), for: .normal)
-      toggleButton.setTitleColor(.secondaryLabel, for: .normal)
+      toggleButton.tintColor = .secondaryLabel
       toggleButton.addTarget(self, action: #selector(toggleSection), for: .touchUpInside)
 
       section1ToggleButton = toggleButton // 상태 저장
