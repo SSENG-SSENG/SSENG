@@ -31,9 +31,21 @@ class MypageViewcontroller: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+//    signAndLoginTest()
     fetchUserData()
     configureUI()
   }
+
+//  // MARK: - 회원가입/로그인 임시 테스트 (작동 확인함)
+//  private func signAndLoginTest() {
+//    let userID = "Mori"
+//    if userRepository.readUser(by: userID) == nil {
+//      userRepository.createUser(id: userID, name: "서광용", password: "1234")
+//    }
+//
+//    // 임시 로그인
+//    UserDefaults.standard.set(userID, forKey: "loggedInUserID")
+//  }
 
   // MARK: - 유저 데이터 불러오기
 
@@ -163,6 +175,10 @@ extension MypageViewcontroller: UITableViewDataSource {
       guard let cell = tableView.dequeueReusableCell(withIdentifier: UserInfoCell.identifier, for: indexPath) as? UserInfoCell else {
         return UITableViewCell()
       }
+      if let user {
+        cell.configure(user)
+      }
+
       return cell
 
     case 1:
