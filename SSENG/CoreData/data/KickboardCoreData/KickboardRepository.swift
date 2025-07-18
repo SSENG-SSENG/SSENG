@@ -6,20 +6,28 @@
 //
 
 import CoreData
+import Foundation
+
+enum KickboardType: String {
+  case kickboard
+  case bike
+}
 
 final class KickboardRepository {
   private let context = CoreDataStack.shared.context
 
   // 킥보드 등록
-  func registKickboard(registerDate: String, location: String, detailLocation: String, type: Int16) -> String {
+  func registKickboard(registerDate: String, lat: Double, lng: Double, detailLocation: String, type: KickboardType, registerId: String) -> String {
     let kb = Kickboard(context: context)
     let newID = UUID().uuidString
     kb.id = newID
     kb.registerDate = registerDate
-    kb.location = location
+    kb.lat = lat
+    kb.lng = lng
     kb.detailLocation = detailLocation
-    kb.type = type
-    kb.battery = Int16(Int.random(in: 20 ... 100)) // 배터리 잔량 50~100 사이의 랜덤 값
+    kb.type = type.rawValue
+    kb.registerId = registerId // 유저의 아이디를 넣어주세요
+    kb.battery = Int16(Int.random(in: 20 ... 100)) // 배터리 잔량 20~100 사이의 랜덤 값
     kb.batteryTime = "약 \(round(Double(kb.battery)) * 1.2) 분"
     kb.isRented = false // 초기 상태는 대여 가능
     // 등록한 유저 아이디
@@ -29,6 +37,12 @@ final class KickboardRepository {
   }
 
   // 등록한 킥보드 조회
+  
+  func readRegistedKickboard(by registerId: String) -> Kickboard? {
+    let fetch = Kickboard.fetchRequest()
+    fetch.predicate = NSPredicate(format: "registerId == %@", registerId)
+    return (try? CoreDataStack.shared.context.fetch(fetch))?.first
+  }
 
   // 킥보드 조회
   func readKickboard(by id: String) -> Kickboard? {
@@ -52,11 +66,12 @@ final class KickboardRepository {
   }
 
   // 킥보드 반납
-  func returnKickboard(id: String, newLocation: String, detailLocation: String) {
+  func returnKickboard(id: String, lat: Double, lng:Double, newLocation: String, detailLocation: String) {
     guard let kb = readKickboard(by: id) else { return }
 
     kb.isRented = false
-    kb.location = newLocation
+    kb.lat = lat
+    kb.lng = lng
     kb.detailLocation = detailLocation
     CoreDataStack.shared.saveContext()
   }

@@ -11,12 +11,12 @@ final class HistoryRepository {
   private let context = CoreDataStack.shared.context
 
   // 내역 등록
-  func createHistory(userId: String, duration: Int16, startTime: String, type: Int16) {
+  func createHistory(userId: String, duration: Int16, startTime: String, type: KickboardType) {
     let history = History(context: context)
     history.userId = userId
     history.duration = duration
     history.startTime = startTime
-    history.type = type
+    history.type = type.rawValue
 
     CoreDataStack.shared.saveContext()
   }

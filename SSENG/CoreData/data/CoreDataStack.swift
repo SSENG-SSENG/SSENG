@@ -52,22 +52,49 @@ final class CoreDataStack {
       print("Delete error: \(error)")
     }
   }
-  
+
   func deleteAllData() {
-      let entities = persistentContainer.managedObjectModel.entities
+    let entities = persistentContainer.managedObjectModel.entities
 
-      for entity in entities {
-          guard let name = entity.name else { continue }
-          let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name)
-          let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-          do {
-              try context.execute(batchDeleteRequest)
-          } catch {
-              print("Failed to delete data for entity: \(name), error: \(error)")
-          }
+    for entity in entities {
+      guard let name = entity.name else { continue }
+      let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name)
+      let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+      do {
+        try context.execute(batchDeleteRequest)
+      } catch {
+        print("Failed to delete data for entity: \(name), error: \(error)")
       }
+    }
 
-      // 변경 사항 저장 (필요 시)
-      saveContext()
+    saveContext()
+  }
+
+  func deleteCoreDataStore() {
+    let storeName = "SSENG"
+    let fileManager = FileManager.default
+
+    let urls = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+    guard let applicationSupportURL = urls.last else { return }
+
+    let storeURL = applicationSupportURL.appendingPathComponent("\(storeName).sqlite")
+
+    let files = [
+      storeURL,
+      storeURL.appendingPathExtension("-shm"),
+      storeURL.appendingPathExtension("-wal"),
+    ]
+
+    for url in files {
+      if fileManager.fileExists(atPath: url.path) {
+        do {
+          try fileManager.removeItem(at: url)
+          print("Deleted: \(url.lastPathComponent)")
+        } catch {
+          print("Error deleting \(url.lastPathComponent): \(error)")
+        }
+      }
+    }
+    saveContext()
   }
 }
