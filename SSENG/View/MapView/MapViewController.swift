@@ -250,11 +250,16 @@ class MapViewController: UIViewController {
   // MARK: - 뷰 추가
 
   private func setupUI() {
-    [mapView, controlStackView, myPageButton, rideKickBoardView].forEach { view.addSubview($0) }
-    [reloadButton, dividerView, locationButton].forEach { controlStackView.addArrangedSubview($0) }
+    [mapView, myPageButton, markerFilterStackView, controlStackView, rideKickBoardView].forEach { view.addSubview($0) }
+
+    [reloadButton, dividerView4, locationButton].forEach { controlStackView.addArrangedSubview($0) }
+
+    [allMarkerButton, dividerView1, kickBoardMarkerButton, dividerView2, bikeMarkerButton, dividerView3, noneMarkerButton].forEach { markerFilterStackView.addArrangedSubview($0) }
+
     [kickBoardHStackView, riddingButton].forEach { rideKickBoardView.addSubview($0) }
 
     [typeImageView, kickBoardVStackView].forEach { kickBoardHStackView.addArrangedSubview($0) }
+
     [batteryLabel, priceLabel, detailLocationTitleLabel, detailLocationLabel].forEach { kickBoardVStackView.addArrangedSubview($0) }
 
     allMarkerButton.addSubview(allMarkerIndicatorDot)
