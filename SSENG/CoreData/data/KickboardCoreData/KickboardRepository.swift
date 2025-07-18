@@ -52,7 +52,7 @@ final class KickboardRepository {
   }
 
   // 킥보드 반납
-  func returnKickboard(id: String, newLocation: String, detailLocation: String) {
+  func returnKickboard(id: String, newLocation _: String, detailLocation: String) {
     guard let kb = readKickboard(by: id) else { return }
 
     kb.isRented = false
