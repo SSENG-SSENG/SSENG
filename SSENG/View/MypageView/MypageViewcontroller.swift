@@ -37,7 +37,7 @@ class MypageViewcontroller: UIViewController {
       tableView.deleteRows(at: indexPaths, with: .fade)
     }
 
-    let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.left"
+    let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.right"
     section1ToggleButton?.setImage(UIImage(systemName: iconName), for: .normal)
   }
 
