@@ -103,13 +103,16 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
           let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
           let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
 
-    // 키보드와 텍스트필드 사이 거리 계산
-    let bottomSpace = view.frame.height - bottomModalView.frame.origin.y - bottomModalView.frame.height
-    let overlap = keyboardFrame.height - bottomSpace
+    let textFieldFrameInView = view.convert(detailLocationTextField.frame, from: detailLocationTextField.superview)
+    let textFieldBottomY = textFieldFrameInView.maxY
+
+    let keyboardTopY = view.frame.height - keyboardFrame.height
+
+    let overlap = textFieldBottomY - keyboardTopY
 
     if overlap > 0 {
       UIView.animate(withDuration: animationDuration) {
-        self.bottomModalView.transform = CGAffineTransform(translationX: 0, y: -overlap - 9)
+        self.bottomModalView.transform = CGAffineTransform(translationX: 0, y: -overlap - 10)
       }
     }
   }
@@ -252,7 +255,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
       print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세위치=\(detailLocation), 타입=\(selectedType)")
 
-      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습니다.") { [weak self] in
+      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습까?") { [weak self] in
           guard let self else { return }
           delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
           self.navigationController?.popViewController(animated: true)
