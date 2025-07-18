@@ -1,12 +1,12 @@
 name: 🔨 Refactor
 description: 기능 변경 없이 코드 리팩토링
 title: "🔨 Refactor: "
-labels: ["Refactor"]
+labels: ["🔨 Refactor"]
 body:
   - type: input
     id: branch
     attributes:
-      label: 브랜치 이름
+      label: 📍 브랜치 이름
       description: 작업할 브랜치 이름을 명확하게 작성해주세요 예) refactor/
       placeholder: 예) refactor/
     validations:
@@ -14,10 +14,10 @@ body:
   - type: input
     id: summary
     attributes:
-      label: 간단 요약
+      label: ✨ 간단 요약
       placeholder: 어떤 코드를 리팩토링하나요?
   - type: textarea
     id: details
     attributes:
-      label: 상세 설명
+      label: ✏️ 상세 설명
       description: 구조 개선 이유, 변경 방식 등을 명시해주세요.
