@@ -18,19 +18,20 @@ class MypageViewcontroller: UIViewController {
     $0.register(KickboardHistoryCell.self, forCellReuseIdentifier: KickboardHistoryCell.identifier)
   }
 
-  private lazy var toggleButton = UIButton(type: .system).then {
-    $0.setTitle("아아~", for: .normal)
-    $0.addTarget(self, action: #selector(toggleSection), for: .touchUpInside)
-  }
-
   private var isKickboardSectionExpanded = true // 나중에 삭제 예정
 
+  private var kickboardsCount: Int {
+    3 // CoreData.count로 나중에 받아옴
+  }
+
   @objc private func toggleSection() {
-    isKickboardSectionExpanded.toggle()
-    tableView.reloadSections( // 섹션 reload
-      IndexSet(integer: 1), // 갱신할 섹션 번호
-      with: .automatic // 애니메이션 방식
-    )
+    isKickboardSectionExpanded.toggle() // 확장 상태 토글
+    let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 등록된 킥보드 개수만큼 indexPath 배열 생성 (1번섹션, row 0~N)
+    if isKickboardSectionExpanded {
+      tableView.insertRows(at: indexPaths, with: .automatic)
+    } else {
+      tableView.deleteRows(at: indexPaths, with: .automatic)
+    }
   }
 
   override func viewDidLoad() {
@@ -91,6 +92,9 @@ extension MypageViewcontroller: UITableViewDataSource {
     }
 
     if section == 1 {
+      let toggleButton = UIButton(type: .system)
+      toggleButton.setTitle("아아~", for: .normal)
+      toggleButton.addTarget(self, action: #selector(toggleSection), for: .touchUpInside)
       container.addSubview(toggleButton)
       toggleButton.snp.makeConstraints {
         $0.trailing.equalToSuperview()
@@ -105,7 +109,7 @@ extension MypageViewcontroller: UITableViewDataSource {
   func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
     switch section {
     case 0: return 1
-    case 1: return isKickboardSectionExpanded ? 2 : 0
+    case 1: return isKickboardSectionExpanded ? kickboardsCount : 0
     case 2: return 5
     default: return 0
     }
