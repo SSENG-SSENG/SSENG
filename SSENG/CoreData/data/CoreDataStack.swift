@@ -52,4 +52,22 @@ final class CoreDataStack {
       print("Delete error: \(error)")
     }
   }
+
+  func deleteAllData() {
+    let entities = persistentContainer.managedObjectModel.entities
+
+    for entity in entities {
+      guard let name = entity.name else { continue }
+      let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: name)
+      let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+      do {
+        try context.execute(batchDeleteRequest)
+      } catch {
+        print("Failed to delete data for entity: \(name), error: \(error)")
+      }
+    }
+
+    // 변경 사항 저장 (필요 시)
+    saveContext()
+  }
 }
