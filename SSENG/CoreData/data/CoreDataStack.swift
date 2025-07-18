@@ -66,32 +66,8 @@ final class CoreDataStack {
         print("Failed to delete data for entity: \(name), error: \(error)")
       }
     }
-<<<<<<< HEAD
 
-    // 변경 사항 저장 (필요 시)
     saveContext()
-  }
-
-  func migrateKickboardLocation(in context: NSManagedObjectContext) {
-    let fetchRequest = NSFetchRequest<Kickboard>(entityName: "Kickboard")
-        do {
-            let kickboards = try context.fetch(fetchRequest)
-            for kb in kickboards {
-                if !kb.location.isEmpty && kb.lat == 0 && kb.lng == 0 {
-                    let parts = kb.location.split(separator: "/").map { String($0) }
-                    if parts.count == 2,
-                       let lat = Double(parts[0].trimmingCharacters(in: .whitespaces)),
-                       let lng = Double(parts[1].trimmingCharacters(in: .whitespaces)) {
-                        kb.lat = lat
-                        kb.lng = lng
-                    }
-                }
-            }
-            try context.save()
-            print("Kickboard location 마이그레이션 완료")
-        } catch {
-            print("마이그레이션 중 오류 발생: \(error)")
-        }
   }
 
   func deleteCoreDataStore() {
@@ -119,10 +95,6 @@ final class CoreDataStack {
         }
       }
     }
-=======
-
-    // 변경 사항 저장 (필요 시)
     saveContext()
->>>>>>> develop
   }
 }
