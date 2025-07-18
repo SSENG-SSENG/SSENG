@@ -55,13 +55,12 @@ class UserInfoCell: UITableViewCell {
     configureLayout()
   }
 
+  // MARK: - layoutSubviews
+
   override func layoutSubviews() {
     super.layoutSubviews()
     DispatchQueue.main.async {
-      self.userImageView.layer.cornerRadius = self.userImageView.frame.width / 2
-      self.userImageView.layer.borderWidth = 0.5
-      self.userImageView.layer.borderColor = UIColor.lightGray.cgColor
-      self.userImageView.clipsToBounds = true
+      self.userImageView.makeCircular()
     }
   }
 
@@ -70,12 +69,16 @@ class UserInfoCell: UITableViewCell {
     fatalError("init(coder:) has not been implemented")
   }
 
+  // MARK: - configureUI
+
   private func configureUI() {
     selectionStyle = .none
 
     contentView.addSubview(containerView)
     [userImageView, userNameLabel, ridingStatusStackView, logoutButton].forEach { containerView.addSubview($0) }
   }
+
+  // MARK: - configureLayout
 
   private func configureLayout() {
     containerView.snp.makeConstraints {

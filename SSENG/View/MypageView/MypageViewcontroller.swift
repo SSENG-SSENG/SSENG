@@ -20,13 +20,15 @@ class MypageViewcontroller: UIViewController {
 
   private var isKickboardSectionExpanded = true // 나중에 삭제 예정
 
+  // 등록된 킥보드 개수. 나중에 CoreData에서 받아올 예정
   private var kickboardsCount: Int {
-    3 // CoreData.count로 나중에 받아옴
+    3
   }
 
+  // 등록한 킥보드 섹션을 열거나 접는 동작
   @objc private func toggleSection() {
     isKickboardSectionExpanded.toggle() // 확장 상태 토글
-    let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 등록된 킥보드 개수만큼 indexPath 배열 생성 (1번섹션, row 0~N)
+    let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 현재 섹션의 셀 위치들을 미리 만듦
     if isKickboardSectionExpanded {
       tableView.insertRows(at: indexPaths, with: .fade)
     } else {
@@ -39,6 +41,8 @@ class MypageViewcontroller: UIViewController {
     configureUI()
   }
 
+  // MARK: - configureUI
+
   private func configureUI() {
     view.addSubview(tableView)
     view.backgroundColor = .systemBackground
@@ -50,6 +54,8 @@ class MypageViewcontroller: UIViewController {
   }
 }
 
+// MARK: - UITableViewDelegate
+
 extension MypageViewcontroller: UITableViewDelegate {
   // 0번째 섹션 헤더 높이 설정(0으로)
   func tableView(_: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -57,18 +63,20 @@ extension MypageViewcontroller: UITableViewDelegate {
   }
 }
 
+// MARK: - UITableViewDataSource
+
 extension MypageViewcontroller: UITableViewDataSource {
-  // 셀의 높이를 자동으로
+  // 셀 높이는 자동으로 계산되도록 (AutoLayout 기반)
   func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
     UITableView.automaticDimension
   }
 
-  // 섹션의 개수를 반환하는 메서드
+  // 섹션의 개수를 반환 (유저 정보 / 등록한 킥보드 / 이용 내역)
   func numberOfSections(in _: UITableView) -> Int {
     3
   }
 
-  // 섹션 헤더 커스텀 UIView 사용
+  // 각 섹션에 맞는 헤더 타이틀 설정
   func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let title: String
     switch section {
@@ -91,6 +99,7 @@ extension MypageViewcontroller: UITableViewDataSource {
       $0.bottom.equalToSuperview().inset(4)
     }
 
+    // 등록한 킥보드 섹션에만 토글 버튼 추가
     if section == 1 {
       let toggleButton = UIButton(type: .system)
       toggleButton.setTitle("아아~", for: .normal)
@@ -105,7 +114,7 @@ extension MypageViewcontroller: UITableViewDataSource {
     return container
   }
 
-  // 섹션에 몇 개의 row(셀)이 들어갈지 결정하는 메서드
+  // 각 섹션에 몇 개의 row(셀)이 들어갈지 결정하는 메서드
   func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
     switch section {
     case 0: return 1
@@ -115,6 +124,7 @@ extension MypageViewcontroller: UITableViewDataSource {
     }
   }
 
+  // 각 섹션에 맞는 셀을 반환
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     switch indexPath.section {
     case 0:
