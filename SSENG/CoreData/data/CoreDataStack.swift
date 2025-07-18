@@ -82,7 +82,7 @@ final class CoreDataStack {
     let files = [
       storeURL,
       storeURL.appendingPathExtension("-shm"),
-      storeURL.appendingPathExtension("-wal"),
+      storeURL.appendingPathExtension("-wal")
     ]
 
     for url in files {

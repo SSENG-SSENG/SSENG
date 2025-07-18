@@ -37,7 +37,7 @@ final class KickboardRepository {
   }
 
   // 등록한 킥보드 조회
-  
+
   func readRegistedKickboard(by registerId: String) -> Kickboard? {
     let fetch = Kickboard.fetchRequest()
     fetch.predicate = NSPredicate(format: "registerId == %@", registerId)
@@ -66,7 +66,7 @@ final class KickboardRepository {
   }
 
   // 킥보드 반납
-  func returnKickboard(id: String, lat: Double, lng:Double, newLocation: String, detailLocation: String) {
+  func returnKickboard(id: String, lat: Double, lng: Double, newLocation _: String, detailLocation: String) {
     guard let kb = readKickboard(by: id) else { return }
 
     kb.isRented = false

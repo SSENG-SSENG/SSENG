@@ -29,7 +29,7 @@ public extension Kickboard {
 extension Kickboard: Identifiable {}
 
 extension Kickboard {
-    var kickboardType: KickboardType? {
-      return KickboardType(rawValue: self.type)
-    }
+  var kickboardType: KickboardType? {
+    KickboardType(rawValue: type)
+  }
 }
