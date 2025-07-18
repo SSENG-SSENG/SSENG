@@ -506,13 +506,30 @@ extension MapViewController {
       marker.mapView = nil
     }
 
+    let visibleBounds = mapView.contentBounds
+
     switch selected {
     case .all:
-      allMarkers.forEach { $0.mapView = mapView }
+      allMarkers.forEach {
+        let position = $0.position
+        if visibleBounds.hasPoint(position) {
+          $0.mapView = mapView
+        }
+      }
     case .kickBoard:
-      kickBoardMarkers.forEach { $0.mapView = mapView }
+      kickBoardMarkers.forEach {
+        let position = $0.position
+        if visibleBounds.hasPoint(position) {
+          $0.mapView = mapView
+        }
+      }
     case .bike:
-      bikeMarkers.forEach { $0.mapView = mapView }
+      bikeMarkers.forEach {
+        let position = $0.position
+        if visibleBounds.hasPoint(position) {
+          $0.mapView = mapView
+        }
+      }
     case .none:
       break
     }
@@ -708,6 +725,8 @@ extension MapViewController: NMFMapViewCameraDelegate {
       showKickBoardView(kickBoard: kickboard)
       pendingKickBoard = nil
     }
+
+    updateVisibleMarkers()
   }
 }
 
