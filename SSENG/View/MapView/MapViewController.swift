@@ -83,6 +83,59 @@ class MapViewController: UIViewController {
     $0.layer.shadowRadius = 6
   }
 
+  private let kickBoardHStackView = UIStackView().then {
+    $0.axis = .horizontal
+    $0.distribution = .fillEqually
+    $0.alignment = .center
+    $0.spacing = 15
+  }
+
+  private let kickBoardVStackView = UIStackView().then {
+    $0.axis = .vertical
+    $0.distribution = .fillEqually
+    $0.spacing = 8
+  }
+
+  // 타입별 이미지
+  private let typeImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+  }
+
+  // 배터리
+  private let batteryLabel = UILabel().then {
+    $0.textColor = .black
+    $0.font = .systemFont(ofSize: 12, weight: .bold)
+  }
+
+  // 가격
+  private let priceLabel = UILabel().then {
+    $0.textColor = .black
+    $0.font = .systemFont(ofSize: 12, weight: .bold)
+  }
+
+  // 상세위치
+  private let detailLocationTitleLabel = UILabel().then {
+    $0.textColor = .black
+    $0.text = "- 상세 위치 -"
+    $0.font = .systemFont(ofSize: 12, weight: .bold)
+  }
+
+  private let detailLocationLabel = UILabel().then {
+    $0.textColor = .black
+    $0.font = .systemFont(ofSize: 12)
+    $0.isUserInteractionEnabled = true
+  }
+
+  private let riddingButton = UIButton().then {
+    $0.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+    $0.setTitleColor(.white, for: .normal)
+    $0.setTitle("대여하기", for: .normal)
+    $0.layer.cornerRadius = 8
+    $0.backgroundColor = .main
+    $0.layer.borderWidth = 1
+    $0.layer.borderColor = UIColor.black.cgColor
+  }
+
   var rideKickBoardViewShowConstraint: [Constraint] = []
   var rideKickBoardViewHiddenConstraint: [Constraint] = []
   var controlStackViewConstraint: [Constraint] = []
@@ -98,6 +151,7 @@ class MapViewController: UIViewController {
     setupConstraints()
     setupButtonActions()
     allKickBoardMarker()
+
     locationManager.requestWhenInUseAuthorization()
   }
 
@@ -117,6 +171,9 @@ class MapViewController: UIViewController {
   private func setupUI() {
     [mapView, controlStackView, myPageButton, rideKickBoardView].forEach { view.addSubview($0) }
     [reloadButton, dividerView, locationButton].forEach { controlStackView.addArrangedSubview($0) }
+    [kickBoardHStackView, riddingButton].forEach { rideKickBoardView.addSubview($0) }
+    [typeImageView, kickBoardVStackView].forEach { kickBoardHStackView.addArrangedSubview($0) }
+    [batteryLabel, priceLabel, detailLocationTitleLabel, detailLocationLabel].forEach { kickBoardVStackView.addArrangedSubview($0) }
   }
 
   // 제약조건
@@ -143,9 +200,13 @@ class MapViewController: UIViewController {
       $0.size.equalTo(50)
     }
 
+    typeImageView.snp.makeConstraints {
+      $0.height.equalTo(80)
+    }
+
     rideKickBoardView.snp.makeConstraints {
       $0.leading.trailing.equalToSuperview()
-      $0.height.equalTo(200)
+      $0.height.equalToSuperview().multipliedBy(0.25)
     }
 
     rideKickBoardViewShowConstraint = rideKickBoardView.snp.prepareConstraints {
@@ -158,10 +219,19 @@ class MapViewController: UIViewController {
     for constraint in rideKickBoardViewHiddenConstraint {
       constraint.isActive = true
     }
+
+    kickBoardHStackView.snp.makeConstraints {
+      $0.leading.top.trailing.equalToSuperview().inset(20)
+    }
+
+    riddingButton.snp.makeConstraints {
+      $0.top.equalTo(kickBoardHStackView.snp.bottom).offset(20)
+      $0.leading.trailing.equalToSuperview().inset(20)
+    }
   }
 
   // 킥보드 정보창 띄우기
-  private func showKickBoardView() {
+  private func showKickBoardView(kickBoard: Kickboard) {
     for constraint in rideKickBoardViewHiddenConstraint {
       constraint.isActive = false
     }
@@ -171,7 +241,18 @@ class MapViewController: UIViewController {
     UIView.animate(withDuration: 0.3) {
       self.view.layoutIfNeeded()
     }
+
     print("마커 클릭됨!")
+
+    if kickBoard.type == 1 {
+      typeImageView.image = UIImage(resource: .kickboard)
+      priceLabel.text = "분당: 100원"
+    } else {
+      typeImageView.image = UIImage(resource: .bike)
+      priceLabel.text = "분당: 1000원"
+    }
+    batteryLabel.attributedText = batteryStatusAttributedText(for: Int(kickBoard.battery))
+    detailLocationLabel.text = "\(kickBoard.detailLocation ?? "정보 없음")"
   }
 
   // 킥보드정보 창 가리기
@@ -237,17 +318,36 @@ class MapViewController: UIViewController {
         marker.iconImage = NMFOverlayImage(image: image)
       }
     }
-    marker.iconTintColor = .black
+
+    marker.userInfo = ["kickboard": kickboard]
     marker.isForceShowIcon = true
     marker.width = 42.5
     marker.height = 42.5
     marker.captionOffset = 8
     marker.mapView = mapView
     marker.touchHandler = { [weak self] _ in
-      self?.showKickBoardView()
+      self?.showKickBoardView(kickBoard: kickboard)
       return true
     }
     kickboardMarkers.append(marker)
+  }
+
+  // 배터리 상태에 따라 아이콘과 텍스트를 반환하는 메서드
+  private func batteryStatusAttributedText(for batteryLevel: Int) -> NSAttributedString {
+    let imageAttachment = NSTextAttachment()
+    if batteryLevel == 100 {
+      imageAttachment.image = UIImage(systemName: "battery.100percent")
+    } else if batteryLevel >= 51 {
+      imageAttachment.image = UIImage(systemName: "battery.75percent")
+    } else if batteryLevel >= 26 {
+      imageAttachment.image = UIImage(systemName: "battery.50percent")
+    } else {
+      imageAttachment.image = UIImage(systemName: "battery.25percent")
+    }
+
+    let fullString = NSMutableAttributedString(attachment: imageAttachment)
+    fullString.append(NSAttributedString(string: " \(batteryLevel)%"))
+    return fullString
   }
 
   // MARK: - Action
@@ -256,6 +356,9 @@ class MapViewController: UIViewController {
     myPageButton.addTarget(self, action: #selector(didTabMyPageButton), for: .touchUpInside)
     reloadButton.addTarget(self, action: #selector(didTabReloadButton), for: .touchUpInside)
     locationButton.addTarget(self, action: #selector(didTapLocationButton), for: .touchUpInside)
+//    rideingButton.addTarget(self, action: #selector(didTapRideingButton), for: .touchUpInside)
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDetailLocationLabelTap))
+    detailLocationLabel.addGestureRecognizer(tapGesture)
   }
 
   // 마이페이지 버튼 액션
@@ -274,6 +377,17 @@ class MapViewController: UIViewController {
   @objc private func didTapLocationButton() {
     print("Location Tapped")
     locationManager.startUpdatingLocation()
+  }
+
+  // 상세위치 탭 제스처 액션
+  @objc private func handleDetailLocationLabelTap() {
+    let alert = UIAlertController(
+      title: "상세 위치",
+      message: detailLocationLabel.text,
+      preferredStyle: .alert
+    )
+    alert.addAction(UIAlertAction(title: "확인", style: .default))
+    present(alert, animated: true)
   }
 }
 
