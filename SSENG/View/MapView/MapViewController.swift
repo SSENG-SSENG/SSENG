@@ -26,9 +26,7 @@ class MapViewController: UIViewController {
   private var pendingKickBoard: Kickboard?
 
   // 맵 뷰
-  let mapView = NMFMapView().then {
-    $0.positionMode = .normal
-  }
+  let mapView = NMFMapView()
 
   // 위치
   let locationManager = CLLocationManager()
@@ -241,6 +239,11 @@ class MapViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     navigationController?.setNavigationBarHidden(true, animated: false)
+
+    // 위치 권한 상태를 확인하고, 필요할 때만 요청
+    if locationManager.authorizationStatus == .notDetermined {
+      locationManager.requestWhenInUseAuthorization()
+    }
   }
 
   // 화면이 꺼질때 네비게이션바 보이게 설정
@@ -384,6 +387,34 @@ extension MapViewController {
     }
   }
 
+  // 현재위치로 카메라 이동 메서드
+  private func locationMove(nowLocation: CLLocationManager) {
+    if let location = nowLocation.location {
+      let lat = location.coordinate.latitude
+      let lng = location.coordinate.longitude
+      let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
+      cameraUpdate.animation = .fly
+      cameraUpdate.animationDuration = 0.5
+      mapView.positionMode = .normal
+      mapView.moveCamera(cameraUpdate)
+    } else {
+      // 약간의 시간차를 두고 다시 시도
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        guard let self = self, let location = nowLocation.location else {
+          print(" 위치를 가져오지 못했습니다.")
+          return
+        }
+        let lat = location.coordinate.latitude
+        let lng = location.coordinate.longitude
+        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
+        cameraUpdate.animation = .fly
+        cameraUpdate.animationDuration = 0.5
+        self.mapView.moveCamera(cameraUpdate)
+      }
+    }
+  }
+
+  // 마커 클릭시 카메라 이동
   private func moveMarker(kickBoard: Kickboard) {
     let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: kickBoard.lat, lng: kickBoard.lng), zoomTo: 16)
     cameraUpdate.animation = .easeIn
@@ -631,6 +662,21 @@ extension MapViewController {
 // MARK: - Location Delegate
 
 extension MapViewController: CLLocationManagerDelegate {
+  // 위치권한 확인
+  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    switch status {
+    case .authorizedWhenInUse, .authorizedAlways:
+      print("위치 권한 허용됨")
+      locationMove(nowLocation: manager) // 권한 허용 즉시 위치 이동
+    case .denied, .restricted:
+      print("위치 권한 거부됨")
+    case .notDetermined:
+      break
+    @unknown default:
+      break
+    }
+  }
+
   // 현재 위치 움직임 감지
   func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     guard let location = locations.last else { return }
@@ -639,7 +685,7 @@ extension MapViewController: CLLocationManagerDelegate {
     cameraUpdate.animation = .fly
     cameraUpdate.animationDuration = 0.5
     mapView.moveCamera(cameraUpdate)
-    mapView.positionMode = .compass
+    mapView.positionMode = .direction
 
     print("카메라 업데이트: \(cameraUpdate)")
   }
