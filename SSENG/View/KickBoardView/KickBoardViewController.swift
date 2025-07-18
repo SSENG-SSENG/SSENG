@@ -252,7 +252,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
       print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세위치=\(detailLocation), 타입=\(selectedType)")
 
-      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습니다.") { [weak self] in
+      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습까?") { [weak self] in
           guard let self else { return }
           delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
           self.navigationController?.popViewController(animated: true)
