@@ -28,9 +28,9 @@ class MypageViewcontroller: UIViewController {
     isKickboardSectionExpanded.toggle() // 확장 상태 토글
     let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 등록된 킥보드 개수만큼 indexPath 배열 생성 (1번섹션, row 0~N)
     if isKickboardSectionExpanded {
-      tableView.insertRows(at: indexPaths, with: .automatic)
+      tableView.insertRows(at: indexPaths, with: .fade)
     } else {
-      tableView.deleteRows(at: indexPaths, with: .automatic)
+      tableView.deleteRows(at: indexPaths, with: .fade)
     }
   }
 
