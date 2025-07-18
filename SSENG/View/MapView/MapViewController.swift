@@ -383,8 +383,9 @@ extension MapViewController {
       handleMarkerFilterButton(allMarkerButton)
     }
   }
+
   private func moveMarker(kickBoard: Kickboard) {
-    let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: kickBoard.lat, lng: kickBoard.lng) , zoomTo: 16)
+    let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: kickBoard.lat, lng: kickBoard.lng), zoomTo: 16)
     cameraUpdate.animation = .easeIn
     cameraUpdate.animationDuration = 0.3
     mapView.moveCamera(cameraUpdate)
@@ -654,7 +655,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
     locationManager.stopUpdatingLocation()
   }
 
-  func mapViewCameraIdle(_ mapView: NMFMapView) {
+  func mapViewCameraIdle(_: NMFMapView) {
     print("카메라 정지")
     if let kickboard = pendingKickBoard {
       showKickBoardView(kickBoard: kickboard)

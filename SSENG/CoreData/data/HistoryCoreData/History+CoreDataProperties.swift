@@ -23,7 +23,7 @@ public extension History {
 extension History: Identifiable {}
 
 extension History {
-    var kickboardType: KickboardType? {
-        return KickboardType(rawValue: type)
-    }
+  var kickboardType: KickboardType? {
+    KickboardType(rawValue: type)
+  }
 }
