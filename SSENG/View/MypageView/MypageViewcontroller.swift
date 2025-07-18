@@ -34,8 +34,8 @@ class MypageViewcontroller: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-//     signAndLoginTest() // 테스트 데이터 생성
-//     registerKickboardTest() // 테스트 데이터 생성
+    //     signAndLoginTest() // 테스트 데이터 생성
+    //     registerKickboardTest() // 테스트 데이터 생성
     configureUI()
   }
 
@@ -121,6 +121,11 @@ class MypageViewcontroller: UIViewController {
     }
 
     kickboards = kickboardRepository.readRegistedKickboard(by: userID)
+      .sorted { // 내림차순 정렬 (최신순)
+        guard let date1 = $0.registerDate?.toDate(),
+              let date2 = $1.registerDate?.toDate() else { return false }
+        return date1 > date2
+      }
     print("불러온 킥보드 개수: \(kickboards.count)")
   }
 
