@@ -126,7 +126,7 @@ class MapViewController: UIViewController {
     $0.isUserInteractionEnabled = true
   }
 
-  private let rideingButton = UIButton().then {
+  private let riddingButton = UIButton().then {
     $0.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
     $0.setTitleColor(.white, for: .normal)
     $0.setTitle("대여하기", for: .normal)
@@ -171,7 +171,7 @@ class MapViewController: UIViewController {
   private func setupUI() {
     [mapView, controlStackView, myPageButton, rideKickBoardView].forEach { view.addSubview($0) }
     [reloadButton, dividerView, locationButton].forEach { controlStackView.addArrangedSubview($0) }
-    [kickBoardHStackView, rideingButton].forEach { rideKickBoardView.addSubview($0) }
+    [kickBoardHStackView, riddingButton].forEach { rideKickBoardView.addSubview($0) }
     [typeImageView, kickBoardVStackView].forEach { kickBoardHStackView.addArrangedSubview($0) }
     [batteryLabel, priceLabel, detailLocationTitleLabel, detailLocationLabel].forEach { kickBoardVStackView.addArrangedSubview($0) }
   }
@@ -224,7 +224,7 @@ class MapViewController: UIViewController {
       $0.leading.top.trailing.equalToSuperview().inset(20)
     }
 
-    rideingButton.snp.makeConstraints {
+    riddingButton.snp.makeConstraints {
       $0.top.equalTo(kickBoardHStackView.snp.bottom).offset(20)
       $0.leading.trailing.equalToSuperview().inset(20)
     }
