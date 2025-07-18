@@ -150,7 +150,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
     marker.mapView = mapView.mapView
 
-    let cameraTarget = NMGLatLng(lat: latitude - 0.0004, lng: longitude) // 위로 약간 보정
+    let cameraTarget = NMGLatLng(lat: latitude - 0.0004, lng: longitude)
     let cameraUpdate = NMFCameraUpdate(scrollTo: cameraTarget, zoomTo: 18)
     mapView.mapView.moveCamera(cameraUpdate)
   }
@@ -234,13 +234,11 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
       dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
       let nowString = dateFormatter.string(from: Date())
 
-      // 👉 타입 매핑 (Int → KickboardType)
       guard let type = selectedType == 1 ? KickboardType.kickboard : selectedType == 2 ? KickboardType.bike : nil else {
           showAlert(title: "타입 오류", message: "유효한 킥보드 타입을 선택해주세요.")
           return
       }
-
-      // 👉 registerId는 사용자 ID로 임시값 넣어둡니다. 실제 로그인 정보에서 가져오세요.
+    
       let registerId = "TEMP_USER_ID"
 
       let newID = repository.registKickboard(
