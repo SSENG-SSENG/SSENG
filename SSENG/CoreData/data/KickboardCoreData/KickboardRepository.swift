@@ -56,7 +56,7 @@ final class KickboardRepository {
     guard let kb = readKickboard(by: id) else { return }
 
     kb.isRented = false
-    kb.location = newLocation
+    // kb.location = newLocation
     kb.detailLocation = detailLocation
     CoreDataStack.shared.saveContext()
   }

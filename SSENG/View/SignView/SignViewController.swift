@@ -242,11 +242,10 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let nickname = nickNameTextField.text ?? ""
     let allValid =
       isValidID(id)
-        && isValidPW(pw)
-        && !rePw.isEmpty
-        // && pw == rePw
-        && isValidNickname(nickname)
-        && isAgreed
+      // && isValidPW(pw)
+      // && !rePw.isEmpty
+      && isValidNickname(nickname)
+      && isAgreed
 
     submitButton.isEnabled = allValid
     submitButton.alpha = allValid ? 1.0 : 0.5
@@ -321,15 +320,15 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       return
     }
 
-    if !isValidPW(pw) {
-      alertController(on: self, title: "패스워드 오류", message: "잘못된 패스워드입니다.")
-      return
-    }
-
-    if pw != rePw {
-      alertController(on: self, title: "패스워드 재확인 오류", message: "패스워드가 같지 않습니다.")
-      return
-    }
+    // if !isValidPW(pw) {
+    //   alertController(on: self, title: "패스워드 오류", message: "잘못된 패스워드입니다.")
+    //   return
+    // }
+   
+    // if pw != rePw {
+    //   alertController(on: self, title: "패스워드 재확인 오류", message: "패스워드가 같지 않습니다.")
+    //   return
+    // }
 
     if !isValidNickname(nickname) {
       alertController(on: self, title: "닉네임 오류", message: "잘못된 닉네임입니다.")
