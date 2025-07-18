@@ -74,7 +74,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     self.latitude = latitude
     self.longitude = longitude
     super.init(nibName: nil, bundle: nil)
-    modalPresentationStyle = .overFullScreen // 전체 화면으로 설정
+    modalPresentationStyle = .overFullScreen
   }
 
   @available(*, unavailable)
@@ -84,7 +84,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    view.backgroundColor = .clear // 배경을 투명하게 하여 아래 뷰가 보이도록
+    view.backgroundColor = .clear
 
     setupMapView()
     setupModalUI()
@@ -101,13 +101,16 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
           let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
           let animationDuration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
 
-    // 키보드와 텍스트필드 사이 거리 계산
-    let bottomSpace = view.frame.height - bottomModalView.frame.origin.y - bottomModalView.frame.height
-    let overlap = keyboardFrame.height - bottomSpace
+    let textFieldFrameInView = view.convert(detailLocationTextField.frame, from: detailLocationTextField.superview)
+    let textFieldBottomY = textFieldFrameInView.maxY
+
+    let keyboardTopY = view.frame.height - keyboardFrame.height
+
+    let overlap = textFieldBottomY - keyboardTopY
 
     if overlap > 0 {
       UIView.animate(withDuration: animationDuration) {
-        self.bottomModalView.transform = CGAffineTransform(translationX: 0, y: -overlap - 9)
+        self.bottomModalView.transform = CGAffineTransform(translationX: 0, y: -overlap - 10)
       }
     }
   }
@@ -148,7 +151,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     marker.position = NMGLatLng(lat: latitude, lng: longitude)
     marker.mapView = mapView.mapView
 
-    let cameraTarget = NMGLatLng(lat: latitude - 0.0004, lng: longitude) // 위로 약간 보정
+    let cameraTarget = NMGLatLng(lat: latitude - 0.0004, lng: longitude)
     let cameraUpdate = NMFCameraUpdate(scrollTo: cameraTarget, zoomTo: 18)
     mapView.mapView.moveCamera(cameraUpdate)
   }
@@ -187,7 +190,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     detailLocationTitleLabel.snp.makeConstraints {
-      $0.top.equalTo(typeSelectionStackView.snp.bottom).offset(20)
+      $0.top.equalTo(typeSelectionStackView.snp.bottom).offset(30)
       $0.leading.trailing.equalToSuperview().inset(20)
     }
 
@@ -250,7 +253,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
       print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세위치=\(detailLocation), 타입=\(selectedType)")
 
-      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습니다.") { [weak self] in
+      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습까?") { [weak self] in
           guard let self else { return }
           delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
           self.navigationController?.popViewController(animated: true)
@@ -259,7 +262,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
 
   @objc private func didTapBackground() {
-    view.endEditing(true) // ✅ 키보드 내리기
+    view.endEditing(true)
   }
 
   @objc private func didTapTypeButton(_ sender: UIButton) {
