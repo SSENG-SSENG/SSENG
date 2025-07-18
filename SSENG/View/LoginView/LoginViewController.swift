@@ -40,7 +40,6 @@ class LoginViewController: UIViewController {
 
   private let pwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 입력하세요."
-    // $0.isSecureTextEntry = true
     $0.textContentType = .password
     $0.clearButtonMode = .always
     $0.isSecureTextEntry = true
@@ -73,7 +72,7 @@ class LoginViewController: UIViewController {
     setupConstraints()
 
     // loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
-    // signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
+    signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
     // debugButton.addTarget(self, action: #selector(donttouchthis), for: .touchUpInside)
   }
 
@@ -85,7 +84,7 @@ class LoginViewController: UIViewController {
     [idLabel, idTextField].forEach {
       idStackView.addArrangedSubview($0)
     }
-    
+
     [pwLabel, pwTextField].forEach {
       pwStackView.addArrangedSubview($0)
     }
@@ -100,22 +99,28 @@ class LoginViewController: UIViewController {
 
     idStackView.snp.makeConstraints {
       $0.top.equalTo(appLogoImageView.snp.bottom)
-      $0.leading.trailing.equalToSuperview()
+      $0.leading.trailing.equalToSuperview().inset(80)
+      $0.centerX.equalToSuperview()
     }
 
     pwStackView.snp.makeConstraints {
-      $0.top.equalTo(idStackView.snp.bottom)
-      $0.leading.trailing.equalToSuperview()
+      $0.top.equalTo(idStackView.snp.bottom).offset(10)
+      $0.leading.trailing.equalToSuperview().inset(80)
+      $0.centerX.equalToSuperview()
     }
 
     loginButton.snp.makeConstraints {
-      $0.top.equalTo(pwStackView.snp.bottom)
-      $0.leading.trailing.equalToSuperview()
+      $0.top.equalTo(pwStackView.snp.bottom).offset(10)
+      $0.leading.trailing.equalToSuperview().inset(80)
+      $0.centerX.equalToSuperview()
+
     }
 
     signUpBUtton.snp.makeConstraints {
       $0.top.equalTo(loginButton.snp.bottom)
-      $0.leading.trailing.equalToSuperview()
+      $0.leading.trailing.equalToSuperview().inset(80)
+      $0.centerX.equalToSuperview()
+
     }
   }
 
