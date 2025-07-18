@@ -9,6 +9,48 @@ import Then
 import UIKit
 
 class LoginViewController: UIViewController {
+  private let appLogoImageView = UIImageView().then {
+    // $0.image = UIImage(named: "LogoCroped")
+    $0.contentMode = .scaleAspectFit
+  }
+
+  private let idLabel = UILabel().then {
+    $0.text = "아이디"
+  }
+
+  private let idTextField = UITextField().then {
+    $0.placeholder = "아이디를 입력하세요."
+    $0.keyboardType = .asciiCapable
+    $0.textContentType = .none
+    $0.autocorrectionType = .no
+    $0.spellCheckingType = .no
+    $0.smartInsertDeleteType = .no
+    $0.autocapitalizationType = .none
+    $0.clearButtonMode = .always
+    $0.returnKeyType = .next
+  }
+
+  private let idStackView = UIStackView().then {
+    $0.axis = .vertical
+  }
+
+  private let pwLabel = UILabel().then {
+    $0.text = "비밀번호"
+  }
+
+  private let pwTextField = UITextField().then {
+    $0.placeholder = "비밀번호를 입력하세요."
+    // $0.isSecureTextEntry = true
+    $0.textContentType = .password
+    $0.clearButtonMode = .always
+    $0.isSecureTextEntry = true
+    $0.returnKeyType = .next
+  }
+
+  private let pwStackView = UIStackView().then {
+    $0.axis = .vertical
+  }
+
   private let loginButton = UIButton().then {
     $0.setTitle("로그인", for: .normal)
     $0.setTitleColor(.main, for: .normal)
@@ -30,32 +72,56 @@ class LoginViewController: UIViewController {
     setupUI()
     setupConstraints()
 
-    loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
-    signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
-    debugButton.addTarget(self, action: #selector(donttouchthis), for: .touchUpInside)
+    // loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
+    // signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
+    // debugButton.addTarget(self, action: #selector(donttouchthis), for: .touchUpInside)
   }
 
   func setupUI() {
-    [loginButton, signUpBUtton, debugButton].forEach(view.addSubview)
+    [appLogoImageView, idStackView, pwStackView, loginButton, signUpBUtton].forEach {
+      view.addSubview($0)
+    }
+
+    [idLabel, idTextField].forEach {
+      idStackView.addArrangedSubview($0)
+    }
+    
+    [pwLabel, pwTextField].forEach {
+      pwStackView.addArrangedSubview($0)
+    }
   }
 
   func setupConstraints() {
-    loginButton.snp.makeConstraints {
-      $0.centerX.centerY.equalToSuperview()
+    appLogoImageView.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide)
+      $0.centerX.equalToSuperview()
+      // $0.width.height.equalTo(100) // 로고 크기 조정
     }
-    signUpBUtton.snp.makeConstraints {
-      $0.top.equalTo(loginButton.snp.bottom)
+
+    idStackView.snp.makeConstraints {
+      $0.top.equalTo(appLogoImageView.snp.bottom)
       $0.leading.trailing.equalToSuperview()
     }
-    debugButton.snp.makeConstraints {
-      $0.top.equalTo(signUpBUtton.snp.bottom)
+
+    pwStackView.snp.makeConstraints {
+      $0.top.equalTo(idStackView.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+    }
+
+    loginButton.snp.makeConstraints {
+      $0.top.equalTo(pwStackView.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+    }
+
+    signUpBUtton.snp.makeConstraints {
+      $0.top.equalTo(loginButton.snp.bottom)
       $0.leading.trailing.equalToSuperview()
     }
   }
 
   @objc func didTapLogin() {
-    let mapVC = MapViewController()
-    navigationController?.pushViewController(mapVC, animated: true)
+    // let mapVC = MapViewController()
+    // navigationController?.pushViewController(mapVC, animated: true)
   }
 
   @objc func didTapSignUp() {
