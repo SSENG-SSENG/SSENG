@@ -28,6 +28,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   // |=============|
 
   // MARK: 컴포넌트 초기화
+
   private let appLogoImageView = UIImageView().then {
     // $0.image = UIImage(named: "LogoCroped")
     $0.contentMode = .scaleAspectFit
@@ -125,7 +126,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     $0.setTitleColor(.white, for: .normal)
     $0.backgroundColor = .main
     $0.layer.cornerRadius = 8
-
   }
 
   override func viewDidLoad() {
@@ -150,29 +150,29 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       rePwStackView,
       nickNameViewStack,
       termsStackView,
-      submitButton,
+      submitButton
     ].forEach {
       view.addSubview($0)
     }
 
-    [idLabel, idTextField].forEach {
-      idStackView.addArrangedSubview($0)
+    for item in [idLabel, idTextField] {
+      idStackView.addArrangedSubview(item)
     }
 
-    [pwLabel, pwTextField].forEach {
-      pwStackView.addArrangedSubview($0)
+    for item in [pwLabel, pwTextField] {
+      pwStackView.addArrangedSubview(item)
     }
 
-    [rePwLabel, rePwTextField].forEach {
-      rePwStackView.addArrangedSubview($0)
+    for item in [rePwLabel, rePwTextField] {
+      rePwStackView.addArrangedSubview(item)
     }
 
-    [nickNameLabel, nickNameTextField].forEach {
-      nickNameViewStack.addArrangedSubview($0)
+    for item in [nickNameLabel, nickNameTextField] {
+      nickNameViewStack.addArrangedSubview(item)
     }
 
-    [termsAgreeCheckBox, termsViewButton, termsTextLabel].forEach {
-      termsStackView.addArrangedSubview($0)
+    for item in [termsAgreeCheckBox, termsViewButton, termsTextLabel] {
+      termsStackView.addArrangedSubview(item)
     }
   }
 
@@ -221,6 +221,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   // MARK: 버튼 addTarget
+
   private func setupButtonActions() {
     termsAgreeCheckBox.addTarget(self, action: #selector(didTapCheckbox(_:)), for: .touchUpInside)
     termsViewButton.addTarget(self, action: #selector(didTapTersmView(_:)), for: .touchUpInside)
@@ -228,8 +229,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   private func addTextFieldObservers() {
-    [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach {
-      $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    for item in [idTextField, pwTextField, rePwTextField, nickNameTextField] {
+      item.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
   }
 
@@ -241,11 +242,11 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let nickname = nickNameTextField.text ?? ""
     let allValid =
       isValidID(id)
-      && isValidPW(pw)
-      && !rePw.isEmpty
-      // && pw == rePw
-      && isValidNickname(nickname)
-      && isAgreed
+        && isValidPW(pw)
+        && !rePw.isEmpty
+        // && pw == rePw
+        && isValidNickname(nickname)
+        && isAgreed
 
     submitButton.isEnabled = allValid
     submitButton.alpha = allValid ? 1.0 : 0.5
@@ -283,7 +284,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     return trimmed.range(of: #"^[가-힣A-Za-z0-9]{1,8}$"#, options: .regularExpression) != nil
   }
 
-  public func alertController(on vc: UIViewController, title: String, message: String) {
+  func alertController(on vc: UIViewController, title: String, message: String) {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
     let button = UIAlertAction(title: "확인", style: .default)
     alert.addAction(button)
@@ -291,6 +292,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   // MARK: 버튼 팡숀
+
   @objc func didTapCheckbox(_ sender: UIButton) {
     sender.isSelected.toggle()
     isAgreed = sender.isSelected
@@ -298,7 +300,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     print(sender.isSelected)
   }
 
-  @objc func didTapTersmView(_ sender: UIButton) {
+  @objc func didTapTersmView(_: UIButton) {
     let vc = TermsViewController()
     vc.delegate = self
     let nav = UINavigationController(rootViewController: vc)
@@ -306,7 +308,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     present(nav, animated: true)
   }
 
-  @objc func didTapSubmitButton(_ sender: UIButton) {
+  @objc func didTapSubmitButton(_: UIButton) {
     // TODO: 2. 빈 칸(변경 필요한 칸) 파악되면 하이라이팅
     // TODO: 3. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
     let id = idTextField.text ?? ""
@@ -347,18 +349,19 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     navigationController?.popViewController(animated: true)
   }
 
-  @objc private func textFieldDidChange(_ sender: UITextField) {
+  @objc private func textFieldDidChange(_: UITextField) {
     updateSubmitButtonState()
   }
 }
 
 extension SignViewController: TermsViewControllerDelegate {
-  func termsViewControllerDidAgree(_ controller: TermsViewController) {
+  func termsViewControllerDidAgree(_: TermsViewController) {
     termsAgreeCheckBox.isSelected = true
     isAgreed = true
     updateSubmitButtonState()
   }
-  func termsViewControllerDidReject(_ controller: TermsViewController) {
+
+  func termsViewControllerDidReject(_: TermsViewController) {
     termsAgreeCheckBox.isSelected = false
     isAgreed = false
     updateSubmitButtonState()

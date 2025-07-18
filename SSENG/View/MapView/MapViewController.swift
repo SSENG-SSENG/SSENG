@@ -259,7 +259,7 @@ class MapViewController: UIViewController {
     [kickBoardHStackView, riddingButton].forEach { rideKickBoardView.addSubview($0) }
 
     [typeImageView, kickBoardVStackView].forEach { kickBoardHStackView.addArrangedSubview($0) }
-    
+
     [batteryLabel, priceLabel, detailLocationTitleLabel, detailLocationLabel].forEach { kickBoardVStackView.addArrangedSubview($0) }
 
     allMarkerButton.addSubview(allMarkerIndicatorDot)
