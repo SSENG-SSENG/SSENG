@@ -573,11 +573,12 @@ extension MapViewController {
       self.view.layoutIfNeeded()
     }
 
-    // 탑승 중일때 다른 킥보드 대여 못하게
-    riddingButton.isEnabled = false
-    riddingButton.backgroundColor = .lightGray
-    riddingButton.setTitle("기기를 반납 후 이용해주세요.", for: .normal)
-
+    // 탑승 중일때 다른 킥보드 대여 못하게 및 창이 내려간 후에 바뀌게
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      self.riddingButton.isEnabled = false
+      self.riddingButton.backgroundColor = .lightGray
+      self.riddingButton.setTitle("기기를 반납 후 이용해주세요.", for: .normal)
+    }
     // 스톱워치 초기화
     secondsElapsed = 0
     timer?.invalidate() // 혹시 모를 기존 타이머 제거
@@ -904,6 +905,7 @@ extension MapViewController {
       self.kickBoardRepository.returnKickboard(id: self.riddingKickBoard?.id ?? "데이터가 없습니다.", lat: lat, lng: lng, detailLocation: self.detailLocationLabel.text ?? "데이터가 없습니다")
       self.allKickBoardMarker()
       self.hiddenRiddingView()
+      self.locationMove(nowLocation: self.locationManager)
       self.locationManager.stopUpdatingLocation()
       self.mapView.positionMode = .normal
       self.riddingKickBoard = nil

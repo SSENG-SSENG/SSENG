@@ -28,7 +28,7 @@ final class KickboardRepository {
     kb.type = type.rawValue
     kb.registerId = registerId // 유저의 아이디를 넣어주세요
     kb.battery = Int16(Int.random(in: 20 ... 100)) // 배터리 잔량 20~100 사이의 랜덤 값
-    kb.batteryTime = "약 \(round(Double(kb.battery)) * 1.2) 분"
+    kb.batteryTime = String(format: "약 %.1f 분", round(Double(kb.battery) * 1.2))
     kb.isRented = false // 초기 상태는 대여 가능
     // 등록한 유저 아이디
 
