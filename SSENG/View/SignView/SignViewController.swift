@@ -44,11 +44,11 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     $0.placeholder = "아이디를 입력하세요."
     $0.keyboardType = .asciiCapable
     $0.textContentType = .none
+    $0.autocapitalizationType = .none
     $0.autocorrectionType = .no
     $0.spellCheckingType = .no
     $0.smartInsertDeleteType = .no
-    $0.autocapitalizationType = .none
-    $0.clearButtonMode = .always
+    $0.clearButtonMode = .whileEditing
     $0.returnKeyType = .next
   }
 
@@ -65,7 +65,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   private let pwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 입력하세요."
-    $0.clearButtonMode = .always
+    $0.clearButtonMode = .whileEditing
     $0.isSecureTextEntry = true
     $0.returnKeyType = .next
   }
@@ -83,7 +83,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   private let rePwTextField = UITextField().then {
     $0.placeholder = "비밀번호를 다시 입력하세요."
-    $0.clearButtonMode = .always
+    $0.clearButtonMode = .whileEditing
     $0.isSecureTextEntry = true
     $0.returnKeyType = .next
   }
@@ -101,12 +101,11 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   private let nameTextField = UITextField().then {
     $0.placeholder = "최대 8자"
-    $0.clearButtonMode = .always
+    $0.clearButtonMode = .whileEditing
+    $0.autocapitalizationType = .none
     $0.autocorrectionType = .no
     $0.spellCheckingType = .no
     $0.smartInsertDeleteType = .no
-    $0.autocapitalizationType = .none
-    $0.clearButtonMode = .always
     $0.returnKeyType = .done
   }
 
@@ -421,6 +420,11 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       alertController(on: self, title: "아이디 오류", message: "아이디는 4-16자 영문 소문자와 숫자로만 구성되어야 합니다.")
       return
     }
+    
+    if repository.readUser(by: idTextField.text ?? "id-xxxx") != nil {
+      alertController(on: self, title: "아이디 중복", message: "중복된 아이디입니다.\n다른 아이디를 사용해 주세요.")
+      return
+    }
 
     if !isValidPW(pw) {
       alertController(on: self, title: "패스워드 오류", message: "비밀번호는 8-32자 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.")
@@ -437,12 +441,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       return
     }
 
-    if repository.readUser(by: idTextField.text ?? "id-xxxx") != nil {
-      alertController(on: self, title: "아이디 중복", message: "중복된 아이디입니다.\n다른 아이디를 사용해 주세요.")
-      return
-    }
-
-    if repository.readUser(by: nameTextField.text ?? "name-xxxx") != nil {
+    if repository.readName(by: nameTextField.text ?? "name-xxxx") != nil {
       alertController(on: self, title: "닉네임 중복", message: "중복된 닉네임입니다.\n다른 아이디를 사용해 주세요.")
       return
     }
