@@ -12,6 +12,9 @@ import Then
 import UIKit
 
 class MapViewController: UIViewController {
+  // 검색Service
+  let searchService = SearchService()
+
   // 선택된 마커
   var selected: SelectedMarkerModel = .all
 
@@ -311,7 +314,7 @@ class MapViewController: UIViewController {
   // MARK: - 뷰 추가
 
   private func setupUI() {
-    [mapView, myPageButton, markerFilterStackView, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
+    [mapView, searchBar, myPageButton, markerFilterStackView, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
 
     [reloadButton, dividerView4, locationButton].forEach { controlStackView.addArrangedSubview($0) }
 
@@ -338,9 +341,15 @@ class MapViewController: UIViewController {
       $0.directionalEdges.equalToSuperview()
     }
 
+    searchBar.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.height.equalTo(50)
+    }
+
     myPageButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(20)
-      $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+      $0.top.equalTo(searchBar.snp.bottom).offset(20)
       $0.size.equalTo(50)
     }
 
@@ -481,6 +490,20 @@ extension MapViewController {
     } else {
       // 기본값은 all
       handleMarkerFilterButton(allMarkerButton)
+    }
+  }
+
+  // 검색
+  func searchData(query: String) {
+    searchService.search(query: query) { result in
+      switch result {
+      case let .success(places):
+        for place in places {
+          print("📍 \(place.title) - \(place.address)")
+        }
+      case let .failure(error):
+        print("❌ 검색 실패: \(error)")
+      }
     }
   }
 
@@ -943,7 +966,11 @@ extension MapViewController {
 
 // MARK: - SearchBar Delegate
 
-extension MapViewController: UISearchBarDelegate {}
+extension MapViewController: UISearchBarDelegate {
+  func searchBar(_: UISearchBar, textDidChange searchText: String) {
+    searchData(query: searchText)
+  }
+}
 
 // MARK: - Location Delegate
 
