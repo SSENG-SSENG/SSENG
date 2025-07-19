@@ -880,7 +880,7 @@ extension MapViewController {
     }
 
     guard let location = locationManager.location else {
-      print("❗️현재 위치 정보를 아직 가져오지 못했어요")
+      print("현재 위치 정보가 없습니다.")
       return
     }
     let lat = location.coordinate.latitude
@@ -893,8 +893,17 @@ extension MapViewController {
       preferredStyle: .alert
     )
 
+    var confirmAction: UIAlertAction? = nil
+
     alert.addTextField { textField in
       textField.placeholder = "예: 건물 앞 자전거 거치대"
+
+      NotificationCenter.default.addObserver(forName: UITextField.textDidChangeNotification, object: textField, queue: .main) { _ in
+        guard let text = textField.text,
+              let confirm = confirmAction else { return }
+
+        confirm.isEnabled = !text.trimmingCharacters(in: .whitespaces).isEmpty
+      }
     }
 
     // 확인 버튼 클릭시 반납 처리 실행
@@ -915,6 +924,8 @@ extension MapViewController {
       self.riddingButton.backgroundColor = .main
       self.riddingButton.setTitle("대여하기", for: .normal)
     }
+    confirm.isEnabled = false
+    confirmAction = confirm
 
     alert.addAction(confirm)
     alert.addAction(UIAlertAction(title: "취소", style: .cancel))
