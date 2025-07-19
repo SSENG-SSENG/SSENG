@@ -37,9 +37,9 @@ class MypageViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-//    signAndLoginTest() // 테스트 데이터 생성
-//    registerKickboardTest() // 테스트 데이터 생성
-//    registerHistoryTest() // 테스트 이용내역 생성
+    //    signAndLoginTest() // 테스트 데이터 생성
+    //    registerKickboardTest() // 테스트 데이터 생성
+    //    registerHistoryTest() // 테스트 이용내역 생성
     configureUI()
   }
 
@@ -50,84 +50,84 @@ class MypageViewController: UIViewController {
     fetchHistoryData()
   }
 
-//  // MARK: - 회원가입/로그인 임시 테스트 (작동 확인함)
-//
-//  private func signAndLoginTest() {
-//    let userID = "Mori"
-//    if userRepository.readUser(by: userID) == nil {
-//      userRepository.createUser(id: userID, name: "서광용", password: "1234")
-//    }
-//
-//    // 임시 로그인
-//    UserDefaults.standard.set(userID, forKey: "loggedUserID")
-//  }
+  //  // MARK: - 회원가입/로그인 임시 테스트 (작동 확인함)
+  //
+  //  private func signAndLoginTest() {
+  //    let userID = "Mori"
+  //    if userRepository.readUser(by: userID) == nil {
+  //      userRepository.createUser(id: userID, name: "서광용", password: "1234")
+  //    }
+  //
+  //    // 임시 로그인
+  //    UserDefaults.standard.set(userID, forKey: "loggedUserID")
+  //  }
 
-//  // MARK: - 등록한 킥보드 임시 테스트 (테스트 완료)
-//
-//  private func registerKickboardTest() {
-//    let context = CoreDataStack.shared.context
-//
-//    // 킥보드 1 (bike 타입)
-//    let kickboard1 = Kickboard(context: context)
-//    kickboard1.type = KickboardType.bike.rawValue
-//    kickboard1.registerDate = "2025-07-18 17:00:00"
-//    kickboard1.id = UUID().uuidString
-//
-//    // 킥보드 2 (kickboard 타입)
-//    let kickboard2 = Kickboard(context: context)
-//    kickboard2.type = KickboardType.kickboard.rawValue
-//    kickboard2.registerDate = "2025-07-18 17:10:00"
-//    kickboard2.id = UUID().uuidString
-//
-//    // 킥보드 3 (bike 타입)
-//    let kickboard3 = Kickboard(context: context)
-//    kickboard3.type = KickboardType.bike.rawValue
-//    kickboard3.registerDate = "2025-07-18 17:20:00"
-//    kickboard3.id = UUID().uuidString
-//
-//    // 공통: 현재 로그인된 사용자 ID 설정
-//    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
-//      print("로그인된 사용자 ID가 없습니다.")
-//      return
-//    }
-//    for item in [kickboard1, kickboard2, kickboard3] {
-//      item.registerId = userID
-//    }
-//
-//    CoreDataStack.shared.saveContext()
-//    print("테스트 킥보드 3개 등록 완료")
-//  }
+  //  // MARK: - 등록한 킥보드 임시 테스트 (테스트 완료)
+  //
+  //  private func registerKickboardTest() {
+  //    let context = CoreDataStack.shared.context
+  //
+  //    // 킥보드 1 (bike 타입)
+  //    let kickboard1 = Kickboard(context: context)
+  //    kickboard1.type = KickboardType.bike.rawValue
+  //    kickboard1.registerDate = "2025-07-18 17:00:00"
+  //    kickboard1.id = UUID().uuidString
+  //
+  //    // 킥보드 2 (kickboard 타입)
+  //    let kickboard2 = Kickboard(context: context)
+  //    kickboard2.type = KickboardType.kickboard.rawValue
+  //    kickboard2.registerDate = "2025-07-18 17:10:00"
+  //    kickboard2.id = UUID().uuidString
+  //
+  //    // 킥보드 3 (bike 타입)
+  //    let kickboard3 = Kickboard(context: context)
+  //    kickboard3.type = KickboardType.bike.rawValue
+  //    kickboard3.registerDate = "2025-07-18 17:20:00"
+  //    kickboard3.id = UUID().uuidString
+  //
+  //    // 공통: 현재 로그인된 사용자 ID 설정
+  //    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
+  //      print("로그인된 사용자 ID가 없습니다.")
+  //      return
+  //    }
+  //    for item in [kickboard1, kickboard2, kickboard3] {
+  //      item.registerId = userID
+  //    }
+  //
+  //    CoreDataStack.shared.saveContext()
+  //    print("테스트 킥보드 3개 등록 완료")
+  //  }
 
-//  // MARK: - 이용 내역 임시 테스트 (테스트 완료)
-//
-//  private func registerHistoryTest() {
-//    let context = CoreDataStack.shared.context
-//    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else { return }
-//
-//    let formatter = DateFormatter()
-//    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-//
-//    let history1 = History(context: context)
-//    history1.userId = userID
-//    history1.type = KickboardType.kickboard.rawValue
-//    history1.startTime = "2025-07-18 20:00:00"
-//    history1.duration = 40
-//
-//    let history2 = History(context: context)
-//    history2.userId = userID
-//    history2.type = KickboardType.bike.rawValue
-//    history2.startTime = "2025-07-17 21:10:00"
-//    history2.duration = 25
-//
-//    let history3 = History(context: context)
-//    history3.userId = userID
-//    history3.type = KickboardType.kickboard.rawValue
-//    history3.startTime = "2025-07-18 22:00:00"
-//    history3.duration = 60
-//
-//    CoreDataStack.shared.saveContext()
-//    print("이용내역 3개 등록 완료")
-//  }
+  //  // MARK: - 이용 내역 임시 테스트 (테스트 완료)
+  //
+  //  private func registerHistoryTest() {
+  //    let context = CoreDataStack.shared.context
+  //    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else { return }
+  //
+  //    let formatter = DateFormatter()
+  //    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+  //
+  //    let history1 = History(context: context)
+  //    history1.userId = userID
+  //    history1.type = KickboardType.kickboard.rawValue
+  //    history1.startTime = "2025-07-18 20:00:00"
+  //    history1.duration = 40
+  //
+  //    let history2 = History(context: context)
+  //    history2.userId = userID
+  //    history2.type = KickboardType.bike.rawValue
+  //    history2.startTime = "2025-07-17 21:10:00"
+  //    history2.duration = 25
+  //
+  //    let history3 = History(context: context)
+  //    history3.userId = userID
+  //    history3.type = KickboardType.kickboard.rawValue
+  //    history3.startTime = "2025-07-18 22:00:00"
+  //    history3.duration = 60
+  //
+  //    CoreDataStack.shared.saveContext()
+  //    print("이용내역 3개 등록 완료")
+  //  }
 
   // MARK: - 유저 데이터 불러오기
 
@@ -205,6 +205,25 @@ class MypageViewController: UIViewController {
 
     let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.right"
     section1ToggleButton?.setImage(UIImage(systemName: iconName), for: .normal)
+  }
+
+  @objc private func handleLogout() {
+    print("로그아웃 버튼 눌림")
+    let alert = UIAlertController(title: "로그아웃", message: "정말 로그아웃 하시겠습니까?", preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+      UserDefaults.standard.removeObject(forKey: "loggedUserID") // 로그인한 id를 임시 저장한 UserDefaults에서 삭제
+
+      // 메인 화면을 로그인 화면으로 변경
+      guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, // 연결된 scene중 첫 번째를 가져옴
+            let sceneDelegate = windowScene.delegate as? SceneDelegate else { return } // 그 화면을 관리하는 SceneDelegate
+
+      let loginVC = LoginViewController()
+      let nav = UINavigationController(rootViewController: loginVC)
+      sceneDelegate.window?.rootViewController = nav // 앱의 메인 창의 rootVC를 nav로 완전 교체
+      sceneDelegate.window?.makeKeyAndVisible()
+    }))
+    present(alert, animated: true)
   }
 }
 
@@ -294,6 +313,8 @@ extension MypageViewController: UITableViewDataSource {
       if let user {
         cell.configure(user)
       }
+
+      cell.logoutButton.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
 
       return cell
 

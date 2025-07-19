@@ -41,7 +41,7 @@ class UserInfoCell: UITableViewCell {
     $0.alignment = .center
   }
 
-  private let logoutButton = UIButton().then {
+  private(set) var logoutButton = UIButton(type: .system).then { // VC에서 addTarget을 위해 private(set)
     $0.setTitle("로그아웃", for: .normal)
     $0.setTitleColor(.systemRed, for: .normal)
   }
