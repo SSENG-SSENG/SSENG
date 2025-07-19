@@ -7,6 +7,7 @@
 import SnapKit
 import Then
 import UIKit
+import AVFoundation
 
 class SignViewController: UIViewController, UITextFieldDelegate {
   // 동의 여부
@@ -355,6 +356,27 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     tapGesture.cancelsTouchesInView = false
     view.addGestureRecognizer(tapGesture)
   }
+  
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    guard let text = textField.text, !text.isEmpty else {
+      textField.shake()
+      AudioServicesPlaySystemSound(4095)
+      return false
+    }
+    switch textField {
+    case idTextField:
+      pwTextField.becomeFirstResponder()
+    case pwTextField:
+      rePwTextField.becomeFirstResponder()
+    case rePwTextField:
+      nameTextField.becomeFirstResponder()
+    case nameTextField:
+      nameTextField.resignFirstResponder()
+    default:
+      break
+    }
+    return false
+  }
 
   func prepareForTransition() {
     [idStackView, pwStackView, rePwStackView, nameStackView, termsStackView, submitButton].forEach {
@@ -488,6 +510,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     guard let scalar = character.unicodeScalars.first else { return false }
     return scalar.value >= 0xAC00 && scalar.value <= 0xD7A3
   }
+
 }
 
 // TermsViewController 데이터 가져오기
@@ -503,4 +526,15 @@ extension SignViewController: TermsViewControllerDelegate {
     isAgreed = false
     updateSubmitButtonState()
   }
+}
+
+extension UIView {
+    func shake(duration: CFTimeInterval = 0.5, repeatCount: Float = 2) {
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+        animation.duration = duration
+        animation.values = [-8, 8, -6, 6, -4, 4, -2, 2, 0]
+        animation.repeatCount = repeatCount
+        self.layer.add(animation, forKey: "shake")
+    }
 }
