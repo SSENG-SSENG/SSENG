@@ -22,9 +22,9 @@ final class HistoryRepository {
   }
 
   // 내역 조회
-  func readHistory(by userId: String) -> History? {
+  func readHistory(by userId: String) -> [History] {
     let fetch = History.fetchRequest()
     fetch.predicate = NSPredicate(format: "userId == %@", userId)
-    return (try? CoreDataStack.shared.context.fetch(fetch))?.first
+    return (try? CoreDataStack.shared.context.fetch(fetch)) ?? []
   }
 }

@@ -38,10 +38,10 @@ final class KickboardRepository {
 
   // 등록한 킥보드 조회
 
-  func readRegistedKickboard(by registerId: String) -> Kickboard? {
+  func readRegistedKickboard(by registerId: String) -> [Kickboard] {
     let fetch = Kickboard.fetchRequest()
     fetch.predicate = NSPredicate(format: "registerId == %@", registerId)
-    return (try? CoreDataStack.shared.context.fetch(fetch))?.first
+    return (try? CoreDataStack.shared.context.fetch(fetch)) ?? []
   }
 
   // 킥보드 조회
