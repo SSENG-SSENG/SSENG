@@ -940,11 +940,10 @@ extension MapViewController {
     present(alert, animated: true)
   }
 }
+
 // MARK: - SearchBar Delegate
-extension MapViewController: UISearchBarDelegate {
 
-}
-
+extension MapViewController: UISearchBarDelegate {}
 
 // MARK: - Location Delegate
 
