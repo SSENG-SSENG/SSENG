@@ -38,6 +38,12 @@ class MapViewController: UIViewController {
   // 위치
   let locationManager = CLLocationManager()
 
+  // 검색창
+  private let searchBar = UISearchBar().then {
+    $0.placeholder = "주소 검색"
+    $0.searchBarStyle = .minimal
+  }
+
   // 마이페이지 버튼
   private let myPageButton = UIButton().then {
     $0.setImage(UIImage(systemName: "person"), for: .normal)
@@ -272,6 +278,7 @@ class MapViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    searchBar.delegate = self
     mapView.addCameraDelegate(delegate: self)
     mapView.touchDelegate = self
     locationManager.delegate = self
@@ -933,6 +940,11 @@ extension MapViewController {
     present(alert, animated: true)
   }
 }
+// MARK: - SearchBar Delegate
+extension MapViewController: UISearchBarDelegate {
+
+}
+
 
 // MARK: - Location Delegate
 
