@@ -29,7 +29,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   // MARK: 컴포넌트 초기화
 
-  private let appLogoImageView = UIImageView().then {
+  let appLogoImageView = UIImageView().then {
     $0.image = UIImage(named: "Logo")
     $0.contentMode = .scaleAspectFit
   }
@@ -94,12 +94,12 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   }
 
-  private let nickNameLabel = UILabel().then {
+  private let nameLabel = UILabel().then {
     $0.text = "닉네임"
     $0.font = .systemFont(ofSize: 15, weight: .medium)
   }
 
-  private let nickNameTextField = UITextField().then {
+  private let nameTextField = UITextField().then {
     $0.placeholder = "최대 8자"
     $0.clearButtonMode = .always
     $0.autocorrectionType = .no
@@ -110,7 +110,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     $0.returnKeyType = .done
   }
 
-  private let nickNameViewStack = UIStackView().then {
+  private let nameStackView = UIStackView().then {
     $0.axis = .vertical
     $0.spacing = 6
 
@@ -156,7 +156,20 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     afterFilter()
     dismissKeyboardController()
 
-    [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach { $0.delegate = self }
+    [idTextField, pwTextField, rePwTextField, nameTextField].forEach { $0.delegate = self }
+
+    prepareForTransition()
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    if self.isMovingFromParent {
+      if let loginVC = navigationController?.viewControllers.last(where: { $0 is LoginViewController })
+        as? LoginViewController
+      {
+        loginVC.prepareForTransition()
+      }
+    }
   }
 
   // 뷰, 스택
@@ -166,7 +179,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       idStackView,
       pwStackView,
       rePwStackView,
-      nickNameViewStack,
+      nameStackView,
       termsStackView,
       submitButton,
     ].forEach {
@@ -185,8 +198,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       rePwStackView.addArrangedSubview($0)
     }
 
-    [nickNameLabel, nickNameTextField].forEach {
-      nickNameViewStack.addArrangedSubview($0)
+    [nameLabel, nameTextField].forEach {
+      nameStackView.addArrangedSubview($0)
     }
 
     [termsAgreeCheckBox, termsViewButton, termsTextLabel].forEach {
@@ -236,11 +249,11 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       $0.centerX.equalToSuperview()
     }
 
-    nickNameTextField.snp.makeConstraints {
+    nameTextField.snp.makeConstraints {
       $0.height.equalTo(height)
     }
 
-    nickNameViewStack.snp.makeConstraints {
+    nameStackView.snp.makeConstraints {
       $0.top.equalTo(rePwStackView.snp.bottom).offset(10)
       $0.leading.trailing.equalToSuperview().inset(padding)
       $0.centerX.equalToSuperview()
@@ -248,7 +261,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
     termsStackView.setCustomSpacing(4, after: termsAgreeCheckBox)
     termsStackView.snp.makeConstraints {
-      $0.top.equalTo(nickNameViewStack.snp.bottom).offset(10)
+      $0.top.equalTo(nameStackView.snp.bottom).offset(10)
       $0.centerX.equalToSuperview()
     }
 
@@ -268,7 +281,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   private func addTextFieldObservers() {
-    [idTextField, pwTextField, rePwTextField, nickNameTextField].forEach {
+    [idTextField, pwTextField, rePwTextField, nameTextField].forEach {
       $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
   }
@@ -278,12 +291,12 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let id = idTextField.text ?? ""
     let pw = pwTextField.text ?? ""
     let rePw = rePwTextField.text ?? ""
-    let nickname = nickNameTextField.text ?? ""
+    let name = nameTextField.text ?? ""
     let allValid =
       isValidID(id)
       && isValidPW(pw)
       && !rePw.isEmpty
-      && isValidNickname(nickname)
+      && isValidName(name)
       && isAgreed
 
     submitButton.isEnabled = allValid
@@ -302,7 +315,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
         && (string.isEmpty || string.range(of: "[^a-z0-9]", options: .regularExpression) == nil)
     case pwTextField, rePwTextField:
       return updated.count <= 32
-    case nickNameTextField:
+    case nameTextField:
       return updated.replacingOccurrences(of: " ", with: "").count <= 8
     default:
       return true
@@ -318,7 +331,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     pw.range(of: #"^[A-Za-z\d!@#$&*]{8,32}$"#, options: .regularExpression) != nil
   }
 
-  private func isValidNickname(_ nick: String) -> Bool {
+  private func isValidName(_ nick: String) -> Bool {
     let trimmed = nick.replacingOccurrences(of: " ", with: "")
     return trimmed.range(of: #"^[가-힣A-Za-z0-9]{1,8}$"#, options: .regularExpression) != nil
   }
@@ -344,8 +357,43 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     view.addGestureRecognizer(tapGesture)
   }
 
-  // MARK: 버튼 팡숀
+  func prepareForTransition() {
+    [idStackView, pwStackView, rePwStackView, nameStackView, termsStackView, submitButton].forEach {
+      $0.alpha = 0
+    }
+  }
 
+  func animateContentAppearance() {
+    let components: [UIView] = [
+      idStackView,
+      pwStackView,
+      rePwStackView,
+      nameStackView,
+      termsStackView,
+      submitButton,
+    ]
+    let baseDelay: TimeInterval = 0.05
+    let animationDuration: TimeInterval = 0.25
+    let initialTranslationY: CGFloat = 20  // 아래쪽에서 20pt 만큼 시작
+
+    for (index, component) in components.enumerated() {
+      component.alpha = 0
+      component.transform = CGAffineTransform(translationX: 0, y: initialTranslationY)
+
+      UIView.animate(
+        withDuration: animationDuration,
+        delay: baseDelay * Double(index),
+        options: [.curveEaseOut],
+        animations: {
+          component.alpha = 1
+          component.transform = .identity
+        },
+        completion: nil
+      )
+    }
+  }
+
+  // MARK: 버튼 팡숀
   @objc func didTapCheckbox(_ sender: UIButton) {
     sender.isSelected.toggle()
     isAgreed = sender.isSelected
@@ -366,7 +414,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let id = idTextField.text ?? ""
     let pw = pwTextField.text ?? ""
     let rePw = rePwTextField.text ?? ""
-    let nickname = nickNameTextField.text ?? ""
+    let name = nameTextField.text ?? ""
 
     // 입력 잘못된 칸 Alert
     if !isValidID(id) {
@@ -384,7 +432,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       return
     }
 
-    if !isValidNickname(nickname) {
+    if !isValidName(name) {
       alertController(on: self, title: "닉네임 오류", message: "잘못된 닉네임입니다.")
       return
     }
@@ -394,12 +442,17 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       return
     }
 
-    if repository.readUser(by: nickNameTextField.text ?? "name-xxxx") != nil {
+    if repository.readUser(by: nameTextField.text ?? "name-xxxx") != nil {
       alertController(on: self, title: "닉네임 중복", message: "중복된 닉네임입니다.\n다른 아이디를 사용해 주세요.")
       return
     }
 
-    repository.createUser(id: idTextField.text!, name: nickNameTextField.text!, password: pwTextField.text!)
+    repository.createUser(id: idTextField.text!, name: nameTextField.text!, password: pwTextField.text!)
+    if let loginVC = navigationController?.viewControllers.last(where: { $0 is LoginViewController })
+      as? LoginViewController
+    {
+      loginVC.prepareForTransition()
+    }
     navigationController?.popViewController(animated: true)
   }
 
@@ -416,7 +469,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
         textField.text = String(text.prefix(32))
       }
 
-    case nickNameTextField:
+    case nameTextField:
       if let text = textField.text {
         let trimmed = text.replacingOccurrences(of: " ", with: "")
         let allowed = trimmed.filter { isKorean($0) || $0.isLetter || $0.isNumber }

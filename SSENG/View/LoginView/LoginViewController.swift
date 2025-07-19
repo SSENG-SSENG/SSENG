@@ -8,11 +8,11 @@ import SnapKit
 import Then
 import UIKit
 
-class LoginViewController: UIViewController {
+class LoginViewController: UIViewController, UINavigationControllerDelegate {
   private var isAgreed = false
   private let repository = UserRepository()
 
-  private let appLogoImageView = UIImageView().then {
+  let appLogoImageView = UIImageView().then {
     $0.image = UIImage(named: "Logo")
     $0.contentMode = .scaleAspectFit
   }
@@ -93,8 +93,14 @@ class LoginViewController: UIViewController {
     $0.setTitleColor(.main, for: .normal)
   }
 
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    animateContentAppearance()
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
+    navigationController?.delegate = self
     view.backgroundColor = .systemBackground
     if UserDefaults.standard.string(forKey: "loggedUserID") != nil {
       let mapVC = MapViewController()
@@ -110,7 +116,9 @@ class LoginViewController: UIViewController {
   }
 
   func setupUI() {
-    for item in [appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton] {
+    for item in [
+      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton,
+    ] {
       view.addSubview(item)
     }
 
@@ -245,10 +253,59 @@ class LoginViewController: UIViewController {
     vc.present(alert, animated: true)
   }
 
+  func navigationController(
+    _ navigationController: UINavigationController,
+    animationControllerFor operation: UINavigationController.Operation,
+    from fromVC: UIViewController,
+    to toVC: UIViewController
+  ) -> UIViewControllerAnimatedTransitioning? {
+    if fromVC is LoginViewController && toVC is SignViewController
+      || fromVC is SignViewController && toVC is LoginViewController
+    {
+      return LogoTransitionAnimator(operation: operation)
+    }
+    return nil
+  }
+
   func dismissKeyboardController() {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     tapGesture.cancelsTouchesInView = false
     view.addGestureRecognizer(tapGesture)
+  }
+
+  func prepareForTransition() {
+    [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton].forEach {
+      $0.alpha = 0
+    }
+  }
+
+  func animateContentAppearance() {
+    let components: [UIView] = [
+      idStackView,
+      pwStackView,
+      autoLoginStackView,
+      loginButton,
+      signUpBUtton,
+    ]
+    let baseDelay: TimeInterval = 0.05
+    let animationDuration: TimeInterval = 0.25
+    let initialTranslationY: CGFloat = 20  // 아래쪽에서 20pt 만큼 시작
+
+    for (index, component) in components.enumerated() {
+      component.alpha = 0
+      component.transform = CGAffineTransform(translationX: 0, y: initialTranslationY)
+
+      UIView.animate(
+        withDuration: animationDuration,
+        delay: baseDelay * Double(index),
+        options: [.curveEaseOut],
+        animations: {
+          component.alpha = 1
+          component.transform = .identity
+        },
+        completion: nil
+      )
+    }
   }
 
   @objc func didTapLogin() {
@@ -267,6 +324,7 @@ class LoginViewController: UIViewController {
 
   @objc func didTapSignUp() {
     let signUpVC = SignViewController()
+    signUpVC.prepareForTransition()
     navigationController?.pushViewController(signUpVC, animated: true)
   }
 
