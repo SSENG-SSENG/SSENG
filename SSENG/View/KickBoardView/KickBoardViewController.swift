@@ -224,44 +224,41 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   // MARK: - Actions
 
   @objc private func didTapRegister() {
-      let detailLocation = detailLocationTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let detailLocation = detailLocationTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
-      if detailLocation.isEmpty {
-          addressShowAlert(title: "입력 오류", message: "상세 위치를 입력해주세요.")
-          return
-      }
+    if detailLocation.isEmpty {
+      addressShowAlert(title: "입력 오류", message: "상세 위치를 입력해주세요.")
+      return
+    }
 
-      didRegister = true
+    didRegister = true
 
-      let dateFormatter = DateFormatter()
-      dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-      let nowString = dateFormatter.string(from: Date())
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    let nowString = dateFormatter.string(from: Date())
 
-      guard let type = selectedType == 1 ? KickboardType.kickboard : selectedType == 2 ? KickboardType.bike : nil else {
-          showAlert(title: "타입 오류", message: "유효한 킥보드 타입을 선택해주세요.")
-          return
-      }
-    
-      let registerId = "TEMP_USER_ID"
+    guard let type = selectedType == 1 ? KickboardType.kickboard : selectedType == 2 ? KickboardType.bike : nil else {
+      showAlert(title: "타입 오류", message: "유효한 킥보드 타입을 선택해주세요.")
+      return
+    }
 
-      let newID = repository.registKickboard(
-          registerDate: nowString,
-          lat: latitude,
-          lng: longitude,
-          detailLocation: detailLocation,
-          type: type,
-          registerId: registerId
-      )
+    let registerId = "TEMP_USER_ID"
 
-      print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세위치=\(detailLocation), 타입=\(selectedType)")
+    let newID = repository.registKickboard(
+      registerDate: nowString,
+      lat: latitude,
+      lng: longitude,
+      detailLocation: detailLocation,
+      type: type,
+      registerId: registerId
+    )
 
-      showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습까?") { [weak self] in
-          guard let self else { return }
-          delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
-          self.navigationController?.popViewController(animated: true)
-      }
+    showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습까?") { [weak self] in
+      guard let self else { return }
+      delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
+      self.navigationController?.popViewController(animated: true)
+    }
   }
-
 
   @objc private func didTapBackground() {
     view.endEditing(true)

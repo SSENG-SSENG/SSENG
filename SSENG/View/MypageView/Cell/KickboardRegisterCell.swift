@@ -16,20 +16,14 @@ class KickboardRegisterCell: UITableViewCell {
 
   private let kickboardImageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
-    $0.image = UIImage(named: "bikePadding") // 예시 이미지
   }
 
   private let uuidLabel = UILabel().then {
-    $0.text = "uuid 값"
     $0.font = .systemFont(ofSize: 14, weight: .medium)
     $0.textColor = .label
   }
 
   private let registerDateTimeLabel = UILabel().then { // 킥보드 등록 날짜 및 시간
-    $0.text = """
-    2025년 09월 02일
-    14시 35분
-    """
     $0.font = .systemFont(ofSize: 13)
     $0.textColor = .secondaryLabel
     $0.numberOfLines = 0
@@ -92,5 +86,50 @@ class KickboardRegisterCell: UITableViewCell {
       $0.leading.equalTo(kickboardImageView.snp.trailing).offset(12)
       $0.trailing.equalToSuperview().offset(-16)
     }
+  }
+
+  // MARK: - configure
+
+  func configure(_ kickboard: Kickboard) {
+    uuidLabel.text = kickboard.id.map { String($0.prefix(8)) } // UUID는 앞에 8글자만 보여줌
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+
+    let timeFormatter = DateFormatter()
+    timeFormatter.dateFormat = "HH시 mm분"
+
+    if let registerDateStr = kickboard.registerDate,
+       let registerDate = registerDateStr.toDate()
+    { // "2025-07-18 14:35:00"
+      let dateString = dateFormatter.string(from: registerDate) // "2025년 07월 18일"
+      let timeString = timeFormatter.string(from: registerDate) // "14시 35분"
+
+      registerDateTimeLabel.text = """
+      \(dateString)
+      \(timeString)
+      """
+    }
+
+    if let kickboardType = kickboard.kickboardType {
+      let imageName: String
+      switch kickboardType {
+      case .bike:
+        imageName = "bikePadding"
+      case .kickboard:
+        imageName = "kickboardPadding"
+      }
+      kickboardImageView.image = UIImage(named: imageName)
+    }
+  }
+}
+
+extension String {
+  // 문자열(String) -> Date로 변환
+  func toDate() -> Date? {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    formatter.locale = Locale(identifier: "ko_KR")
+    return formatter.date(from: self)
   }
 }

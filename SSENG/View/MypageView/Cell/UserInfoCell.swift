@@ -13,7 +13,6 @@ class UserInfoCell: UITableViewCell {
   static let identifier = "UserInfoCell"
 
   private let containerView = UIView()
-
   private let userImageView = UIImageView().then {
     let symbolConfig = UIImage.SymbolConfiguration(pointSize: 42, weight: .semibold)
     let image = UIImage(systemName: "person", withConfiguration: symbolConfig)
@@ -23,20 +22,15 @@ class UserInfoCell: UITableViewCell {
   }
 
   private let userNameLabel = UILabel().then {
-    $0.text = "SSENG~"
     $0.font = .systemFont(ofSize: 17, weight: .bold)
   }
 
   private let statusDotView = UIView().then {
     $0.layer.cornerRadius = 4
     $0.clipsToBounds = true
-    $0.backgroundColor = .systemGreen
-    // $0.backgroundColor = isRiding ? .systemGreen : .lightGray
   }
 
   private let statusTextLabel = UILabel().then {
-    $0.text = "탑승 중"
-    // $0.text = isRiding ? "탑승 중" : "미탑승"
     $0.font = .systemFont(ofSize: 14)
     $0.textColor = .label
   }
@@ -120,6 +114,20 @@ class UserInfoCell: UITableViewCell {
       $0.bottom.equalToSuperview().offset(-8)
       $0.height.equalTo(32)
       $0.width.greaterThanOrEqualTo(60) // width >= 60
+    }
+  }
+
+  // MARK: - configure
+
+  func configure(_ user: User) {
+    userNameLabel.text = user.name
+
+    if user.isRiding {
+      statusTextLabel.text = "탑승 중"
+      statusDotView.backgroundColor = .systemGreen
+    } else {
+      statusTextLabel.text = "미탑승"
+      statusDotView.backgroundColor = .lightGray
     }
   }
 }
