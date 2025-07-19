@@ -66,7 +66,7 @@ final class KickboardRepository {
   }
 
   // 킥보드 반납
-  func returnKickboard(id: String, lat: Double, lng: Double, newLocation _: String, detailLocation: String) {
+  func returnKickboard(id: String, lat: Double, lng: Double, detailLocation: String) {
     guard let kb = readKickboard(by: id) else { return }
 
     kb.isRented = false
