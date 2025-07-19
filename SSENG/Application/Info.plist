@@ -19,6 +19,11 @@
 					<string>Default Configuration</string>
 					<key>UISceneDelegateClassName</key>
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>NaverClientID</key>
+					<string>fcFUd8DJXn0MASxG1ncW&quot;
+&quot;</string>
+					<key>NaverClientSecret</key>
+					<string>SWzp3BLBgv</string>
 				</dict>
 			</array>
 		</dict>
