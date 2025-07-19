@@ -7,6 +7,7 @@
 struct SearchResponse: Decodable {
   let items: [Place]
 }
+
 // 장소 정보
 struct Place: Decodable {
   let title: String

@@ -4,8 +4,8 @@
 //
 //  Created by 이태윤 on 7/20/25.
 //
-import Foundation
 import Alamofire
+import Foundation
 
 // 네이버 지역 검색 API 호출
 class SearchService {
@@ -13,8 +13,8 @@ class SearchService {
   private let clientSecret: String
 
   init() {
-    self.clientID = Bundle.main.object(forInfoDictionaryKey: "NaverClientID") as? String ?? ""
-    self.clientSecret = Bundle.main.object(forInfoDictionaryKey: "NaverClientSecret") as? String ?? ""
+    clientID = Bundle.main.object(forInfoDictionaryKey: "NaverClientID") as? String ?? ""
+    clientSecret = Bundle.main.object(forInfoDictionaryKey: "NaverClientSecret") as? String ?? ""
   }
 
   func search(query: String, completion: @escaping (Result<[Place], AFError>) -> Void) {
@@ -33,9 +33,9 @@ class SearchService {
       .validate()
       .responseDecodable(of: SearchResponse.self) { response in
         switch response.result {
-        case .success(let data):
+        case let .success(data):
           completion(.success(data.items))
-        case .failure(let error):
+        case let .failure(error):
           completion(.failure(error))
           return
         }
