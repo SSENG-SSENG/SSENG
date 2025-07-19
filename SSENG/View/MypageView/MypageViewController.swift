@@ -206,6 +206,25 @@ class MypageViewController: UIViewController {
     let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.right"
     section1ToggleButton?.setImage(UIImage(systemName: iconName), for: .normal)
   }
+  
+  @objc private func handleLogout() {
+    print("로그아웃 버튼 눌림")
+    let alert = UIAlertController(title: "로그아웃", message: "정말 로그아웃 하시겠습니까?", preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: {_ in 
+      UserDefaults.standard.removeObject(forKey: "loggedUserID") // 로그인한 id를 임시 저장한 UserDefaults에서 삭제
+      
+      // 메인 화면을 로그인 화면으로 변경
+      guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, // 연결된 scene중 첫 번째를 가져옴
+            let sceneDelegate = windowScene.delegate as? SceneDelegate else { return } // 그 화면을 관리하는 SceneDelegate
+      
+      let loginVC = LoginViewController()
+      let nav = UINavigationController(rootViewController: loginVC)
+      sceneDelegate.window?.rootViewController = nav // 앱의 메인 창의 rootVC를 nav로 완전 교체
+      sceneDelegate.window?.makeKeyAndVisible()
+    }))
+    present(alert, animated: true)
+  }
 }
 
 // MARK: - UITableViewDelegate
@@ -294,6 +313,8 @@ extension MypageViewController: UITableViewDataSource {
       if let user {
         cell.configure(user)
       }
+      
+      cell.logoutButton.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
 
       return cell
 
