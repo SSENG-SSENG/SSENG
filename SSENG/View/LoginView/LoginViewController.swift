@@ -117,7 +117,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
 
   func setupUI() {
     for item in [
-      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton,
+      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton
     ] {
       view.addSubview(item)
     }
@@ -254,7 +254,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
   }
 
   func navigationController(
-    _ navigationController: UINavigationController,
+    _: UINavigationController,
     animationControllerFor operation: UINavigationController.Operation,
     from fromVC: UIViewController,
     to toVC: UIViewController
@@ -274,8 +274,8 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
   }
 
   func prepareForTransition() {
-    [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton].forEach {
-      $0.alpha = 0
+    for item in [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton] {
+      item.alpha = 0
     }
   }
 
@@ -285,11 +285,11 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
       pwStackView,
       autoLoginStackView,
       loginButton,
-      signUpBUtton,
+      signUpBUtton
     ]
     let baseDelay: TimeInterval = 0.05
     let animationDuration: TimeInterval = 0.25
-    let initialTranslationY: CGFloat = 20  // 아래쪽에서 20pt 만큼 시작
+    let initialTranslationY: CGFloat = 20 // 아래쪽에서 20pt 만큼 시작
 
     for (index, component) in components.enumerated() {
       component.alpha = 0

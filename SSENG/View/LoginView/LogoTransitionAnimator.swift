@@ -16,8 +16,8 @@ class LogoTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     // super.init()
   }
 
-  func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-    return 0.4
+  func transitionDuration(using _: UIViewControllerContextTransitioning?) -> TimeInterval {
+    0.4
   }
 
   func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -34,14 +34,14 @@ class LogoTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let toLogo: UIImageView
 
     if operation == .push,
-      let loginVC = fromVC as? LoginViewController,
-      let signVC = toVC as? SignViewController
+       let loginVC = fromVC as? LoginViewController,
+       let signVC = toVC as? SignViewController
     {
       fromLogo = loginVC.appLogoImageView
       toLogo = signVC.appLogoImageView
     } else if operation == .pop,
-      let signVC = fromVC as? SignViewController,
-      let loginVC = toVC as? LoginViewController
+              let signVC = fromVC as? SignViewController,
+              let loginVC = toVC as? LoginViewController
     {
       fromLogo = signVC.appLogoImageView
       toLogo = loginVC.appLogoImageView
