@@ -24,7 +24,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   func sceneWillResignActive(_: UIScene) {}
 
-  func sceneWillEnterForeground(_: UIScene) {}
+  func sceneWillEnterForeground(_: UIScene) {
+    // 앱이 포그라운드로 진입할 때 알림을 보냄
+    NotificationCenter.default.post(name: .appDidEnterForeground, object: nil)
+  }
 
   func sceneDidEnterBackground(_: UIScene) {
     (UIApplication.shared.delegate as? AppDelegate)?.saveContext()

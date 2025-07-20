@@ -294,6 +294,15 @@ class MapViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    // NotificationCenter에 옵저버를 등록한다.
+    // 이 옵저버는 앱이 포그라운드로 전환될 때 .appDidEnterForeground 라는 알림을 받을 수 있도록 설정한다.
+    NotificationCenter.default.addObserver(
+      self, // self는 현재 ViewController를 의미
+      selector: #selector(checkLocationAuthorization), // 알림을 받으면 실행할 메서드 (objc 함수로 선언되어 있어야 함)
+      name: .appDidEnterForeground, // 포그라운드 진입 시 보낼 사용자 정의 알림 이름
+      object: nil // 특정 객체에서 보낸 알림만 받도록 제한할 수 있는데, nil이면 모든 발신자로부터 받음
+    )
+
     searchBar.delegate = self
     searchCollectionView.delegate = self
     mapView.addCameraDelegate(delegate: self)
@@ -308,15 +317,15 @@ class MapViewController: UIViewController {
     locationManager.requestWhenInUseAuthorization()
   }
 
-  // 화면이 켜졌을때 네이게이션바 안보이게 설정
+  // 화면이 켜졌을때
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+
+    // 네이게이션바 안보이게 설정
     navigationController?.setNavigationBarHidden(true, animated: false)
 
-    // 위치 권한 상태를 확인하고, 필요할 때만 요청
-    if locationManager.authorizationStatus == .notDetermined {
-      locationManager.requestWhenInUseAuthorization()
-    }
+    // 위치 권한 상태를 확인
+    checkLocationAuthorization()
   }
 
   // 화면이 꺼질때 네비게이션바 보이게 설정
@@ -1042,6 +1051,46 @@ extension MapViewController {
 
     present(alert, animated: true)
   }
+
+  // 실제 위치 권한 확인 메서드
+  @objc func checkLocationAuthorization() {
+    let status = locationManager.authorizationStatus
+
+    switch status {
+    case .authorizedAlways, .authorizedWhenInUse:
+      print("권한 있음")
+      locationMove(nowLocation: locationManager)
+    case .denied, .restricted:
+      print("권한 거부됨 - 설정화면 유도")
+      showLocationSettingsAlert()
+    case .notDetermined:
+      print("아직 결정 안됨")
+      locationManager.requestWhenInUseAuthorization()
+    @unknown default:
+      break
+    }
+  }
+
+  // 위치 권한 요청 Alert
+  func showLocationSettingsAlert() {
+    let alert = UIAlertController(
+      title: "위치 권한 필요",
+      message: "이 기능을 사용하려면 위치 권한이 필요합니다.\n설정에서 위치 접근을 앱을 사용하는동안으로 허용해주세요.",
+      preferredStyle: .alert
+    )
+
+    alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
+      if let appSettings = URL(string: UIApplication.openSettingsURLString),
+         UIApplication.shared.canOpenURL(appSettings)
+      {
+        UIApplication.shared.open(appSettings)
+      }
+    })
+
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+
+    present(alert, animated: true)
+  }
 }
 
 // MARK: - SearchBar Delegate
@@ -1112,9 +1161,10 @@ extension MapViewController: CLLocationManagerDelegate {
     switch status {
     case .authorizedAlways, .authorizedWhenInUse:
       print("위치 권한 허용됨")
-      locationMove(nowLocation: manager) // 권한 허용 즉시 위치 이동
+      locationMove(nowLocation: manager)
     case .denied, .restricted:
       print("위치 권한 거부됨")
+      showLocationSettingsAlert()
     case .notDetermined:
       break
     @unknown default:
