@@ -119,10 +119,10 @@ class UserInfoCell: UITableViewCell {
 
   // MARK: - configure
 
-  func configure(_ user: User) {
+  func configure(user: User, isRiding: Bool) {
     userNameLabel.text = user.name
 
-    if user.isRiding {
+    if isRiding {
       statusTextLabel.text = "탑승 중"
       statusDotView.backgroundColor = .systemGreen
     } else {

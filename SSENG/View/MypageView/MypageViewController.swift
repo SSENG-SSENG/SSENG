@@ -275,7 +275,7 @@ extension MypageViewController: UITableViewDataSource {
     // 등록한 킥보드 섹션에만 토글 버튼 추가
     if section == 1 {
       let toggleButton = UIButton(type: .system)
-      let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.left"
+      let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.right"
       toggleButton.setImage(UIImage(systemName: iconName), for: .normal)
       toggleButton.tintColor = .secondaryLabel
       toggleButton.addTarget(self, action: #selector(toggleSection), for: .touchUpInside)
@@ -311,7 +311,8 @@ extension MypageViewController: UITableViewDataSource {
         return UITableViewCell()
       }
       if let user {
-        cell.configure(user)
+        let isRiding = kickboards.contains { $0.isRented }
+        cell.configure(user: user, isRiding: isRiding)
       }
 
       cell.logoutButton.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
