@@ -14,7 +14,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     guard let windowScene = (scene as? UIWindowScene) else { return }
 
     window = UIWindow(windowScene: windowScene)
-    window?.rootViewController = UINavigationController(rootViewController: LoginViewController()) // 시작 뷰컨트롤러 지정
+
+    let rootVC: UIViewController
+    let loggedInID = UserDefaults.standard.string(forKey: "loggedUserID")
+    let isAutoLogin = UserDefaults.standard.bool(forKey: "isAutoLogin")
+
+    if isAutoLogin, loggedInID != nil {
+      rootVC = MapViewController()
+    } else {
+      rootVC = LoginViewController()
+    }
+
+    let navController = UINavigationController(rootViewController: rootVC)
+
+    window?.rootViewController = navController
     window?.makeKeyAndVisible()
   }
 

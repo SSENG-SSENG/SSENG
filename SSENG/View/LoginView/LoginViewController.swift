@@ -1,3 +1,4 @@
+import AVFoundation
 //
 //  ViewController.swift
 //  SSENG
@@ -8,7 +9,7 @@ import SnapKit
 import Then
 import UIKit
 
-class LoginViewController: UIViewController, UINavigationControllerDelegate {
+class LoginViewController: UIViewController, UINavigationControllerDelegate, UITextFieldDelegate {
   private var isAgreed = false
   private let repository = UserRepository()
 
@@ -23,7 +24,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
   }
 
   private let idTextField = UITextField().then {
-    $0.placeholder = "아이디를 입력하세요."
+    $0.placeholder = "영어/숫자 4-16자"
     $0.keyboardType = .asciiCapable
     $0.textContentType = .none
     $0.autocorrectionType = .no
@@ -32,6 +33,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
     $0.autocapitalizationType = .none
     $0.clearButtonMode = .always
     $0.returnKeyType = .next
+    $0.addLeftPadding()
   }
 
   private let idStackView = UIStackView().then {
@@ -45,11 +47,12 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
   }
 
   private let pwTextField = UITextField().then {
-    $0.placeholder = "비밀번호를 입력하세요."
+    $0.placeholder = "영어/숫자/기호 8-32자"
     $0.textContentType = .password
     $0.clearButtonMode = .always
     $0.isSecureTextEntry = true
-    $0.returnKeyType = .next
+    $0.returnKeyType = .done
+    $0.addLeftPadding()
   }
 
   private let autoLoginAgreeCheckBox = UIButton(type: .custom).then {
@@ -96,42 +99,41 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     animateContentAppearance()
+    updateLoginButtonState()
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
     navigationController?.delegate = self
     view.backgroundColor = .systemBackground
-    if UserDefaults.standard.string(forKey: "loggedUserID") != nil {
-      let mapVC = MapViewController()
-      navigationController?.pushViewController(mapVC, animated: true)
-    } else {
-      setupUI()
-      setupConstraints()
-      setupBUttonActions()
-      updateLoginButtonState()
-      addTextFieldObsevers()
-      dismissKeyboardController()
-    }
+
+    setupUI()
+    setupConstraints()
+    setupButtonActions()
+    addTextFieldObsevers()
+    updateLoginButtonState()
+    dismissKeyboardController()
+
+    [idTextField, pwTextField].forEach { $0.delegate = self }
   }
 
   func setupUI() {
-    for item in [
+    [
       appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton,
-    ] {
-      view.addSubview(item)
+    ].forEach {
+      view.addSubview($0)
     }
 
-    for item in [idLabel, idTextField] {
-      idStackView.addArrangedSubview(item)
+    [idLabel, idTextField].forEach {
+      idStackView.addArrangedSubview($0)
     }
 
-    for item in [pwLabel, pwTextField] {
-      pwStackView.addArrangedSubview(item)
+    [pwLabel, pwTextField].forEach {
+      pwStackView.addArrangedSubview($0)
     }
 
-    for item in [autoLoginAgreeCheckBox, autoLoginAgreeLabel] {
-      autoLoginStackView.addArrangedSubview(item)
+    [autoLoginAgreeCheckBox, autoLoginAgreeLabel].forEach {
+      autoLoginStackView.addArrangedSubview($0)
     }
   }
 
@@ -192,7 +194,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
     }
   }
 
-  private func setupBUttonActions() {
+  private func setupButtonActions() {
     loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
     signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
     debugButton.addTarget(self, action: #selector(donttouchthis), for: .touchUpInside)
@@ -200,9 +202,19 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
   }
 
   private func addTextFieldObsevers() {
-    for item in [idTextField, pwTextField] {
-      item.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    [idTextField, pwTextField].forEach {
+      $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
+  }
+
+  func createDefaultUser(id: String) {
+    if isAgreed {
+      UserDefaults.standard.set(true, forKey: "isAutoLogin")
+    } else {
+      UserDefaults.standard.set(false, forKey: "isAutoLogin")
+    }
+    UserDefaults.standard.set(id, forKey: "autoLoginID")
+
   }
 
   private func updateLoginButtonState() {
@@ -214,15 +226,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
     loginButton.alpha = allVAlid ? 1.0 : 0.5
   }
 
-  func createDefaultUser(id: String) {
-    if isAgreed {
-      if UserDefaults.standard.string(forKey: "loggedUserID") == nil {
-        UserDefaults.standard.set(id, forKey: "loggedUserID")
-        return
-      }
-    }
-  }
-
+  // 정규표현식 및 글자수 제한
   func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String)
     -> Bool
   {
@@ -267,16 +271,46 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
     return nil
   }
 
+  func prepareForTransition() {
+    [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton].forEach {
+      $0.alpha = 0
+    }
+  }
+
   func dismissKeyboardController() {
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
     tapGesture.cancelsTouchesInView = false
     view.addGestureRecognizer(tapGesture)
   }
 
-  func prepareForTransition() {
-    [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton].forEach {
-      $0.alpha = 0
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    textField.borderStyle = .roundedRect
+    textField.layer.borderColor = UIColor.main.cgColor
+    textField.layer.cornerRadius = 3.0
+    textField.layer.borderWidth = 1.0
+  }
+
+  func textFieldDidEndEditing(_ textField: UITextField) {
+    textField.borderStyle = .none
+    textField.backgroundColor = .clear
+    textField.layer.borderColor = UIColor.clear.cgColor
+  }
+
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    guard let text = textField.text, !text.isEmpty else {
+      textField.shake()
+      AudioServicesPlaySystemSound(4095)
+      return false
     }
+    switch textField {
+    case idTextField:
+      pwTextField.becomeFirstResponder()
+    case pwTextField:
+      pwTextField.resignFirstResponder()
+    default:
+      break
+    }
+    return false
   }
 
   func animateContentAppearance() {
@@ -310,10 +344,12 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate {
 
   @objc func didTapLogin() {
     if repository.readUser(by: idTextField.text ?? "id-xxxx")?.id != idTextField.text {
+      idTextField.becomeFirstResponder()
       alertController(on: self, title: "아이디 오류", message: "해당 아이디가 존재하지 않습니다.")
     }
 
     if repository.readUser(by: idTextField.text ?? "pw-xxxx")?.password != pwTextField.text {
+      pwTextField.becomeFirstResponder()
       alertController(on: self, title: "비밀번호 오류", message: "비밀번호가 일치하지 않습니다.")
     }
 
