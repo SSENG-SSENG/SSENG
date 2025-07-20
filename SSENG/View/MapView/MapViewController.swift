@@ -41,6 +41,7 @@ class MapViewController: UIViewController {
 
   // 위치
   let locationManager = CLLocationManager()
+  private var isLocationAlertPresented = false
 
   // 검색창
   private let searchBar = UISearchBar().then {
@@ -314,7 +315,6 @@ class MapViewController: UIViewController {
     setupButtonActions()
     allKickBoardMarker()
     loadSelectedMarkerKey()
-    locationManager.requestWhenInUseAuthorization()
   }
 
   // 화면이 켜졌을때
@@ -1052,20 +1052,28 @@ extension MapViewController {
     present(alert, animated: true)
   }
 
-  // 실제 위치 권한 확인 메서드
+  // 위치 권한 확인 메서드
   @objc func checkLocationAuthorization() {
     let status = locationManager.authorizationStatus
 
     switch status {
     case .authorizedAlways, .authorizedWhenInUse:
       print("권한 있음")
+      isLocationAlertPresented = false
       locationMove(nowLocation: locationManager)
+
     case .denied, .restricted:
       print("권한 거부됨 - 설정화면 유도")
-      showLocationSettingsAlert()
+      if !isLocationAlertPresented {
+        isLocationAlertPresented = true
+        showLocationSettingsAlert()
+      }
+
     case .notDetermined:
       print("아직 결정 안됨")
       locationManager.requestWhenInUseAuthorization()
+      isLocationAlertPresented = false
+
     @unknown default:
       break
     }
@@ -1080,14 +1088,16 @@ extension MapViewController {
     )
 
     alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
-      if let appSettings = URL(string: UIApplication.openSettingsURLString),
-         UIApplication.shared.canOpenURL(appSettings)
+      if let url = URL(string: UIApplication.openSettingsURLString),
+         UIApplication.shared.canOpenURL(url)
       {
-        UIApplication.shared.open(appSettings)
+        UIApplication.shared.open(url)
       }
     })
 
-    alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel) { _ in
+      self.isLocationAlertPresented = false // 사용자가 취소했으면 다시 알럿 허용
+    })
 
     present(alert, animated: true)
   }
