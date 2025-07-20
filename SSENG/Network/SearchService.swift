@@ -25,7 +25,7 @@ class SearchService {
     ]
     let parameters: Parameters = [
       "query": query,
-      "display": 10,
+      "display": 15,
       "sort": "random"
     ]
 

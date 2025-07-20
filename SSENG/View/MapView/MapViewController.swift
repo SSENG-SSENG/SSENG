@@ -295,6 +295,7 @@ class MapViewController: UIViewController {
     super.viewDidLoad()
 
     searchBar.delegate = self
+    searchCollectionView.delegate = self
     mapView.addCameraDelegate(delegate: self)
     mapView.touchDelegate = self
     locationManager.delegate = self
@@ -993,8 +994,6 @@ extension MapViewController {
       }
     }
 
-    // TODO: - 히스토리 등록하기
-
     // 확인 버튼 클릭시 반납 처리 실행
     let confirm = UIAlertAction(title: "반납하기", style: .default) { _ in
       let text = alert.textFields?.first?.text ?? "위치 정보 없음"
@@ -1028,6 +1027,7 @@ extension MapViewController {
       self.mapView.positionMode = .normal
       self.riddingKickBoard = nil
       self.timer = nil
+
       // 반납완료 되어 대여버튼 활성화 시켜주기
       self.riddingButton.isEnabled = true
       self.riddingButton.backgroundColor = .main
@@ -1072,6 +1072,29 @@ extension MapViewController: UICollectionViewDataSource {
     }
     cell.configure(with: places[indexPath.item])
     return cell
+  }
+}
+
+// MARK: - CollectionViewDelegate
+
+extension MapViewController: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    collectionView.deselectItem(at: indexPath, animated: true)
+    let place = places[indexPath.item]
+
+    // 위경도는 1,000,000으로 나눠서 실제 GPS 위치로 변환
+    if let latValue = Double(place.lat),
+       let lngValue = Double(place.lng)
+    {
+      let lat = latValue * 0.0000001
+      let lng = lngValue * 0.0000001
+
+      print("\(place.address)로 이동합니다")
+      print("위도: \(lat) 경도: \(lng)")
+
+      let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
+      mapView.moveCamera(cameraUpdate)
+    }
   }
 }
 
