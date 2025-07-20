@@ -593,17 +593,14 @@ extension MapViewController {
     }
   }
 
-  // 마커 클릭시 카메라 이동
-  private func moveMarker(kickBoard: Kickboard) {
+  // 킥보드 정보창 띄우기
+  private func showKickBoardView(kickBoard: Kickboard) {
+    selectedKickBoard = kickBoard
     let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: kickBoard.lat, lng: kickBoard.lng), zoomTo: 16)
     cameraUpdate.animation = .easeIn
     cameraUpdate.animationDuration = 0.3
     mapView.moveCamera(cameraUpdate)
-  }
 
-  // 킥보드 정보창 띄우기
-  private func showKickBoardView(kickBoard: Kickboard) {
-    riddingKickBoard = kickBoard
     for constraint in kickBoardIfoViewHiddenConstraint {
       constraint.isActive = false
     }
@@ -680,6 +677,7 @@ extension MapViewController {
 
   // 탑승 창 가리기
   private func hiddenRiddingView() {
+    selectedKickBoard = nil
     for constraint in riddingViewShowConstraint {
       constraint.isActive = false
     }
@@ -793,8 +791,7 @@ extension MapViewController {
     marker.captionOffset = 8
 
     marker.touchHandler = { [weak self] _ in
-      self?.selectedKickBoard = kickboard
-      self?.moveMarker(kickBoard: kickboard)
+      self?.showKickBoardView(kickBoard: kickboard)
       return true
     }
     return marker
@@ -915,6 +912,9 @@ extension MapViewController {
 
   // 대여하기 버튼 액션
   @objc private func didTapRideingButton() {
+    riddingKickBoard = selectedKickBoard
+    selectedKickBoard = nil
+
     guard let kickBoard = riddingKickBoard else {
       print("대여할 킥보드 정보가 없습니다.")
       return
@@ -951,7 +951,7 @@ extension MapViewController {
 
     stopwatchLabel.text = String(format: "%02d:%02d:%02d 이용 중", hours, min, sec)
 
-    if selectedKickBoard?.kickboardType == .kickboard {
+    if riddingKickBoard?.kickboardType == .kickboard {
       riddingPriceLabel.text = "\(100 * min)원"
     } else {
       riddingPriceLabel.text = "\(1000 * min)원"
@@ -1142,18 +1142,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
   func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
     print("카메라 이동: \(reason)")
     hiddenCollectionView()
-    hiddenKickBoardView()
     locationManager.stopUpdatingLocation()
-  }
-
-  func mapViewCameraIdle(_: NMFMapView) {
-    print("카메라 정지")
-    if let kickboard = selectedKickBoard {
-      showKickBoardView(kickBoard: kickboard)
-      selectedKickBoard = nil
-    }
-
-    updateVisibleMarkers()
   }
 }
 
