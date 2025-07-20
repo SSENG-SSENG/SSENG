@@ -16,10 +16,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window = UIWindow(windowScene: windowScene)
 
     let rootVC: UIViewController
-    let loggedInID = UserDefaults.standard.string(forKey: "loggedUserID")
+    let loggedUserID = UserDefaults.standard.string(forKey: "loggedUserID")
     let isAutoLogin = UserDefaults.standard.bool(forKey: "isAutoLogin")
 
-    if isAutoLogin, loggedInID != nil {
+    if isAutoLogin == true && loggedUserID != nil {
       rootVC = MapViewController()
     } else {
       rootVC = LoginViewController()

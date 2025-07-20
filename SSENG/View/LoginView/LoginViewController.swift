@@ -213,8 +213,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     } else {
       UserDefaults.standard.set(false, forKey: "isAutoLogin")
     }
-    UserDefaults.standard.set(id, forKey: "autoLoginID")
-
+    UserDefaults.standard.set(id, forKey: "loggedUserID")
   }
 
   private func updateLoginButtonState() {
