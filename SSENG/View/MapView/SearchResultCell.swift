@@ -22,10 +22,29 @@ class SearchResultCell: UICollectionViewCell {
     $0.numberOfLines = 2
   }
 
+  // 셀이 터치되었을 때 시각적인 하이라이트 효과 적용
+  override var isHighlighted: Bool {
+    didSet {
+      UIView.animate(withDuration: 0.2) {
+        // 터치 중일 땐 살짝 축소 + 투명도 낮춤
+        self.contentView.alpha = self.isHighlighted ? 0.8 : 1.0
+        self.contentView.transform = self.isHighlighted ? CGAffineTransform(scaleX: 0.97, y: 0.97) : .identity
+      }
+    }
+  }
+
   // 셀 초기화 시 UI 요소 등록 및 제약조건 설정
   override init(frame: CGRect) {
     super.init(frame: frame)
-    backgroundColor = .secondarySystemBackground
+
+    contentView.backgroundColor = .white
+    contentView.layer.cornerRadius = 12
+    contentView.layer.shadowColor = UIColor.black.cgColor
+    contentView.layer.shadowOpacity = 0.05
+    contentView.layer.shadowOffset = CGSize(width: 0, height: 2)
+    contentView.layer.shadowRadius = 4
+    contentView.layer.masksToBounds = false
+
     setupUI()
     setConstraints()
   }
@@ -43,12 +62,12 @@ class SearchResultCell: UICollectionViewCell {
   // SnapKit을 이용해 레이아웃 설정
   private func setConstraints() {
     titleLabel.snp.makeConstraints {
-      $0.top.equalToSuperview().offset(10)
+      $0.top.equalToSuperview().offset(2)
       $0.leading.trailing.equalToSuperview().inset(12)
     }
 
     addressLabel.snp.makeConstraints {
-      $0.top.equalTo(titleLabel.snp.bottom).offset(4)
+      $0.top.equalTo(titleLabel.snp.bottom).offset(2)
       $0.leading.trailing.equalToSuperview().inset(12)
       $0.bottom.equalToSuperview().inset(10)
     }

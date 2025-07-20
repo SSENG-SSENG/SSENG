@@ -48,17 +48,15 @@ class MapViewController: UIViewController {
     $0.searchBarStyle = .minimal
   }
 
-  private lazy var searchCollectionView = UICollectionView(
-    frame: .zero,
-    collectionViewLayout: UICollectionViewFlowLayout().then {
-      $0.itemSize = CGSize(width: UIScreen.main.bounds.width - 40, height: 80)
-      $0.sectionInset = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
-    }
-  ).then {
+  private lazy var searchCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout().then {
+    $0.itemSize = CGSize(width: UIScreen.main.bounds.width - 80, height: 80)
+    $0.sectionInset = UIEdgeInsets(top: 5, left: 30, bottom: 5, right: 30)
+  }).then {
     $0.showsVerticalScrollIndicator = false
     $0.register(SearchResultCell.self, forCellWithReuseIdentifier: SearchResultCell.identifier)
     $0.dataSource = self
-    $0.backgroundColor = .systemBackground
+    $0.backgroundColor = .systemGray6
+    $0.layer.cornerRadius = 12
   }
 
   // 마이페이지 버튼
@@ -364,7 +362,7 @@ class MapViewController: UIViewController {
 
     searchCollectionView.snp.makeConstraints {
       $0.top.equalTo(searchBar.snp.bottom)
-      $0.leading.trailing.equalTo(searchBar)
+      $0.leading.trailing.equalTo(searchBar).inset(5)
       $0.height.equalTo(0).priority(.low)
     }
 
@@ -961,7 +959,6 @@ extension MapViewController {
   @objc private func didTapReturnButton() {
     // 타이머 멈추기
     timer?.invalidate()
-    timer = nil
 
     guard riddingKickBoard != nil else {
       print("반납할 킥보드 정보가 없습니다.")
@@ -995,19 +992,41 @@ extension MapViewController {
       }
     }
 
+    // TODO: - 히스토리 등록하기
+
     // 확인 버튼 클릭시 반납 처리 실행
     let confirm = UIAlertAction(title: "반납하기", style: .default) { _ in
       let text = alert.textFields?.first?.text ?? "위치 정보 없음"
       print("입력된 위치: \(text)")
       self.detailLocationLabel.text = text
       self.kickBoardRepository.returnKickboard(id: self.riddingKickBoard?.id ?? "데이터가 없습니다.", lat: lat, lng: lng, detailLocation: self.detailLocationLabel.text ?? "데이터가 없습니다")
+
+      let kickBoardHistory = HistoryRepository()
+      guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
+        print("유저 데이터를 불러오지 못했습니다.")
+        return
+      }
+
+      let nowTime = Date()
+      let startTime = nowTime.addingTimeInterval(TimeInterval(-self.secondsElapsed))
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+
+      kickBoardHistory.createHistory(
+        userId: userID,
+        duration: Int16(self.secondsElapsed),
+        startTime: dateFormatter.string(from: startTime),
+        type: KickboardType(rawValue: self.riddingKickBoard?.kickboardType?.rawValue ?? "타입 정보가 없습니다.") ?? .kickboard
+      )
+
       self.allKickBoardMarker()
       self.hiddenRiddingView()
+
       self.locationMove(nowLocation: self.locationManager)
       self.locationManager.stopUpdatingLocation()
       self.mapView.positionMode = .normal
       self.riddingKickBoard = nil
-
+      self.timer = nil
       // 반납완료 되어 대여버튼 활성화 시켜주기
       self.riddingButton.isEnabled = true
       self.riddingButton.backgroundColor = .main
@@ -1027,8 +1046,12 @@ extension MapViewController {
 
 extension MapViewController: UISearchBarDelegate {
   func searchBar(_: UISearchBar, textDidChange searchText: String) {
-    searchData(query: searchText)
-    showCollectionView()
+    if searchText.isEmpty {
+      hiddenCollectionView()
+    } else {
+      searchData(query: searchText)
+      showCollectionView()
+    }
   }
 }
 
