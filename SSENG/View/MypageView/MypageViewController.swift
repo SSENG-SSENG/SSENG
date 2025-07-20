@@ -311,7 +311,8 @@ extension MypageViewController: UITableViewDataSource {
         return UITableViewCell()
       }
       if let user {
-        cell.configure(user)
+        let isRiding = kickboards.contains { $0.isRented }
+        cell.configure(user: user, isRiding: isRiding)
       }
 
       cell.logoutButton.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
