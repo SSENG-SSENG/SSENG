@@ -28,6 +28,12 @@ final class UserRepository {
     return (try? CoreDataStack.shared.context.fetch(fetch))?.first
   }
 
+  func readName(by name: String) -> User? {
+    let fetch = User.fetchRequest()
+    fetch.predicate = NSPredicate(format: "name == %@", name)
+    return (try? CoreDataStack.shared.context.fetch(fetch))?.first
+  }
+  
   // 사용자 탑승 상태 변경(true <-> false)
   func updateUserRiding(id: String, isRiding: Bool) {
     guard let user = readUser(by: id) else { return }

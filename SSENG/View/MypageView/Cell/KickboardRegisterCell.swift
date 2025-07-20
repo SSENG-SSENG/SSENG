@@ -97,7 +97,7 @@ class KickboardRegisterCell: UITableViewCell {
     dateFormatter.dateFormat = "yyyy년 MM월 dd일"
 
     let timeFormatter = DateFormatter()
-    timeFormatter.dateFormat = "HH시 mm분"
+    timeFormatter.dateFormat = "HH시 mm분 ss초"
 
     if let registerDateStr = kickboard.registerDate,
        let registerDate = registerDateStr.toDate()
