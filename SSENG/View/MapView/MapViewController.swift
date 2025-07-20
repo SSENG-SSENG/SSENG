@@ -943,10 +943,11 @@ extension MapViewController {
   // 스톱워치 액션
   @objc private func updateTime() {
     secondsElapsed += 1
-    let min = secondsElapsed / 60
+    let hours = secondsElapsed / 3600
+    let min = (secondsElapsed % 3600) / 60
     let sec = secondsElapsed % 60
 
-    stopwatchLabel.text = String(format: "%02d:%02d 이용 중", min, sec)
+    stopwatchLabel.text = String(format: "%02d:%02d:%02d 이용 중", hours, min, sec)
 
     if selectedKickBoard?.kickboardType == .kickboard {
       riddingPriceLabel.text = "\(100 * min)원"
