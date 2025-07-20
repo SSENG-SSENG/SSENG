@@ -981,7 +981,7 @@ extension MapViewController {
       preferredStyle: .alert
     )
 
-    var confirmAction: UIAlertAction? = nil
+    var confirmAction: UIAlertAction?
 
     alert.addTextField { textField in
       textField.placeholder = "예: 건물 앞 자전거 거치대"
