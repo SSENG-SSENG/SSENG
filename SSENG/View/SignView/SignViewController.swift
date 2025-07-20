@@ -42,7 +42,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   private let idTextField = UITextField().then {
-    $0.placeholder = "아이디를 입력하세요."
+    $0.placeholder = "영어/숫자 4-16자"
     $0.keyboardType = .asciiCapable
     $0.textContentType = .none
     $0.autocapitalizationType = .none
@@ -51,6 +51,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     $0.smartInsertDeleteType = .no
     $0.clearButtonMode = .whileEditing
     $0.returnKeyType = .next
+    $0.addLeftPadding()
   }
 
   private let idStackView = UIStackView().then {
@@ -65,10 +66,11 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   private let pwTextField = UITextField().then {
-    $0.placeholder = "비밀번호를 입력하세요."
+    $0.placeholder = "영어/숫자/기호 8-32자"
     $0.clearButtonMode = .whileEditing
     $0.isSecureTextEntry = true
     $0.returnKeyType = .next
+    $0.addLeftPadding()
   }
 
   private let pwStackView = UIStackView().then {
@@ -87,6 +89,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     $0.clearButtonMode = .whileEditing
     $0.isSecureTextEntry = true
     $0.returnKeyType = .next
+    $0.addLeftPadding()
   }
 
   private let rePwStackView = UIStackView().then {
@@ -101,13 +104,14 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   private let nameTextField = UITextField().then {
-    $0.placeholder = "최대 8자"
+    $0.placeholder = "한글/영어 1-8자"
     $0.clearButtonMode = .whileEditing
     $0.autocapitalizationType = .none
     $0.autocorrectionType = .no
     $0.spellCheckingType = .no
     $0.smartInsertDeleteType = .no
     $0.returnKeyType = .done
+    $0.addLeftPadding()
   }
 
   private let nameStackView = UIStackView().then {
@@ -357,6 +361,19 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     view.addGestureRecognizer(tapGesture)
   }
   
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    textField.borderStyle = .roundedRect
+    textField.layer.borderColor = UIColor.main.cgColor
+    textField.layer.cornerRadius = 3.0
+    textField.layer.borderWidth = 1.0
+  }
+  
+  func textFieldDidEndEditing(_ textField: UITextField) {
+    textField.backgroundColor = .clear
+    textField.borderStyle = .none
+    textField.layer.borderColor = UIColor.clear.cgColor
+  }
+  
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     guard let text = textField.text, !text.isEmpty else {
       textField.shake()
@@ -537,4 +554,12 @@ extension UIView {
         animation.repeatCount = repeatCount
         self.layer.add(animation, forKey: "shake")
     }
+}
+
+extension UITextField {
+  func addLeftPadding() {
+    let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: self.frame.height))
+    self.leftView = paddingView
+    self.leftViewMode = .always
+  }
 }
