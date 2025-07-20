@@ -525,6 +525,7 @@ extension MapViewController {
         for place in places {
           print("📍 \(place.title) - \(place.address)")
           self.places = places
+          self.showCollectionView()
         }
       case let .failure(error):
         print("❌ 검색 실패: \(error)")
@@ -1051,7 +1052,6 @@ extension MapViewController: UISearchBarDelegate {
       hiddenCollectionView()
     } else {
       searchData(query: searchText)
-      showCollectionView()
     }
   }
 }
@@ -1064,12 +1064,18 @@ extension MapViewController: UICollectionViewDataSource {
   }
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard indexPath.item < places.count else {
+      print("❌ indexPath out of bounds: \(indexPath.item) / \(places.count)")
+      return UICollectionViewCell()
+    }
+
     guard let cell = collectionView.dequeueReusableCell(
       withReuseIdentifier: SearchResultCell.identifier,
       for: indexPath
     ) as? SearchResultCell else {
       return UICollectionViewCell()
     }
+
     cell.configure(with: places[indexPath.item])
     return cell
   }
@@ -1082,7 +1088,7 @@ extension MapViewController: UICollectionViewDelegate {
     collectionView.deselectItem(at: indexPath, animated: true)
     let place = places[indexPath.item]
 
-    // 위경도는 1,000,000으로 나눠서 실제 GPS 위치로 변환
+    // 위경도는 0.0000001 곱해서 실제 GPS 위치로 변환
     if let latValue = Double(place.lat),
        let lngValue = Double(place.lng)
     {
