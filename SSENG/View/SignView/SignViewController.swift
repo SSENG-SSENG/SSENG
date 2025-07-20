@@ -4,10 +4,10 @@
 //
 //  Created by 이태윤 on 7/15/25.
 //
+import AVFoundation
 import SnapKit
 import Then
 import UIKit
-import AVFoundation
 
 class SignViewController: UIViewController, UITextFieldDelegate {
   // 동의 여부
@@ -38,7 +38,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   private let idLabel = UILabel().then {
     $0.text = "아이디"
     $0.font = .systemFont(ofSize: 15, weight: .medium)
-
   }
 
   private let idTextField = UITextField().then {
@@ -62,7 +61,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   private let pwLabel = UILabel().then {
     $0.text = "비밀번호"
     $0.font = .systemFont(ofSize: 15, weight: .medium)
-
   }
 
   private let pwTextField = UITextField().then {
@@ -76,7 +74,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   private let pwStackView = UIStackView().then {
     $0.axis = .vertical
     $0.spacing = 6
-
   }
 
   private let rePwLabel = UILabel().then {
@@ -95,7 +92,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   private let rePwStackView = UIStackView().then {
     $0.axis = .vertical
     $0.spacing = 6
-
   }
 
   private let nameLabel = UILabel().then {
@@ -117,7 +113,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   private let nameStackView = UIStackView().then {
     $0.axis = .vertical
     $0.spacing = 6
-
   }
 
   private let termsAgreeCheckBox = UIButton(type: .custom).then {
@@ -167,7 +162,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    if self.isMovingFromParent {
+    if isMovingFromParent {
       if let loginVC = navigationController?.viewControllers.last(where: { $0 is LoginViewController })
         as? LoginViewController
       {
@@ -185,29 +180,29 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       rePwStackView,
       nameStackView,
       termsStackView,
-      submitButton,
+      submitButton
     ].forEach {
       view.addSubview($0)
     }
 
-    [idLabel, idTextField].forEach {
-      idStackView.addArrangedSubview($0)
+    for item in [idLabel, idTextField] {
+      idStackView.addArrangedSubview(item)
     }
 
-    [pwLabel, pwTextField].forEach {
-      pwStackView.addArrangedSubview($0)
+    for item in [pwLabel, pwTextField] {
+      pwStackView.addArrangedSubview(item)
     }
 
-    [rePwLabel, rePwTextField].forEach {
-      rePwStackView.addArrangedSubview($0)
+    for item in [rePwLabel, rePwTextField] {
+      rePwStackView.addArrangedSubview(item)
     }
 
-    [nameLabel, nameTextField].forEach {
-      nameStackView.addArrangedSubview($0)
+    for item in [nameLabel, nameTextField] {
+      nameStackView.addArrangedSubview(item)
     }
 
-    [termsAgreeCheckBox, termsViewButton, termsTextLabel].forEach {
-      termsStackView.addArrangedSubview($0)
+    for item in [termsAgreeCheckBox, termsViewButton, termsTextLabel] {
+      termsStackView.addArrangedSubview(item)
     }
   }
 
@@ -278,6 +273,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   // MARK: 버튼 addTarget
+
   private func setupButtonActions() {
     termsAgreeCheckBox.addTarget(self, action: #selector(didTapCheckbox(_:)), for: .touchUpInside)
     termsViewButton.addTarget(self, action: #selector(didTapTersmView(_:)), for: .touchUpInside)
@@ -285,8 +281,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   private func addTextFieldObservers() {
-    [idTextField, pwTextField, rePwTextField, nameTextField].forEach {
-      $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    for item in [idTextField, pwTextField, rePwTextField, nameTextField] {
+      item.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
   }
 
@@ -298,10 +294,10 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let name = nameTextField.text ?? ""
     let allValid =
       isValidID(id)
-      && isValidPW(pw)
-      && !rePw.isEmpty
-      && isValidName(name)
-      && isAgreed
+        && isValidPW(pw)
+        && !rePw.isEmpty
+        && isValidName(name)
+        && isAgreed
 
     submitButton.isEnabled = allValid
     submitButton.alpha = allValid ? 1.0 : 0.5
@@ -360,20 +356,20 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     tapGesture.cancelsTouchesInView = false
     view.addGestureRecognizer(tapGesture)
   }
-  
+
   func textFieldDidBeginEditing(_ textField: UITextField) {
     textField.borderStyle = .roundedRect
     textField.layer.borderColor = UIColor.main.cgColor
     textField.layer.cornerRadius = 3.0
     textField.layer.borderWidth = 1.0
   }
-  
+
   func textFieldDidEndEditing(_ textField: UITextField) {
     textField.backgroundColor = .clear
     textField.borderStyle = .none
     textField.layer.borderColor = UIColor.clear.cgColor
   }
-  
+
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     guard let text = textField.text, !text.isEmpty else {
       textField.shake()
@@ -396,8 +392,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   func prepareForTransition() {
-    [idStackView, pwStackView, rePwStackView, nameStackView, termsStackView, submitButton].forEach {
-      $0.alpha = 0
+    for item in [idStackView, pwStackView, rePwStackView, nameStackView, termsStackView, submitButton] {
+      item.alpha = 0
     }
   }
 
@@ -408,11 +404,11 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       rePwStackView,
       nameStackView,
       termsStackView,
-      submitButton,
+      submitButton
     ]
     let baseDelay: TimeInterval = 0.05
     let animationDuration: TimeInterval = 0.25
-    let initialTranslationY: CGFloat = 20  // 아래쪽에서 20pt 만큼 시작
+    let initialTranslationY: CGFloat = 20 // 아래쪽에서 20pt 만큼 시작
 
     for (index, component) in components.enumerated() {
       component.alpha = 0
@@ -432,6 +428,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   // MARK: 버튼 팡숀
+
   @objc func didTapCheckbox(_ sender: UIButton) {
     sender.isSelected.toggle()
     isAgreed = sender.isSelected
@@ -459,7 +456,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
       alertController(on: self, title: "아이디 오류", message: "아이디는 4-16자 영문 소문자와 숫자로만 구성되어야 합니다.")
       return
     }
-    
+
     if repository.readUser(by: idTextField.text ?? "id-xxxx") != nil {
       alertController(on: self, title: "아이디 중복", message: "중복된 아이디입니다.\n다른 아이디를 사용해 주세요.")
       return
@@ -513,6 +510,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
         let allowed = trimmed.filter { isKorean($0) || $0.isLetter || $0.isNumber }
         textField.text = String(allowed.prefix(8))
       }
+
     default:
       break
     }
@@ -527,7 +525,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     guard let scalar = character.unicodeScalars.first else { return false }
     return scalar.value >= 0xAC00 && scalar.value <= 0xD7A3
   }
-
 }
 
 // TermsViewController 데이터 가져오기
@@ -546,20 +543,20 @@ extension SignViewController: TermsViewControllerDelegate {
 }
 
 extension UIView {
-    func shake(duration: CFTimeInterval = 0.5, repeatCount: Float = 2) {
-        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
-        animation.timingFunction = CAMediaTimingFunction(name: .linear)
-        animation.duration = duration
-        animation.values = [-8, 8, -6, 6, -4, 4, -2, 2, 0]
-        animation.repeatCount = repeatCount
-        self.layer.add(animation, forKey: "shake")
-    }
+  func shake(duration: CFTimeInterval = 0.5, repeatCount: Float = 2) {
+    let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+    animation.timingFunction = CAMediaTimingFunction(name: .linear)
+    animation.duration = duration
+    animation.values = [-8, 8, -6, 6, -4, 4, -2, 2, 0]
+    animation.repeatCount = repeatCount
+    layer.add(animation, forKey: "shake")
+  }
 }
 
 extension UITextField {
   func addLeftPadding() {
-    let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: self.frame.height))
-    self.leftView = paddingView
-    self.leftViewMode = .always
+    let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 8, height: frame.height))
+    leftView = paddingView
+    leftViewMode = .always
   }
 }
