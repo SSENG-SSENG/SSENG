@@ -13,7 +13,8 @@ import UIKit
 
 class MapViewController: UIViewController {
   // 검색Service
-  let searchService = SearchService()
+  private let searchService = SearchService()
+  private var places: [Place] = []
 
   // 선택된 마커
   var selected: SelectedMarkerModel = .all
@@ -45,6 +46,19 @@ class MapViewController: UIViewController {
   private let searchBar = UISearchBar().then {
     $0.placeholder = "주소 검색"
     $0.searchBarStyle = .minimal
+  }
+
+  private lazy var searchCollectionView = UICollectionView(
+    frame: .zero,
+    collectionViewLayout: UICollectionViewFlowLayout().then {
+      $0.itemSize = CGSize(width: UIScreen.main.bounds.width - 40, height: 80)
+      $0.sectionInset = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+    }
+  ).then {
+    $0.showsVerticalScrollIndicator = false
+    $0.register(SearchResultCell.self, forCellWithReuseIdentifier: SearchResultCell.identifier)
+    $0.dataSource = self
+    $0.backgroundColor = .systemBackground
   }
 
   // 마이페이지 버튼
@@ -277,6 +291,7 @@ class MapViewController: UIViewController {
   var controlStackViewConstraint: [Constraint] = []
   var riddingViewShowConstraint: [Constraint] = []
   var riddingViewHiddenConstraint: [Constraint] = []
+  var heightConstraint: [Constraint] = []
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -314,7 +329,7 @@ class MapViewController: UIViewController {
   // MARK: - 뷰 추가
 
   private func setupUI() {
-    [mapView, searchBar, myPageButton, markerFilterStackView, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
+    [mapView, searchBar, searchCollectionView, myPageButton, markerFilterStackView, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
 
     [reloadButton, dividerView4, locationButton].forEach { controlStackView.addArrangedSubview($0) }
 
@@ -347,9 +362,19 @@ class MapViewController: UIViewController {
       $0.height.equalTo(50)
     }
 
+    searchCollectionView.snp.makeConstraints {
+      $0.top.equalTo(searchBar.snp.bottom)
+      $0.leading.trailing.equalTo(searchBar)
+      $0.height.equalTo(0).priority(.low)
+    }
+
+    heightConstraint = searchCollectionView.snp.prepareConstraints {
+      $0.height.equalTo(250)
+    }
+
     myPageButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(20)
-      $0.top.equalTo(searchBar.snp.bottom).offset(20)
+      $0.top.equalTo(searchCollectionView.snp.bottom).offset(20)
       $0.size.equalTo(50)
     }
 
@@ -500,10 +525,44 @@ extension MapViewController {
       case let .success(places):
         for place in places {
           print("📍 \(place.title) - \(place.address)")
+          self.places = places
         }
       case let .failure(error):
         print("❌ 검색 실패: \(error)")
       }
+    }
+  }
+
+  // 검색된 장소 데이터를 업데이트하고 컬렉션뷰 새로고침
+  func update(with places: [Place]) {
+    self.places = places
+    DispatchQueue.main.async {
+      self.searchCollectionView.reloadData()
+    }
+    print("데이터 새로고침 완료")
+  }
+
+  // 검색결과 창 띄우기
+  func showCollectionView() {
+    for constraint in heightConstraint {
+      constraint.isActive = true
+    }
+
+    update(with: places)
+
+    UIView.animate(withDuration: 0.25) {
+      self.view.layoutIfNeeded()
+    }
+  }
+
+  // 검색결과 창 숨기기
+  func hiddenCollectionView() {
+    for constraint in heightConstraint {
+      constraint.isActive = false
+    }
+
+    UIView.animate(withDuration: 0.25) {
+      self.view.layoutIfNeeded()
     }
   }
 
@@ -969,6 +1028,26 @@ extension MapViewController {
 extension MapViewController: UISearchBarDelegate {
   func searchBar(_: UISearchBar, textDidChange searchText: String) {
     searchData(query: searchText)
+    showCollectionView()
+  }
+}
+
+// MARK: - CollectionViewDataSource
+
+extension MapViewController: UICollectionViewDataSource {
+  func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
+    places.count
+  }
+
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: SearchResultCell.identifier,
+      for: indexPath
+    ) as? SearchResultCell else {
+      return UICollectionViewCell()
+    }
+    cell.configure(with: places[indexPath.item])
+    return cell
   }
 }
 
@@ -1009,6 +1088,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
   // 카메라 이동 됐을때
   func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
     print("카메라 이동: \(reason)")
+    hiddenCollectionView()
     hiddenKickBoardView()
     locationManager.stopUpdatingLocation()
   }
@@ -1049,6 +1129,7 @@ extension MapViewController: NMFMapViewTouchDelegate {
   // 지도를 짧게 눌렀을때
   func mapView(_: NMFMapView, didTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("숏 탭: \(latlng.lat), \(latlng.lng)")
+    hiddenCollectionView()
     hiddenKickBoardView()
   }
 }
