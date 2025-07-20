@@ -12,6 +12,10 @@ import Then
 import UIKit
 
 class MapViewController: UIViewController {
+  // 검색Service
+  private let searchService = SearchService()
+  private var places: [Place] = []
+
   // 선택된 마커
   var selected: SelectedMarkerModel = .all
 
@@ -37,6 +41,23 @@ class MapViewController: UIViewController {
 
   // 위치
   let locationManager = CLLocationManager()
+
+  // 검색창
+  private let searchBar = UISearchBar().then {
+    $0.placeholder = "주소 검색"
+    $0.searchBarStyle = .minimal
+  }
+
+  private lazy var searchCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout().then {
+    $0.itemSize = CGSize(width: UIScreen.main.bounds.width - 80, height: 80)
+    $0.sectionInset = UIEdgeInsets(top: 5, left: 30, bottom: 5, right: 30)
+  }).then {
+    $0.showsVerticalScrollIndicator = false
+    $0.register(SearchResultCell.self, forCellWithReuseIdentifier: SearchResultCell.identifier)
+    $0.dataSource = self
+    $0.backgroundColor = .systemGray6
+    $0.layer.cornerRadius = 12
+  }
 
   // 마이페이지 버튼
   private let myPageButton = UIButton().then {
@@ -268,10 +289,13 @@ class MapViewController: UIViewController {
   var controlStackViewConstraint: [Constraint] = []
   var riddingViewShowConstraint: [Constraint] = []
   var riddingViewHiddenConstraint: [Constraint] = []
+  var heightConstraint: [Constraint] = []
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    searchBar.delegate = self
+    searchCollectionView.delegate = self
     mapView.addCameraDelegate(delegate: self)
     mapView.touchDelegate = self
     locationManager.delegate = self
@@ -304,7 +328,7 @@ class MapViewController: UIViewController {
   // MARK: - 뷰 추가
 
   private func setupUI() {
-    [mapView, myPageButton, markerFilterStackView, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
+    [mapView, searchBar, searchCollectionView, myPageButton, markerFilterStackView, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
 
     [reloadButton, dividerView4, locationButton].forEach { controlStackView.addArrangedSubview($0) }
 
@@ -331,9 +355,25 @@ class MapViewController: UIViewController {
       $0.directionalEdges.equalToSuperview()
     }
 
+    searchBar.snp.makeConstraints {
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.height.equalTo(50)
+    }
+
+    searchCollectionView.snp.makeConstraints {
+      $0.top.equalTo(searchBar.snp.bottom)
+      $0.leading.trailing.equalTo(searchBar).inset(5)
+      $0.height.equalTo(0).priority(.low)
+    }
+
+    heightConstraint = searchCollectionView.snp.prepareConstraints {
+      $0.height.equalTo(250)
+    }
+
     myPageButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(20)
-      $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+      $0.top.equalTo(searchCollectionView.snp.bottom).offset(20)
       $0.size.equalTo(50)
     }
 
@@ -474,6 +514,54 @@ extension MapViewController {
     } else {
       // 기본값은 all
       handleMarkerFilterButton(allMarkerButton)
+    }
+  }
+
+  // 검색
+  func searchData(query: String) {
+    searchService.search(query: query) { result in
+      switch result {
+      case let .success(places):
+        for place in places {
+          print("📍 \(place.title) - \(place.address)")
+          self.places = places
+        }
+      case let .failure(error):
+        print("❌ 검색 실패: \(error)")
+      }
+    }
+  }
+
+  // 검색된 장소 데이터를 업데이트하고 컬렉션뷰 새로고침
+  func update(with places: [Place]) {
+    self.places = places
+    DispatchQueue.main.async {
+      self.searchCollectionView.reloadData()
+    }
+    print("데이터 새로고침 완료")
+  }
+
+  // 검색결과 창 띄우기
+  func showCollectionView() {
+    for constraint in heightConstraint {
+      constraint.isActive = true
+    }
+
+    update(with: places)
+
+    UIView.animate(withDuration: 0.25) {
+      self.view.layoutIfNeeded()
+    }
+  }
+
+  // 검색결과 창 숨기기
+  func hiddenCollectionView() {
+    for constraint in heightConstraint {
+      constraint.isActive = false
+    }
+
+    UIView.animate(withDuration: 0.25) {
+      self.view.layoutIfNeeded()
     }
   }
 
@@ -856,10 +944,11 @@ extension MapViewController {
   // 스톱워치 액션
   @objc private func updateTime() {
     secondsElapsed += 1
-    let min = secondsElapsed / 60
+    let hours = secondsElapsed / 3600
+    let min = (secondsElapsed % 3600) / 60
     let sec = secondsElapsed % 60
 
-    stopwatchLabel.text = String(format: "%02d:%02d 이용 중", min, sec)
+    stopwatchLabel.text = String(format: "%02d:%02d:%02d 이용 중", hours, min, sec)
 
     if selectedKickBoard?.kickboardType == .kickboard {
       riddingPriceLabel.text = "\(100 * min)원"
@@ -872,7 +961,6 @@ extension MapViewController {
   @objc private func didTapReturnButton() {
     // 타이머 멈추기
     timer?.invalidate()
-    timer = nil
 
     guard riddingKickBoard != nil else {
       print("반납할 킥보드 정보가 없습니다.")
@@ -912,12 +1000,33 @@ extension MapViewController {
       print("입력된 위치: \(text)")
       self.detailLocationLabel.text = text
       self.kickBoardRepository.returnKickboard(id: self.riddingKickBoard?.id ?? "데이터가 없습니다.", lat: lat, lng: lng, detailLocation: self.detailLocationLabel.text ?? "데이터가 없습니다")
+
+      let kickBoardHistory = HistoryRepository()
+      guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
+        print("유저 데이터를 불러오지 못했습니다.")
+        return
+      }
+
+      let nowTime = Date()
+      let startTime = nowTime.addingTimeInterval(TimeInterval(-self.secondsElapsed))
+      let dateFormatter = DateFormatter()
+      dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+
+      kickBoardHistory.createHistory(
+        userId: userID,
+        duration: Int16(self.secondsElapsed),
+        startTime: dateFormatter.string(from: startTime),
+        type: KickboardType(rawValue: self.riddingKickBoard?.kickboardType?.rawValue ?? "타입 정보가 없습니다.") ?? .kickboard
+      )
+
       self.allKickBoardMarker()
       self.hiddenRiddingView()
+
       self.locationMove(nowLocation: self.locationManager)
       self.locationManager.stopUpdatingLocation()
       self.mapView.positionMode = .normal
       self.riddingKickBoard = nil
+      self.timer = nil
 
       // 반납완료 되어 대여버튼 활성화 시켜주기
       self.riddingButton.isEnabled = true
@@ -931,6 +1040,61 @@ extension MapViewController {
     alert.addAction(UIAlertAction(title: "취소", style: .cancel))
 
     present(alert, animated: true)
+  }
+}
+
+// MARK: - SearchBar Delegate
+
+extension MapViewController: UISearchBarDelegate {
+  func searchBar(_: UISearchBar, textDidChange searchText: String) {
+    if searchText.isEmpty {
+      hiddenCollectionView()
+    } else {
+      searchData(query: searchText)
+      showCollectionView()
+    }
+  }
+}
+
+// MARK: - CollectionViewDataSource
+
+extension MapViewController: UICollectionViewDataSource {
+  func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
+    places.count
+  }
+
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: SearchResultCell.identifier,
+      for: indexPath
+    ) as? SearchResultCell else {
+      return UICollectionViewCell()
+    }
+    cell.configure(with: places[indexPath.item])
+    return cell
+  }
+}
+
+// MARK: - CollectionViewDelegate
+
+extension MapViewController: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    collectionView.deselectItem(at: indexPath, animated: true)
+    let place = places[indexPath.item]
+
+    // 위경도는 1,000,000으로 나눠서 실제 GPS 위치로 변환
+    if let latValue = Double(place.lat),
+       let lngValue = Double(place.lng)
+    {
+      let lat = latValue * 0.0000001
+      let lng = lngValue * 0.0000001
+
+      print("\(place.address)로 이동합니다")
+      print("위도: \(lat) 경도: \(lng)")
+
+      let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
+      mapView.moveCamera(cameraUpdate)
+    }
   }
 }
 
@@ -971,6 +1135,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
   // 카메라 이동 됐을때
   func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
     print("카메라 이동: \(reason)")
+    hiddenCollectionView()
     hiddenKickBoardView()
     locationManager.stopUpdatingLocation()
   }
@@ -1011,6 +1176,7 @@ extension MapViewController: NMFMapViewTouchDelegate {
   // 지도를 짧게 눌렀을때
   func mapView(_: NMFMapView, didTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("숏 탭: \(latlng.lat), \(latlng.lng)")
+    hiddenCollectionView()
     hiddenKickBoardView()
   }
 }
