@@ -118,7 +118,7 @@ class KickboardHistoryCell: UITableViewCell {
 
       let timeFormatter = DateFormatter()
       timeFormatter.locale = Locale(identifier: "ko_KR")
-      timeFormatter.dateFormat = "HH시mm분ss초"
+      timeFormatter.dateFormat = "HH시 mm분 ss초"
 
       let timeRange = "\(timeFormatter.string(from: startTime)) ~ \(timeFormatter.string(from: endTime))" // "22시02분 ~ 22시43분" 형태로 생셩
 
