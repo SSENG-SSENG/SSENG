@@ -2,7 +2,9 @@
 
 > SSENG은 전동 킥보드 및 바이크 대여 플랫폼 애플리케이션으로, 지도 기반 등록, 탑승, 반납 및 이용 내역 확인이 가능합니다.
 
-<img src="https://github.com/user-attachments/assets/c03b04b0-08fd-4922-b6ec-1ec041e62066" width="400" alt="SSENG 화면 이미지" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c03b04b0-08fd-4922-b6ec-1ec041e62066" width="400" alt="SSENG 화면 이미지" />
+</p>
 
 <br>
 
