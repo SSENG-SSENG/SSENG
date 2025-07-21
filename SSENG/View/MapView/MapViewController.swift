@@ -47,6 +47,7 @@ class MapViewController: UIViewController {
   private let searchBar = UISearchBar().then {
     $0.placeholder = "주소 검색"
     $0.searchBarStyle = .minimal
+    $0.searchTextField.backgroundColor = .white
   }
 
   private lazy var searchCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout().then {
