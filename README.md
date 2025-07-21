@@ -1,16 +1,16 @@
 # SSENG – 타는 순간, 바람처럼.
 
-> SSENG은 전동 킥보드 및 바이크 대여 플랫폼 애플리케이션으로, 지도 기반 등록, 탑승, 반납 및 이용 내역 확인이 가능합니다.
+> SSENG은 킥보드 및 바이크 대여 플랫폼 애플리케이션으로, 지도 기반 등록, 탑승, 반납 및 이용 내역 확인이 가능합니다.
+
+<br>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f9de8ae3-b227-4699-a211-899cb5103e35" width="400" alt="SSENG 화면 이미지" />
+  <img src="https://github.com/user-attachments/assets/c03b04b0-08fd-4922-b6ec-1ec041e62066" width="400" alt="SSENG 화면 이미지" />
 </p>
 
 <br>
 
-## 📋 프로젝트 개요
-
-> SSENG은 킥보드 및 바이크를 등록·탑승·반납하고, 마이페이지에서 내 이용 내역과 탑승 상태를 확인할 수 있는 모빌리티 플랫폼입니다.
+## 📋 프로젝트
 
 - **프로젝트 기간**: 2025.07.15(화) ~ 2025.07.22(월)
 - **깃허브 링크**: [SSENG](https://github.com/SSENG-SSENG/SSENG)
