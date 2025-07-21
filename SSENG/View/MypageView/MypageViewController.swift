@@ -19,7 +19,7 @@ class MypageViewController: UIViewController {
   }
 
   private var section1ToggleButton: UIButton?
-  private var isKickboardSectionExpanded = true // 나중에 삭제 예정
+  private var isKickboardSectionExpanded = false
 
   private var user: User? // CoreData에서 가져온 유저 정보
   private let userRepository = UserRepository() // User 정보 가져올 때 사용
@@ -170,9 +170,12 @@ extension MypageViewController: UITableViewDataSource {
 
   // 각 섹션에 맞는 헤더 타이틀 설정
   func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    let registeredCount = kickboards.count
+    // 팀원과 상의하여 "등록한 킥보드"는 개수까지, "킥보드 이용 내역"은 개수를 제거하기로 결정
+
     let title: String
     switch section {
-    case 1: title = "등록한 킥보드"
+    case 1: title = "등록한 킥보드 (\(registeredCount)개)"
     case 2: title = "킥보드 이용 내역"
     default: return nil
     }
@@ -260,6 +263,8 @@ extension MypageViewController: UITableViewDataSource {
     }
   }
 }
+
+// MARK: - 킥보드 상태 이상 신고 Alert
 
 extension MypageViewController: KickboardHistoryCellDelegate {
   func didTapReportButton(_: KickboardHistoryCell) {
