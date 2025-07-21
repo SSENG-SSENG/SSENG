@@ -273,7 +273,7 @@ extension MypageViewController: KickboardHistoryCellDelegate {
     }
 
     alert.addAction(submitAction)
-    alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+    alert.addAction(UIAlertAction(title: "취소", style: .destructive))
     present(alert, animated: true)
   }
 }
