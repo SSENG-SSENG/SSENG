@@ -76,7 +76,6 @@ class MapViewController: UIViewController {
   // 마커 필터 버튼 스택뷰
   private let markerFilterStackView = UIStackView().then {
     $0.axis = .vertical
-    $0.spacing = 0
     $0.distribution = .fillProportionally
     $0.layer.cornerRadius = 12
     $0.backgroundColor = UIColor.white.withAlphaComponent(0.7)
@@ -84,6 +83,16 @@ class MapViewController: UIViewController {
     $0.layer.shadowOpacity = 0.2
     $0.layer.shadowOffset = CGSize(width: 0, height: 2)
     $0.layer.shadowRadius = 4
+    $0.isHidden = true
+  }
+
+  // 전체 마커
+  private let allStackView = UIStackView().then {
+    $0.layoutMargins = .init(top: 0, left: 15, bottom: 0, right: 0)
+    $0.isLayoutMarginsRelativeArrangement = true
+    $0.axis = .horizontal
+    $0.distribution = .fillProportionally
+    $0.alignment = .center
   }
 
   // 전체 마커
@@ -99,8 +108,25 @@ class MapViewController: UIViewController {
   // 닷 뷰
   private lazy var allMarkerIndicatorDot = makeIndicatorDotView()
 
+  // 전체
+  private let allTextLabel = UILabel().then {
+    $0.textColor = .main
+    $0.textAlignment = .right
+    $0.text = "전체"
+    $0.font = .systemFont(ofSize: 12, weight: .medium)
+  }
+
   // 구분선 뷰
   private lazy var dividerView1 = makeDividerView()
+
+  // 킥보드 마커
+  private let kickBoardStackView = UIStackView().then {
+    $0.layoutMargins = .init(top: 0, left: 15, bottom: 0, right: 0)
+    $0.isLayoutMarginsRelativeArrangement = true
+    $0.axis = .horizontal
+    $0.distribution = .fillProportionally
+    $0.alignment = .center
+  }
 
   // 킥보드 마커
   private let kickBoardMarkerButton = UIButton().then {
@@ -115,8 +141,25 @@ class MapViewController: UIViewController {
   // 닷 뷰
   private lazy var kickBoardIndicatorDot = makeIndicatorDotView()
 
+  // 킥보드
+  private let kickBoardTextLabel = UILabel().then {
+    $0.textColor = .main
+    $0.textAlignment = .right
+    $0.text = "킥보드"
+    $0.font = .systemFont(ofSize: 12, weight: .medium)
+  }
+
   // 구분선 뷰
   private lazy var dividerView2 = makeDividerView()
+
+  // 오토바이 마커
+  private let bikeStackView = UIStackView().then {
+    $0.layoutMargins = .init(top: 0, left: 15, bottom: 0, right: 0)
+    $0.isLayoutMarginsRelativeArrangement = true
+    $0.axis = .horizontal
+    $0.distribution = .fillProportionally
+    $0.alignment = .center
+  }
 
   // 오토바이 마커
   private let bikeMarkerButton = UIButton().then {
@@ -131,8 +174,25 @@ class MapViewController: UIViewController {
   // 닷 뷰
   private lazy var bikeIndicatorDot = makeIndicatorDotView()
 
+  // 오토바이
+  private let bikeTextLabel = UILabel().then {
+    $0.textColor = .main
+    $0.textAlignment = .right
+    $0.text = "오토바이"
+    $0.font = .systemFont(ofSize: 12, weight: .medium)
+  }
+
   // 구분선 뷰
   private lazy var dividerView3 = makeDividerView()
+
+  // 노마커
+  private let noneStackView = UIStackView().then {
+    $0.layoutMargins = .init(top: 0, left: 15, bottom: 0, right: 0)
+    $0.isLayoutMarginsRelativeArrangement = true
+    $0.axis = .horizontal
+    $0.distribution = .fillProportionally
+    $0.alignment = .center
+  }
 
   // 노마커
   private let noneMarkerButton = UIButton().then {
@@ -146,6 +206,27 @@ class MapViewController: UIViewController {
 
   // 닷 뷰
   private lazy var noneIndicatorDot = makeIndicatorDotView()
+
+  // 없음
+  private let noneTextLabel = UILabel().then {
+    $0.textColor = .main
+    $0.textAlignment = .right
+    $0.text = "없음"
+    $0.font = .systemFont(ofSize: 12, weight: .medium)
+  }
+
+  // 선택된 버튼
+  private let selectedButton = UIButton().then {
+    $0.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 22, weight: .medium), forImageIn: .normal)
+    $0.tintColor = .main
+    $0.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+    $0.layer.cornerRadius = 12
+    $0.clipsToBounds = false
+    $0.layer.shadowColor = UIColor.black.cgColor
+    $0.layer.shadowOpacity = 0.2
+    $0.layer.shadowOffset = CGSize(width: 0, height: 2)
+    $0.layer.shadowRadius = 4
+  }
 
   // 새로고침, 위치추적 버튼 스택뷰
   private let controlStackView = UIStackView().then {
@@ -345,11 +426,15 @@ class MapViewController: UIViewController {
   // MARK: - 뷰 추가
 
   private func setupUI() {
-    [mapView, searchBar, searchCollectionView, myPageButton, markerFilterStackView, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
+    [mapView, searchBar, searchCollectionView, myPageButton, markerFilterStackView, selectedButton, controlStackView, riddingView, kickBoardInfoView].forEach { view.addSubview($0) }
+
+    [allStackView, dividerView1, kickBoardStackView, dividerView2, bikeStackView, dividerView3, noneStackView].forEach { markerFilterStackView.addArrangedSubview($0) }
+    [allMarkerIndicatorDot, allTextLabel, allMarkerButton].forEach { allStackView.addArrangedSubview($0) }
+    [kickBoardIndicatorDot, kickBoardTextLabel, kickBoardMarkerButton].forEach { kickBoardStackView.addArrangedSubview($0) }
+    [bikeIndicatorDot, bikeTextLabel, bikeMarkerButton].forEach { bikeStackView.addArrangedSubview($0) }
+    [noneIndicatorDot, noneTextLabel, noneMarkerButton].forEach { noneStackView.addArrangedSubview($0) }
 
     [reloadButton, dividerView4, locationButton].forEach { controlStackView.addArrangedSubview($0) }
-
-    [allMarkerButton, dividerView1, kickBoardMarkerButton, dividerView2, bikeMarkerButton, dividerView3, noneMarkerButton].forEach { markerFilterStackView.addArrangedSubview($0) }
 
     [kickBoardHStackView, riddingButton].forEach { kickBoardInfoView.addSubview($0) }
 
@@ -358,11 +443,6 @@ class MapViewController: UIViewController {
     [batteryLabel, priceLabel, detailLocationTitleLabel, detailLocationLabel].forEach { kickBoardVStackView.addArrangedSubview($0) }
 
     [stopwatchLabel, riddingBatteryLabel, riddingPriceLabel, returnButton].forEach { riddingView.addSubview($0) }
-
-    allMarkerButton.addSubview(allMarkerIndicatorDot)
-    kickBoardMarkerButton.addSubview(kickBoardIndicatorDot)
-    bikeMarkerButton.addSubview(bikeIndicatorDot)
-    noneMarkerButton.addSubview(noneIndicatorDot)
   }
 
   // MARK: - 제약조건
@@ -396,41 +476,46 @@ class MapViewController: UIViewController {
 
     markerFilterStackView.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(20)
-      $0.bottom.equalTo(controlStackView.snp.top).offset(-10)
-      $0.width.equalTo(50)
+      $0.bottom.equalTo(selectedButton.snp.top).offset(-10)
+      $0.width.equalTo(120)
+    }
+
+    allStackView.snp.makeConstraints {
+      $0.height.equalTo(50)
     }
 
     allMarkerButton.snp.makeConstraints {
+      $0.width.equalTo(50)
+    }
+
+    kickBoardStackView.snp.makeConstraints {
       $0.height.equalTo(50)
     }
 
     kickBoardMarkerButton.snp.makeConstraints {
+      $0.width.equalTo(50)
+    }
+
+    bikeStackView.snp.makeConstraints {
       $0.height.equalTo(50)
     }
 
     bikeMarkerButton.snp.makeConstraints {
+      $0.width.equalTo(50)
+    }
+
+    noneStackView.snp.makeConstraints {
       $0.height.equalTo(50)
     }
 
     noneMarkerButton.snp.makeConstraints {
-      $0.height.equalTo(50)
+      $0.width.equalTo(50)
     }
 
-    allMarkerIndicatorDot.snp.makeConstraints {
-      $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().inset(40)
-    }
-    kickBoardIndicatorDot.snp.makeConstraints {
-      $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().inset(40)
-    }
-    bikeIndicatorDot.snp.makeConstraints {
-      $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().inset(40)
-    }
-    noneIndicatorDot.snp.makeConstraints {
-      $0.centerX.equalToSuperview()
-      $0.top.equalToSuperview().inset(40)
+    selectedButton.snp.makeConstraints {
+      $0.trailing.equalToSuperview().inset(20)
+      $0.bottom.equalTo(controlStackView.snp.top).offset(-20)
+      $0.size.equalTo(50)
     }
 
     controlStackView.snp.makeConstraints {
@@ -870,6 +955,8 @@ extension MapViewController {
     bikeMarkerButton.addTarget(self, action: #selector(handleMarkerFilterButton(_:)), for: .touchUpInside)
     // 필터링 버튼: 없음
     noneMarkerButton.addTarget(self, action: #selector(handleMarkerFilterButton(_:)), for: .touchUpInside)
+    // 필터링 표시 버튼
+    selectedButton.addTarget(self, action: #selector(toggleFilterMenu), for: .touchUpInside)
     // 새로고침 버튼
     reloadButton.addTarget(self, action: #selector(didTabReloadButton), for: .touchUpInside)
     // 위치 추적 버튼
@@ -896,10 +983,18 @@ extension MapViewController {
     }
 
     switch sender.tag {
-    case 0: selected = .all
-    case 1: selected = .kickBoard
-    case 2: selected = .bike
-    case 3: selected = .none
+    case 0:
+      selected = .all
+      selectedButton.setImage(UIImage(systemName: "a.circle"), for: .normal)
+    case 1:
+      selected = .kickBoard
+      selectedButton.setImage(UIImage(systemName: "k.circle"), for: .normal)
+    case 2:
+      selected = .bike
+      selectedButton.setImage(UIImage(systemName: "b.circle"), for: .normal)
+    case 3:
+      selected = .none
+      selectedButton.setImage(UIImage(systemName: "n.circle"), for: .normal)
     default: break
     }
 
@@ -907,6 +1002,22 @@ extension MapViewController {
     UserDefaults.standard.set(selected.rawValue, forKey: selectedMarkerKey)
     // 마커 업데이트
     updateVisibleMarkers()
+  }
+
+  // 마커 필터링 버튼 토글 애니메이션
+  @objc private func toggleFilterMenu() {
+    let isOpening = markerFilterStackView.isHidden
+
+    if isOpening {
+      markerFilterStackView.alpha = 0
+      markerFilterStackView.isHidden = false
+    }
+
+    UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+      self.markerFilterStackView.alpha = isOpening ? 1 : 0
+    }, completion: { _ in
+      self.markerFilterStackView.isHidden = !isOpening
+    })
   }
 
   // 새로고침 버튼 액션
@@ -1256,6 +1367,11 @@ extension MapViewController: NMFMapViewTouchDelegate {
     hiddenCollectionView()
     hiddenKickBoardView()
     dismissKeyboard()
+
+    // 필터 스택뷰가 보이는 중이면 닫기
+    if !markerFilterStackView.isHidden {
+      toggleFilterMenu()
+    }
     if let serchMarker = searchMarker {
       removeMarker(marker: serchMarker)
     }
