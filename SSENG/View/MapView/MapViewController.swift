@@ -732,20 +732,10 @@ extension MapViewController {
       mapView.positionMode = .normal
       mapView.moveCamera(cameraUpdate)
     } else {
-      // 약간의 시간차를 두고 다시 시도
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-        guard let self, let location = nowLocation.location else {
-          print(" 위치를 가져오지 못했습니다.")
-          return
-        }
-        let lat = location.coordinate.latitude
-        let lng = location.coordinate.longitude
-        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
-        cameraUpdate.animation = .fly
-        cameraUpdate.animationDuration = 0.5
-        self.mapView.moveCamera(cameraUpdate)
-      }
+      print("위치를 받아올 수 없습니다.")
     }
+    
+    nowLocation.startUpdatingLocation()
   }
 
   // 킥보드 정보창 띄우기
