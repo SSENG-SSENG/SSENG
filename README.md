@@ -2,7 +2,7 @@
 
 > SSENG은 전동 킥보드 및 바이크 대여 플랫폼으로, 지도 기반 등록, 탑승, 반납 및 이용 내역 확인이 가능합니다.
 
-<img src="https://github.com/user-attachments/assets/c03b04b0-08fd-4922-b6ec-1ec041e62066" width="300" alt="SSENG 화면 이미지" />
+<img src="https://github.com/user-attachments/assets/c03b04b0-08fd-4922-b6ec-1ec041e62066" width="400" alt="SSENG 화면 이미지" />
 
 <br>
 
@@ -96,7 +96,7 @@ SSENG/
 
 <br>
 
-## **🔁 데이터 플로우**
+## 🔁 데이터 플로우
 ```
 [[LaunchScreen]]
    ↓
@@ -125,18 +125,15 @@ SSENG/
 
 <br>
 
-## 데이터 저장소 (Data Persistence)**  
+## 💾 데이터 저장소 (Data Persistence)
 
 - **Core Data**: 앱의 핵심 데이터(사용자, 킥보드, 이용 내역)는 **Core Data**를 통해 기기 내에 영구적으로 저장.  
 
-- **Entities**: User, Kickboard, History 세 가지 주요 데이터 모델(Entity)이 정의되어 있다.  
+- **Entities**: User, Kickboard, History 세 가지 주요 데이터 모델(Entity)이 정의되어 있음 
 
-- **CoreDataStack**: Core Data의 복잡한 설정을 관리하는 싱글톤 클래스 입니다. 데이터 저장, 컨텍스트 접 등의 역할  
+- **CoreDataStack**: Core Data의 복잡한 설정을 관리하는 싱글톤 클래스
 
-- **UserDefaults**: 로그인 상태(isAutoLogin), 현재 로그인한 사용자 ID(loggedUserID)와 같이 앱 세션 관 에 필요한 간단한 데이터는 **UserDefaults**에 저장됩니다. → 사용자가 `LoginView` 또는 `MapView`에서 시작  
-
-- **데이터 접근 계층**: ViewController -> Repository -> CoreDataStack -> Core Data  
-킥보드 등록은 MapVC → KickboardVC → 다시 MapVC로 delegate 전달됨 전체적으로 **양방향 데이터 흐름 (Bidirectional Data Flow**)을 띄우고 있으며 **sseng**의 구조는 **Controller**가 View와 Model 사이에서 양쪽으로 직접 통신하며 데이터를 주고받습니다.
+- **UserDefaults**: 자동 로그인 상태(isAutoLogin), 현재 로그인한 사용자 ID(loggedUserID)와 같이 앱 세션 간에 필요한 간단한 데이터는 **UserDefaults**에 저장됩니다. → 사용자가 `LoginView` 또는 `MapView`에서 시작  
 
 <br>
 
@@ -165,19 +162,22 @@ SSENG/
 
 ## 📱 주요 기능
 
-1. **전동 킥보드 등록 및 지도 기반 표시**  
-   사용자가 직접 킥보드를 등록할 수 있고, 등록된 킥보드는 지도 상에 위치 기반으로 시각화됩니다.
+1. **Splash 화면 분기 처리**  
+   앱 실행 시 Splash 화면을 통해 2초간 로고를 노출하고, 자동 로그인 여부에 따라 로그인 화면 또는 메인 화면으로 분기됩니다.
 
 2. **로그인 / 회원가입 및 자동 로그인 기능**  
    사용자 정보는 CoreData를 기반으로 저장되며, 자동 로그인 여부를 체크하여 앱 시작 시 로그인 흐름을 결정합니다.
 
-3. **마이페이지에서 등록한 킥보드 및 이용 내역 확인**  
+3. **킥보드 / 바이크 등록 및 지도 기반 표시**  
+   사용자가 직접 킥보드를 등록할 수 있고, 등록된 킥보드는 지도 상에 위치 기반으로 시각화됩니다.
+
+4. **대여 / 반납 기능**  
+   사용자가 킥보드나 바이크에 탑승할 수 있으며, 현재 위치 기반으로 반납할 수 있습니다.
+
+5. **마이페이지에서 등록한 킥보드 및 이용 내역 확인**  
    유저가 등록한 킥보드 목록과 이용 기록을 한 눈에 확인할 수 있도록 마이페이지에 구성하였습니다.
 
-4. **Splash 화면 분기 처리**  
-   앱 실행 시 Splash 화면을 통해 2초간 로고를 노출하고, 자동 로그인 여부에 따라 로그인 화면 또는 메인 화면으로 분기됩니다.
-
-5. **CoreData 기반의 데이터 관리 및 저장**  
+6. **CoreData 기반의 데이터 관리 및 저장**  
    사용자, 킥보드, 이용 내역 등 주요 데이터는 CoreData로 저장되어 앱 종료 후에도 정보를 유지합니다.
 
 <br>
@@ -206,21 +206,20 @@ SSENG/
 ### 🌿 브랜치 네이밍 규칙
 - `feat/`, `fix/`, `style/` 등 prefix 사용  
 - 예시: `feat/login`, `fix/mapview-bug`
-
-### 병합 조건
-- ✅ PR 병합 전 **최소 1명 승인 필요**
-- ❌ `git push --force` 금지
-- 👥 모든 팀원에게 동일 규칙 적용 (Bypass 없음)
+- 병합 조건
+   - ✅ PR 병합 전 **최소 1명 승인 필요**
+   - ❌ `git push --force` 금지
+   - 👥 모든 팀원에게 동일 규칙 적용 (Bypass 없음)
 
 
 <br>
 
-## 와이어 프레임 
+## ⛓️‍💥 와이어 프레임 
 - [Figma 링크](https://www.figma.com/design/ugbya6n45zHdqH0oI5JiuR/%EC%8C%A9?node-id=0-1&p=f&t=bUX2p8ipJvFwPNo2-0)
 
 <br>
 
-## 설치 및 실행 방법
+## 📦 설치 및 실행 방법
 
 ```bash
 git clone https://github.com/SSENG-SSENG/SSENG.git
