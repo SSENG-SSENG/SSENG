@@ -1,6 +1,6 @@
 # SSENG – 타는 순간, 바람처럼.
 
-> SSENG은 전동 킥보드 및 바이크 대여 플랫폼으로, 지도 기반 등록, 탑승, 반납 및 이용 내역 확인이 가능합니다.
+> SSENG은 전동 킥보드 및 바이크 대여 플랫폼 애플리케이션으로, 지도 기반 등록, 탑승, 반납 및 이용 내역 확인이 가능합니다.
 
 <img src="https://github.com/user-attachments/assets/c03b04b0-08fd-4922-b6ec-1ec041e62066" width="400" alt="SSENG 화면 이미지" />
 
@@ -131,9 +131,9 @@ SSENG/
 
 - **Entities**: User, Kickboard, History 세 가지 주요 데이터 모델(Entity)이 정의되어 있음 
 
-- **CoreDataStack**: Core Data의 복잡한 설정을 관리하는 싱글톤 클래스
+- **CoreDataStack**: Core Data의 복잡한 설정을 관리하는 싱글톤 클래스. 더이터 저장/관리 등의 역할
 
-- **UserDefaults**: 자동 로그인 상태(isAutoLogin), 현재 로그인한 사용자 ID(loggedUserID)와 같이 앱 세션 간에 필요한 간단한 데이터는 **UserDefaults**에 저장됩니다. → 사용자가 `LoginView` 또는 `MapView`에서 시작  
+- **UserDefaults**: 로그인 상태(isAutoLogin), 현재 로그인한 사용자 ID(loggedUserID)와 같이 앱 세션 사이에 필요한 간단한 데이터는 **UserDefaults**에 저장됩니다. → 사용자가 `LoginView` 또는 `MapView`에서 시작  
 
 <br>
 
@@ -224,5 +224,5 @@ SSENG/
 ```bash
 git clone https://github.com/SSENG-SSENG/SSENG.git
 open SSENG.xcodeproj
-⌘R로 실행
+⌘(command) + R로 실행
 ```
