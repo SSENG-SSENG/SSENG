@@ -10,6 +10,7 @@ import Then
 import UIKit
 
 class LoginViewController: UIViewController, UINavigationControllerDelegate, UITextFieldDelegate {
+  // 자동로그인 체크박스 체크용
   private var isAgreed = false
   private let repository = UserRepository()
 
@@ -119,10 +120,11 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
 
   func setupUI() {
     [
-      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton,
+      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton,
     ].forEach {
       view.addSubview($0)
     }
+    // view.addSubview(debugButton)
 
     [idLabel, idTextField].forEach {
       idStackView.addArrangedSubview($0)
@@ -187,11 +189,11 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
       $0.centerX.equalToSuperview()
     }
 
-    debugButton.snp.makeConstraints {
-      $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(10)
-      $0.leading.trailing.equalToSuperview().inset(padding)
-      $0.centerX.equalToSuperview()
-    }
+    // debugButton.snp.makeConstraints {
+    //   $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(10)
+    //   $0.leading.trailing.equalToSuperview().inset(padding)
+    //   $0.centerX.equalToSuperview()
+    // }
   }
 
   private func setupButtonActions() {
@@ -312,6 +314,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     return false
   }
 
+  // 화면 전환 때의 컴포넌트 애니메이션
   func animateContentAppearance() {
     let components: [UIView] = [
       idStackView,
@@ -341,8 +344,10 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     }
   }
 
+  // 로그인 버튼
   @objc func didTapLogin() {
     if repository.readUser(by: idTextField.text ?? "id-xxxx")?.id != idTextField.text {
+      // 아이디 텍스트필드로 이동
       idTextField.becomeFirstResponder()
       alertController(on: self, title: "아이디 오류", message: "해당 아이디가 존재하지 않습니다.")
     }
@@ -357,26 +362,31 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     navigationController?.pushViewController(mapVC, animated: true)
   }
 
+  // 회원가입 페이지 이동 버튼
   @objc func didTapSignUp() {
     let signUpVC = SignViewController()
     signUpVC.prepareForTransition()
     navigationController?.pushViewController(signUpVC, animated: true)
   }
 
+  // 오토로그인 체크박스 상태 변환
   @objc func didTapAutoLoginAgree(_ sender: UIButton) {
     sender.isSelected.toggle()
     isAgreed = sender.isSelected
   }
 
+  // 화면 터치하면 키보드 내려가는 기능
   @objc func dismissKeyboard() {
     view.endEditing(true)
   }
 
+  // 디버그
   @objc func donttouchthis() {
     // CoreDataStack.shared.deleteAllData()
     print(UserRepository().readUser(by: idTextField.text ?? "no id")?.password ?? "비밀번호 없음?!")
   }
 
+  // 텍스트필드 유효값 체크
   @objc private func textFieldDidChange(_ textField: UITextField) {
     switch textField {
     case idTextField:
