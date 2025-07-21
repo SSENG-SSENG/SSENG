@@ -37,7 +37,7 @@ class KickboardHistoryCell: UITableViewCell {
   }
 
   private let reportButton = UIButton().then {
-    $0.setImage(UIImage(systemName: "exclamationmark.triangle"), for: .normal)
+    $0.setImage(UIImage(systemName: "exclamationmark.bubble"), for: .normal)
     $0.tintColor = .systemRed
   }
 
@@ -102,7 +102,7 @@ class KickboardHistoryCell: UITableViewCell {
 
     reportButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(16)
-      $0.bottom.equalToSuperview().inset(8)
+      $0.top.equalToSuperview().inset(8)
     }
   }
 
