@@ -1,5 +1,4 @@
 import AVFoundation
-
 //
 //  ViewController.swift
 //  SSENG
@@ -14,10 +13,15 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
   private var isAgreed = false
   private let repository = UserRepository()
 
+  // MARK: 컴포넌트 초기화
+
   let appLogoImageView = UIImageView().then {
     $0.image = UIImage(named: "Logo")
     $0.contentMode = .scaleAspectFit
   }
+
+  private let scrollView = UIScrollView()
+  private let contentView = UIView()
 
   private let idLabel = UILabel().then {
     $0.text = "아이디"
@@ -111,36 +115,56 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     dismissKeyboardController()
 
     [idTextField, pwTextField].forEach { $0.delegate = self }
+
+    prepareForTransition()
   }
 
   func setupUI() {
-    [
-      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton
-    ].forEach {
-      view.addSubview($0)
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
+    contentView.translatesAutoresizingMaskIntoConstraints = false
 
-      for item in [idLabel, idTextField] {
-        idStackView.addArrangedSubview(item)
-      }
+    view.addSubview(appLogoImageView)
+    view.addSubview(scrollView)
+    scrollView.addSubview(contentView)
+    scrollView.showsVerticalScrollIndicator = false
 
-      for item in [pwLabel, pwTextField] {
-        pwStackView.addArrangedSubview(item)
-      }
+    for item in [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton] {
+      contentView.addSubview(item)
+    }
 
-      for item in [autoLoginAgreeCheckBox, autoLoginAgreeLabel] {
-        autoLoginStackView.addArrangedSubview(item)
-      }
+    for item in [idLabel, idTextField] {
+      idStackView.addArrangedSubview(item)
+    }
+
+    for item in [pwLabel, pwTextField] {
+      pwStackView.addArrangedSubview(item)
+    }
+
+    for item in [autoLoginAgreeCheckBox, autoLoginAgreeLabel] {
+      autoLoginStackView.addArrangedSubview(item)
     }
   }
 
+  // 컴포넌트 레이아웃
   func setupConstraints() {
     let padding: CGFloat = 60
     let height: CGFloat = 48
 
     appLogoImageView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide).offset(padding)
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(30)
       $0.centerX.equalToSuperview()
-      $0.height.equalTo(120)
+      $0.height.equalTo(100)
+    }
+
+    scrollView.snp.makeConstraints {
+      $0.top.equalTo(appLogoImageView.snp.bottom).offset(10)
+      $0.leading.trailing.equalToSuperview()
+      $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top)
+    }
+
+    contentView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+      $0.width.equalTo(scrollView.snp.width)
     }
 
     idTextField.snp.makeConstraints {
@@ -148,9 +172,9 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     }
 
     idStackView.snp.makeConstraints {
-      $0.top.equalTo(appLogoImageView.snp.bottom).offset(56)
+      $0.top.equalToSuperview().offset(30)
       $0.leading.trailing.equalToSuperview().inset(padding)
-      $0.centerX.equalToSuperview()
+      // $0.centerX.equalToSuperview()
     }
 
     pwTextField.snp.makeConstraints {
@@ -160,7 +184,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     pwStackView.snp.makeConstraints {
       $0.top.equalTo(idStackView.snp.bottom).offset(10)
       $0.leading.trailing.equalToSuperview().inset(padding)
-      $0.centerX.equalToSuperview()
+      // $0.centerX.equalToSuperview()
     }
 
     autoLoginStackView.setCustomSpacing(4, after: autoLoginAgreeCheckBox)
@@ -181,8 +205,11 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
       $0.leading.trailing.equalToSuperview().inset(padding)
       $0.height.equalTo(height)
       $0.centerX.equalToSuperview()
+      $0.bottom.equalToSuperview().inset(24)
     }
   }
+
+  // MARK: 버튼 addTarget
 
   private func setupButtonActions() {
     loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
@@ -190,21 +217,26 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     autoLoginAgreeCheckBox.addTarget(self, action: #selector(didTapAutoLoginAgree), for: .touchUpInside)
   }
 
+  // 텍스트 입력 때 길이 등 필터링
   private func addTextFieldObsevers() {
     for item in [idTextField, pwTextField] {
       item.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
   }
 
+  // userDefault 생성
   func createDefaultUser(id: String) {
+    // 자동 로그인
     if isAgreed {
       UserDefaults.standard.set(true, forKey: "isAutoLogin")
     } else {
       UserDefaults.standard.set(false, forKey: "isAutoLogin")
     }
+    //  로그인 유저 데이터
     UserDefaults.standard.set(id, forKey: "loggedUserID")
   }
 
+  // 텍스트 필드 상태에 따라 버튼 활성화
   private func updateLoginButtonState() {
     let id = idTextField.text ?? ""
     let pw = pwTextField.text ?? ""
@@ -231,6 +263,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     }
   }
 
+  // 각 칸 정규식
   private func isValidID(_ id: String) -> Bool {
     id.range(of: #"^[a-z0-9]{4,16}$"#, options: .regularExpression) != nil
   }
@@ -239,12 +272,56 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     pw.range(of: #"^[A-Za-z\d!@#$&*]{8,32}$"#, options: .regularExpression) != nil
   }
 
+  // alert 컨트롤러
   func alertController(on vc: UIViewController, title: String, message: String) {
     let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "확인", style: .default))
     vc.present(alert, animated: true)
   }
 
+  // 터치 제스처 인식
+  func dismissKeyboardController() {
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+    tapGesture.cancelsTouchesInView = false
+    view.addGestureRecognizer(tapGesture)
+  }
+
+  // 텍스트 필드 누르면 테두리 표시
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    textField.borderStyle = .roundedRect
+    textField.layer.borderColor = UIColor.main.cgColor
+    textField.layer.cornerRadius = 3.0
+    textField.layer.borderWidth = 1.0
+  }
+
+  // 텍스트 필드 누르면 테두리 해제
+  func textFieldDidEndEditing(_ textField: UITextField) {
+    textField.borderStyle = .none
+    textField.backgroundColor = .clear
+    textField.layer.borderColor = UIColor.clear.cgColor
+  }
+
+  // 키보드 리턴 누를 때
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    // 필드가 비어있다면 필드가 흔들리고 진동이 울림
+    guard let text = textField.text, !text.isEmpty else {
+      textField.shake()
+      AudioServicesPlaySystemSound(4095)
+      return false
+    }
+    // 텍스트 필드 위치에 따라 아래로 내려가거나 키보드가 닫힘
+    switch textField {
+    case idTextField:
+      pwTextField.becomeFirstResponder()
+    case pwTextField:
+      pwTextField.resignFirstResponder()
+    default:
+      break
+    }
+    return false
+  }
+
+  // 화면 전환 때 로고 애니메이션
   func navigationController(
     _: UINavigationController,
     animationControllerFor operation: UINavigationController.Operation,
@@ -259,59 +336,25 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     return nil
   }
 
+  // 화면 전환될 때 투명도 조절
   func prepareForTransition() {
     for item in [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton] {
       item.alpha = 0
     }
   }
 
-  func dismissKeyboardController() {
-    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-    tapGesture.cancelsTouchesInView = false
-    view.addGestureRecognizer(tapGesture)
-  }
-
-  func textFieldDidBeginEditing(_ textField: UITextField) {
-    textField.borderStyle = .roundedRect
-    textField.layer.borderColor = UIColor.main.cgColor
-    textField.layer.cornerRadius = 3.0
-    textField.layer.borderWidth = 1.0
-  }
-
-  func textFieldDidEndEditing(_ textField: UITextField) {
-    textField.borderStyle = .none
-    textField.backgroundColor = .clear
-    textField.layer.borderColor = UIColor.clear.cgColor
-  }
-
-  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    guard let text = textField.text, !text.isEmpty else {
-      textField.shake()
-      AudioServicesPlaySystemSound(4095)
-      return false
-    }
-    switch textField {
-    case idTextField:
-      pwTextField.becomeFirstResponder()
-    case pwTextField:
-      pwTextField.resignFirstResponder()
-    default:
-      break
-    }
-    return false
-  }
-
+  // 화면 전환될 때 컴포넌트가 아래에서 위로 애니메이션
   func animateContentAppearance() {
     let components: [UIView] = [
       idStackView,
       pwStackView,
       autoLoginStackView,
       loginButton,
-      signUpBUtton
+      signUpBUtton,
     ]
     let baseDelay: TimeInterval = 0.05
     let animationDuration: TimeInterval = 0.25
-    let initialTranslationY: CGFloat = 20 // 아래쪽에서 20pt 만큼 시작
+    let initialTranslationY: CGFloat = 20  // 아래쪽에서 20pt 만큼 시작
 
     for (index, component) in components.enumerated() {
       component.alpha = 0
@@ -330,6 +373,14 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     }
   }
 
+  // MARK: 버튼 기능들
+  // 체크박스
+  @objc func didTapAutoLoginAgree(_ sender: UIButton) {
+    sender.isSelected.toggle()
+    isAgreed = sender.isSelected
+  }
+
+  // 로그인 버튼 누르면: 존재, 필터링 체크
   @objc func didTapLogin() {
     if repository.readUser(by: idTextField.text ?? "id-xxxx")?.id != idTextField.text {
       idTextField.becomeFirstResponder()
@@ -346,26 +397,16 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     navigationController?.pushViewController(mapVC, animated: true)
   }
 
+  // 회원가입 클릭하면: 회원가입 VC로 이동
   @objc func didTapSignUp() {
     let signUpVC = SignViewController()
     signUpVC.prepareForTransition()
     navigationController?.pushViewController(signUpVC, animated: true)
   }
 
-  @objc func didTapAutoLoginAgree(_ sender: UIButton) {
-    sender.isSelected.toggle()
-    isAgreed = sender.isSelected
-  }
 
-  @objc func dismissKeyboard() {
-    view.endEditing(true)
-  }
 
-  @objc func donttouchthis() {
-    // CoreDataStack.shared.deleteAllData()
-    print(UserRepository().readUser(by: idTextField.text ?? "no id")?.password ?? "비밀번호 없음?!")
-  }
-
+  // 텍스트가 입력될 때마다 필터링
   @objc private func textFieldDidChange(_ textField: UITextField) {
     switch textField {
     case idTextField:
@@ -383,5 +424,10 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
       break
     }
     updateLoginButtonState()
+  }
+  
+  // 화면 터치 인식되면 키보드 내려감
+  @objc func dismissKeyboard() {
+    view.endEditing(true)
   }
 }
