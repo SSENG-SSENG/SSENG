@@ -1108,6 +1108,11 @@ extension MapViewController {
 
     present(alert, animated: true)
   }
+
+  @objc private func dismissKeyboard() {
+    // 키보드를 내려줌
+    view.endEditing(true)
+  }
 }
 
 // MARK: - SearchBar Delegate
@@ -1249,6 +1254,7 @@ extension MapViewController: NMFMapViewTouchDelegate {
 
     hiddenCollectionView()
     hiddenKickBoardView()
+    dismissKeyboard()
     if let serchMarker = searchMarker {
       removeMarker(marker: serchMarker)
     }
