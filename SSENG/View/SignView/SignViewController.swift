@@ -484,7 +484,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     if repository.readName(by: nameTextField.text ?? "name-xxxx") != nil {
       nameTextField.becomeFirstResponder()
       alertController(on: self, title: "닉네임 중복", message: "중복된 닉네임입니다.\n다른 아이디를 사용해 주세요.")
-      
+
       return
     }
 
@@ -566,4 +566,3 @@ extension UITextField {
     leftViewMode = .always
   }
 }
-

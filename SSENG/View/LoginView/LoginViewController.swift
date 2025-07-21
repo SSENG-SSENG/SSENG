@@ -1,4 +1,5 @@
 import AVFoundation
+
 //
 //  ViewController.swift
 //  SSENG
@@ -119,20 +120,21 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
 
   func setupUI() {
     [
-      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton,
+      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton
     ].forEach {
       view.addSubview($0)
 
-    [idLabel, idTextField].forEach {
-      idStackView.addArrangedSubview($0)
-    }
+      for item in [idLabel, idTextField] {
+        idStackView.addArrangedSubview(item)
+      }
 
-    [pwLabel, pwTextField].forEach {
-      pwStackView.addArrangedSubview($0)
-    }
+      for item in [pwLabel, pwTextField] {
+        pwStackView.addArrangedSubview(item)
+      }
 
-    [autoLoginAgreeCheckBox, autoLoginAgreeLabel].forEach {
-      autoLoginStackView.addArrangedSubview($0)
+      for item in [autoLoginAgreeCheckBox, autoLoginAgreeLabel] {
+        autoLoginStackView.addArrangedSubview(item)
+      }
     }
   }
 
@@ -201,8 +203,8 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
   }
 
   private func addTextFieldObsevers() {
-    [idTextField, pwTextField].forEach {
-      $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
+    for item in [idTextField, pwTextField] {
+      item.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
   }
 
@@ -270,8 +272,8 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
   }
 
   func prepareForTransition() {
-    [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton].forEach {
-      $0.alpha = 0
+    for item in [idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton] {
+      item.alpha = 0
     }
   }
 
@@ -280,7 +282,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     tapGesture.cancelsTouchesInView = false
     view.addGestureRecognizer(tapGesture)
   }
-    
+
   func textFieldDidBeginEditing(_ textField: UITextField) {
     textField.borderStyle = .roundedRect
     textField.layer.borderColor = UIColor.main.cgColor
