@@ -300,7 +300,7 @@ class MapViewController: UIViewController {
     NotificationCenter.default.addObserver(
       self, // self는 현재 ViewController를 의미
       selector: #selector(checkLocationAuthorization), // 알림을 받으면 실행할 메서드 (objc 함수로 선언되어 있어야 함)
-      name: .appDidEnterForeground, // 포그라운드 진입 시 보낼 사용자 정의 알림 이름
+      name: UIApplication.didBecomeActiveNotification, // 포그라운드 진입 시 보낼 사용자 정의 알림 이름
       object: nil // 특정 객체에서 보낸 알림만 받도록 제한할 수 있는데, nil이면 모든 발신자로부터 받음
     )
 
@@ -1064,15 +1064,11 @@ extension MapViewController {
 
     case .denied, .restricted:
       print("권한 거부됨 - 설정화면 유도")
-      if !isLocationAlertPresented {
-        isLocationAlertPresented = true
-        showLocationSettingsAlert()
-      }
+      showLocationSettingsAlert()
 
     case .notDetermined:
       print("아직 결정 안됨")
       locationManager.requestWhenInUseAuthorization()
-      isLocationAlertPresented = false
 
     @unknown default:
       break
@@ -1096,7 +1092,6 @@ extension MapViewController {
     })
 
     alert.addAction(UIAlertAction(title: "취소", style: .cancel) { _ in
-      self.isLocationAlertPresented = false // 사용자가 취소했으면 다시 알럿 허용
     })
 
     present(alert, animated: true)
@@ -1174,7 +1169,7 @@ extension MapViewController: CLLocationManagerDelegate {
       locationMove(nowLocation: manager)
     case .denied, .restricted:
       print("위치 권한 거부됨")
-      showLocationSettingsAlert()
+//      showLocationSettingsAlert()
     case .notDetermined:
       break
     @unknown default:
