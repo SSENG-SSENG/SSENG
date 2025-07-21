@@ -16,7 +16,7 @@ protocol KickboardHistoryCellDelegate: AnyObject {
 class KickboardHistoryCell: UITableViewCell {
   static let identifier = "KickboardHistoryCell"
 
-  weak var delegate: KickboardHistoryCellDelegate?
+  weak var delegate: KickboardHistoryCellDelegate? // TableView가 Cell을 강한참조해서 weak
 
   private let containerView = UIView()
 

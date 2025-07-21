@@ -266,14 +266,20 @@ extension MypageViewController: KickboardHistoryCellDelegate {
     let alert = UIAlertController(title: "문제 신고", message: "문제 내용을 입력해주세요.", preferredStyle: .alert)
     alert.addTextField { $0.placeholder = "예: 고장/침수/잠금 해제 불가" }
 
-    let submitAction = UIAlertAction(title: "확인", style: .default) { _ in
-      let confirm = UIAlertController(title: "신고 완료", message: "신고가 접수되었습니다.", preferredStyle: .alert)
-      confirm.addAction(UIAlertAction(title: "확인", style: .default))
-      self.present(confirm, animated: true)
+    let submitAction = UIAlertAction(title: "신고하기", style: .destructive) { _ in
+      if let text = alert.textFields?.first?.text, text.trimmingCharacters(in: .whitespaces).count >= 2 { // 2글자 이상 입력된 경우만
+        let confirm = UIAlertController(title: "신고 완료", message: "신고가 접수되었습니다.", preferredStyle: .alert)
+        confirm.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(confirm, animated: true)
+      } else { // 2글자 이하로 입력한 경우 Alert
+        let error = UIAlertController(title: "오류", message: "2글자 이상 입력해주세요.", preferredStyle: .alert)
+        error.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(error, animated: true)
+      }
     }
 
     alert.addAction(submitAction)
-    alert.addAction(UIAlertAction(title: "취소", style: .destructive))
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel))
     present(alert, animated: true)
   }
 }
