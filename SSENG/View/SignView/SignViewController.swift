@@ -365,8 +365,8 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   func textFieldDidEndEditing(_ textField: UITextField) {
-    textField.backgroundColor = .clear
     textField.borderStyle = .none
+    textField.backgroundColor = .clear
     textField.layer.borderColor = UIColor.clear.cgColor
   }
 
@@ -444,7 +444,6 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   @objc func didTapSubmitButton(_: UIButton) {
-    // TODO: 2. 빈 칸(변경 필요한 칸) 파악되면 하이라이팅
     // TODO: 3. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
     let id = idTextField.text ?? ""
     let pw = pwTextField.text ?? ""
@@ -453,32 +452,39 @@ class SignViewController: UIViewController, UITextFieldDelegate {
 
     // 입력 잘못된 칸 Alert
     if !isValidID(id) {
+      idTextField.becomeFirstResponder()
       alertController(on: self, title: "아이디 오류", message: "아이디는 4-16자 영문 소문자와 숫자로만 구성되어야 합니다.")
       return
     }
 
     if repository.readUser(by: idTextField.text ?? "id-xxxx") != nil {
+      idTextField.becomeFirstResponder()
       alertController(on: self, title: "아이디 중복", message: "중복된 아이디입니다.\n다른 아이디를 사용해 주세요.")
       return
     }
 
     if !isValidPW(pw) {
+      pwTextField.becomeFirstResponder()
       alertController(on: self, title: "패스워드 오류", message: "비밀번호는 8-32자 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.")
       return
     }
 
     if pw != rePw {
+      pwTextField.becomeFirstResponder()
       alertController(on: self, title: "패스워드 재확인 오류", message: "패스워드가 같지 않습니다.")
       return
     }
 
     if !isValidName(name) {
+      nameTextField.becomeFirstResponder()
       alertController(on: self, title: "닉네임 오류", message: "잘못된 닉네임입니다.")
       return
     }
 
     if repository.readName(by: nameTextField.text ?? "name-xxxx") != nil {
+      nameTextField.becomeFirstResponder()
       alertController(on: self, title: "닉네임 중복", message: "중복된 닉네임입니다.\n다른 아이디를 사용해 주세요.")
+      
       return
     }
 
@@ -560,3 +566,4 @@ extension UITextField {
     leftViewMode = .always
   }
 }
+
