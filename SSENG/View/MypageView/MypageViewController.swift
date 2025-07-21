@@ -42,6 +42,7 @@ class MypageViewController: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    isKickboardSectionExpanded = UserDefaults.standard.bool(forKey: "isKickboardSectionExpanded")
     fetchUserData()
     fetchKickboardData()
     fetchHistoryData()
@@ -113,6 +114,7 @@ class MypageViewController: UIViewController {
   // 등록한 킥보드 섹션을 열거나 접는 동작
   @objc private func toggleSection() {
     isKickboardSectionExpanded.toggle() // 확장 상태 토글
+    UserDefaults.standard.set(isKickboardSectionExpanded, forKey: "isKickboardSectionExpanded")
 
     let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 현재 섹션의 셀 위치들을 미리 만듦
     if isKickboardSectionExpanded {
