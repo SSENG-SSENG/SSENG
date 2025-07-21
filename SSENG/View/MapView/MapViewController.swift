@@ -734,7 +734,7 @@ extension MapViewController {
     } else {
       print("위치를 받아올 수 없습니다.")
     }
-    
+
     nowLocation.startUpdatingLocation()
   }
 
