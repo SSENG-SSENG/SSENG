@@ -451,13 +451,14 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   }
 
   // MARK: 버튼 팡숀
+
   // 체크박스
   @objc func didTapCheckbox(_ sender: UIButton) {
     sender.isSelected.toggle()
     isAgreed = sender.isSelected
     updateSubmitButtonState()
   }
-  
+
   // 가입 버튼 누르면: 중복, 필터링 체크
   @objc func didTapSubmitButton(_: UIButton) {
     // TODO: 3. userDefault에 넣어서 로그인 창에 정보 미리 넣거나 바로 로그인하게 만들기
