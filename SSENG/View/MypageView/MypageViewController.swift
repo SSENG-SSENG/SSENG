@@ -270,7 +270,7 @@ extension MypageViewController: UITableViewDataSource {
 
 extension MypageViewController: KickboardHistoryCellDelegate {
   func didTapReportButton(_: KickboardHistoryCell) {
-    let alert = UIAlertController(title: "문제 신고", message: "문제 내용을 입력해주세요.", preferredStyle: .alert)
+    let alert = UIAlertController(title: "문제 신고", message: "문제 내용을 입력해 주세요.", preferredStyle: .alert)
     alert.addTextField { $0.placeholder = "예: 고장/침수/잠금 해제 불가" }
 
     let submitAction = UIAlertAction(title: "신고하기", style: .destructive) { _ in
@@ -279,7 +279,7 @@ extension MypageViewController: KickboardHistoryCellDelegate {
         confirm.addAction(UIAlertAction(title: "확인", style: .default))
         self.present(confirm, animated: true)
       } else { // 2글자 이하로 입력한 경우 Alert
-        let error = UIAlertController(title: "오류", message: "2글자 이상 입력해주세요.", preferredStyle: .alert)
+        let error = UIAlertController(title: "오류", message: "2글자 이상 입력해 주세요.", preferredStyle: .alert)
         error.addAction(UIAlertAction(title: "확인", style: .default))
         self.present(error, animated: true)
       }

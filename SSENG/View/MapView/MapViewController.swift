@@ -680,7 +680,7 @@ extension MapViewController {
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
       self.riddingButton.isEnabled = false
       self.riddingButton.backgroundColor = .lightGray
-      self.riddingButton.setTitle("기기를 반납 후 이용해주세요.", for: .normal)
+      self.riddingButton.setTitle("기기를 반납 후 이용해 주세요.", for: .normal)
     }
     // 스톱워치 초기화
     secondsElapsed = 0
@@ -944,7 +944,7 @@ extension MapViewController {
 
     let alert = UIAlertController(
       title: "킥보드 대여",
-      message: "해당 킥보드를 대여하시겠습니까?",
+      message: "해당 킥보드를 대여하실 건가요?",
       preferredStyle: .alert
     )
 
@@ -1000,7 +1000,7 @@ extension MapViewController {
 
     let alert = UIAlertController(
       title: "반납 위치 입력",
-      message: "상세 위치를 입력해주세요",
+      message: "상세 위치를 입력해 주세요",
       preferredStyle: .alert
     )
 
@@ -1091,7 +1091,7 @@ extension MapViewController {
   func showLocationSettingsAlert() {
     let alert = UIAlertController(
       title: "위치 권한 필요",
-      message: "이 기능을 사용하려면 위치 권한이 필요합니다.\n설정에서 위치 접근을 앱을 사용하는동안으로 허용해주세요.",
+      message: "이 기능을 사용하려면 위치 권한이 필요합니다.\n설정에서 위치 접근을 앱을 사용하는 동안으로 허용해 주세요.",
       preferredStyle: .alert
     )
 
@@ -1235,7 +1235,7 @@ extension MapViewController: NMFMapViewTouchDelegate {
     } else {
       let alert = UIAlertController(
         title: "등록 불가",
-        message: "기기를 탑승중입니다. 반납을 진행 후 기기등록 해주세요.",
+        message: "기기를 탑승 중입니다. 반납을 진행한 후 기기 등록해 주세요.",
         preferredStyle: .alert
       )
       alert.addAction(UIAlertAction(title: "확인", style: .default))

@@ -1,4 +1,5 @@
 import AVFoundation
+
 //
 //  ViewController.swift
 //  SSENG
@@ -350,11 +351,11 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
       pwStackView,
       autoLoginStackView,
       loginButton,
-      signUpBUtton,
+      signUpBUtton
     ]
     let baseDelay: TimeInterval = 0.05
     let animationDuration: TimeInterval = 0.25
-    let initialTranslationY: CGFloat = 20  // 아래쪽에서 20pt 만큼 시작
+    let initialTranslationY: CGFloat = 20 // 아래쪽에서 20pt 만큼 시작
 
     for (index, component) in components.enumerated() {
       component.alpha = 0
@@ -374,6 +375,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
   }
 
   // MARK: 버튼 기능들
+
   // 체크박스
   @objc func didTapAutoLoginAgree(_ sender: UIButton) {
     sender.isSelected.toggle()
@@ -404,8 +406,6 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     navigationController?.pushViewController(signUpVC, animated: true)
   }
 
-
-
   // 텍스트가 입력될 때마다 필터링
   @objc private func textFieldDidChange(_ textField: UITextField) {
     switch textField {
@@ -425,7 +425,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     }
     updateLoginButtonState()
   }
-  
+
   // 화면 터치 인식되면 키보드 내려감
   @objc func dismissKeyboard() {
     view.endEditing(true)

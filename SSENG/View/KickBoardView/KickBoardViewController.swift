@@ -34,7 +34,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   private let typeSelectionLabel = UILabel().then {
-    $0.text = "킥보드 타입을 선택해주세요."
+    $0.text = "킥보드 타입을 선택해 주세요."
     $0.font = .systemFont(ofSize: 16, weight: .bold)
     $0.textAlignment = .center
   }
@@ -51,7 +51,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   private let detailLocationTitleLabel = UILabel().then {
-    $0.text = "상세위치:"
+    $0.text = "상세 위치:"
     $0.font = .systemFont(ofSize: 16, weight: .bold)
     $0.textAlignment = .center
   }
@@ -157,7 +157,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
   }
 
   private let detailLocationTextField = UITextField().then {
-    $0.placeholder = "상세 위치를 입력해주세요. (예: 약국 앞)"
+    $0.placeholder = "상세 위치를 입력해 주세요. (예: 약국 앞)"
     $0.borderStyle = .roundedRect
     $0.font = .systemFont(ofSize: 14)
   }
@@ -225,7 +225,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     let detailLocation = detailLocationTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
 
     if detailLocation.isEmpty {
-      addressShowAlert(title: "입력 오류", message: "상세 위치를 입력해주세요.")
+      addressShowAlert(title: "입력 오류", message: "상세 위치를 입력해 주세요.")
       return
     }
 
@@ -241,7 +241,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
     let nowString = dateFormatter.string(from: Date())
 
     guard let type = selectedType == 1 ? KickboardType.kickboard : selectedType == 2 ? KickboardType.bike : nil else {
-      showAlert(title: "타입 오류", message: "유효한 킥보드 타입을 선택해주세요.")
+      showAlert(title: "타입 오류", message: "유효한 킥보드 타입을 선택해 주세요.")
       return
     }
 
@@ -254,9 +254,9 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
       registerId: registerId
     )
 
-    print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세위치=\(detailLocation), 타입=\(selectedType), 등록자ID=\(registerId)")
+    print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세 위치=\(detailLocation), 타입=\(selectedType), 등록자 ID=\(registerId)")
 
-    showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습까?") { [weak self] in
+    showAlert(title: "기기 등록", message: "새로운 기기를 등록할까요?") { [weak self] in
       guard let self else { return }
       delegate?.didRegisterKickBoard(at: latitude, longitude: longitude)
       self.navigationController?.popViewController(animated: true)
