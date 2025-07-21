@@ -26,9 +26,7 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
 
   private lazy var modalLabel = UILabel().then {
     $0.text = """
-    선택한 위치:
-    위도: \(String(format: "%.6f", latitude))
-    경도: \(String(format: "%.6f", longitude))
+    위도: \(String(format: "%.6f", latitude)) 경도: \(String(format: "%.6f", longitude))
     """
     $0.font = .systemFont(ofSize: 15, weight: .medium)
     $0.textAlignment = .center
@@ -231,6 +229,11 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
       return
     }
 
+    guard let registerId = UserDefaults.standard.string(forKey: "loggedUserID"), !registerId.isEmpty else {
+      addressShowAlert(title: "로그인 필요", message: "킥보드를 등록하려면 로그인이 필요합니다.")
+      return
+    }
+
     didRegister = true
 
     let dateFormatter = DateFormatter()
@@ -242,8 +245,6 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
       return
     }
 
-    let registerId = "TEMP_USER_ID"
-
     let newID = repository.registKickboard(
       registerDate: nowString,
       lat: latitude,
@@ -252,6 +253,8 @@ class KickBoardViewController: UIViewController, UIGestureRecognizerDelegate {
       type: type,
       registerId: registerId
     )
+
+    print("✅ 킥보드 등록 완료: ID=\(newID), 위도=\(latitude), 경도=\(longitude), 상세위치=\(detailLocation), 타입=\(selectedType), 등록자ID=\(registerId)")
 
     showAlert(title: "기기 등록", message: "새로운 기기를 등록하겠습까?") { [weak self] in
       guard let self else { return }

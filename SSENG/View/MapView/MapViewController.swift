@@ -41,6 +41,7 @@ class MapViewController: UIViewController {
 
   // 위치
   let locationManager = CLLocationManager()
+  private var isLocationAlertPresented = false
 
   // 검색창
   private let searchBar = UISearchBar().then {
@@ -294,6 +295,15 @@ class MapViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    // NotificationCenter에 옵저버를 등록한다.
+    // 이 옵저버는 앱이 포그라운드로 전환될 때 .appDidEnterForeground 라는 알림을 받을 수 있도록 설정한다.
+    NotificationCenter.default.addObserver(
+      self, // self는 현재 ViewController를 의미
+      selector: #selector(checkLocationAuthorization), // 알림을 받으면 실행할 메서드 (objc 함수로 선언되어 있어야 함)
+      name: UIApplication.didBecomeActiveNotification, // 포그라운드 진입 시 보낼 사용자 정의 알림 이름
+      object: nil // 특정 객체에서 보낸 알림만 받도록 제한할 수 있는데, nil이면 모든 발신자로부터 받음
+    )
+
     searchBar.delegate = self
     searchCollectionView.delegate = self
     mapView.addCameraDelegate(delegate: self)
@@ -305,18 +315,17 @@ class MapViewController: UIViewController {
     setupButtonActions()
     allKickBoardMarker()
     loadSelectedMarkerKey()
-    locationManager.requestWhenInUseAuthorization()
   }
 
-  // 화면이 켜졌을때 네이게이션바 안보이게 설정
+  // 화면이 켜졌을때
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+
+    // 네이게이션바 안보이게 설정
     navigationController?.setNavigationBarHidden(true, animated: false)
 
-    // 위치 권한 상태를 확인하고, 필요할 때만 요청
-    if locationManager.authorizationStatus == .notDetermined {
-      locationManager.requestWhenInUseAuthorization()
-    }
+    // 위치 권한 상태를 확인
+    checkLocationAuthorization()
   }
 
   // 화면이 꺼질때 네비게이션바 보이게 설정
@@ -525,6 +534,7 @@ extension MapViewController {
         for place in places {
           print("📍 \(place.title) - \(place.address)")
           self.places = places
+          self.showCollectionView()
         }
       case let .failure(error):
         print("❌ 검색 실패: \(error)")
@@ -592,17 +602,14 @@ extension MapViewController {
     }
   }
 
-  // 마커 클릭시 카메라 이동
-  private func moveMarker(kickBoard: Kickboard) {
+  // 킥보드 정보창 띄우기
+  private func showKickBoardView(kickBoard: Kickboard) {
+    selectedKickBoard = kickBoard
     let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: kickBoard.lat, lng: kickBoard.lng), zoomTo: 16)
     cameraUpdate.animation = .easeIn
     cameraUpdate.animationDuration = 0.3
     mapView.moveCamera(cameraUpdate)
-  }
 
-  // 킥보드 정보창 띄우기
-  private func showKickBoardView(kickBoard: Kickboard) {
-    riddingKickBoard = kickBoard
     for constraint in kickBoardIfoViewHiddenConstraint {
       constraint.isActive = false
     }
@@ -679,6 +686,7 @@ extension MapViewController {
 
   // 탑승 창 가리기
   private func hiddenRiddingView() {
+    selectedKickBoard = nil
     for constraint in riddingViewShowConstraint {
       constraint.isActive = false
     }
@@ -792,8 +800,7 @@ extension MapViewController {
     marker.captionOffset = 8
 
     marker.touchHandler = { [weak self] _ in
-      self?.selectedKickBoard = kickboard
-      self?.moveMarker(kickBoard: kickboard)
+      self?.showKickBoardView(kickBoard: kickboard)
       return true
     }
     return marker
@@ -914,6 +921,9 @@ extension MapViewController {
 
   // 대여하기 버튼 액션
   @objc private func didTapRideingButton() {
+    riddingKickBoard = selectedKickBoard
+    selectedKickBoard = nil
+
     guard let kickBoard = riddingKickBoard else {
       print("대여할 킥보드 정보가 없습니다.")
       return
@@ -950,7 +960,7 @@ extension MapViewController {
 
     stopwatchLabel.text = String(format: "%02d:%02d:%02d 이용 중", hours, min, sec)
 
-    if selectedKickBoard?.kickboardType == .kickboard {
+    if riddingKickBoard?.kickboardType == .kickboard {
       riddingPriceLabel.text = "\(100 * min)원"
     } else {
       riddingPriceLabel.text = "\(1000 * min)원"
@@ -981,7 +991,7 @@ extension MapViewController {
       preferredStyle: .alert
     )
 
-    var confirmAction: UIAlertAction? = nil
+    var confirmAction: UIAlertAction?
 
     alert.addTextField { textField in
       textField.placeholder = "예: 건물 앞 자전거 거치대"
@@ -1041,6 +1051,51 @@ extension MapViewController {
 
     present(alert, animated: true)
   }
+
+  // 위치 권한 확인 메서드
+  @objc func checkLocationAuthorization() {
+    let status = locationManager.authorizationStatus
+
+    switch status {
+    case .authorizedAlways, .authorizedWhenInUse:
+      print("권한 있음")
+      isLocationAlertPresented = false
+      locationMove(nowLocation: locationManager)
+
+    case .denied, .restricted:
+      print("권한 거부됨 - 설정화면 유도")
+      showLocationSettingsAlert()
+
+    case .notDetermined:
+      print("아직 결정 안됨")
+      locationManager.requestWhenInUseAuthorization()
+
+    @unknown default:
+      break
+    }
+  }
+
+  // 위치 권한 요청 Alert
+  func showLocationSettingsAlert() {
+    let alert = UIAlertController(
+      title: "위치 권한 필요",
+      message: "이 기능을 사용하려면 위치 권한이 필요합니다.\n설정에서 위치 접근을 앱을 사용하는동안으로 허용해주세요.",
+      preferredStyle: .alert
+    )
+
+    alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
+      if let url = URL(string: UIApplication.openSettingsURLString),
+         UIApplication.shared.canOpenURL(url)
+      {
+        UIApplication.shared.open(url)
+      }
+    })
+
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel) { _ in
+    })
+
+    present(alert, animated: true)
+  }
 }
 
 // MARK: - SearchBar Delegate
@@ -1051,7 +1106,6 @@ extension MapViewController: UISearchBarDelegate {
       hiddenCollectionView()
     } else {
       searchData(query: searchText)
-      showCollectionView()
     }
   }
 }
@@ -1064,12 +1118,18 @@ extension MapViewController: UICollectionViewDataSource {
   }
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard indexPath.item < places.count else {
+      print("❌ indexPath out of bounds: \(indexPath.item) / \(places.count)")
+      return UICollectionViewCell()
+    }
+
     guard let cell = collectionView.dequeueReusableCell(
       withReuseIdentifier: SearchResultCell.identifier,
       for: indexPath
     ) as? SearchResultCell else {
       return UICollectionViewCell()
     }
+
     cell.configure(with: places[indexPath.item])
     return cell
   }
@@ -1082,7 +1142,7 @@ extension MapViewController: UICollectionViewDelegate {
     collectionView.deselectItem(at: indexPath, animated: true)
     let place = places[indexPath.item]
 
-    // 위경도는 1,000,000으로 나눠서 실제 GPS 위치로 변환
+    // 위경도는 0.0000001 곱해서 실제 GPS 위치로 변환
     if let latValue = Double(place.lat),
        let lngValue = Double(place.lng)
     {
@@ -1106,9 +1166,10 @@ extension MapViewController: CLLocationManagerDelegate {
     switch status {
     case .authorizedAlways, .authorizedWhenInUse:
       print("위치 권한 허용됨")
-      locationMove(nowLocation: manager) // 권한 허용 즉시 위치 이동
+      locationMove(nowLocation: manager)
     case .denied, .restricted:
       print("위치 권한 거부됨")
+//      showLocationSettingsAlert()
     case .notDetermined:
       break
     @unknown default:
@@ -1136,18 +1197,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
   func mapView(_: NMFMapView, cameraIsChangingByReason reason: Int) {
     print("카메라 이동: \(reason)")
     hiddenCollectionView()
-    hiddenKickBoardView()
     locationManager.stopUpdatingLocation()
-  }
-
-  func mapViewCameraIdle(_: NMFMapView) {
-    print("카메라 정지")
-    if let kickboard = selectedKickBoard {
-      showKickBoardView(kickBoard: kickboard)
-      selectedKickBoard = nil
-    }
-
-    updateVisibleMarkers()
   }
 }
 
