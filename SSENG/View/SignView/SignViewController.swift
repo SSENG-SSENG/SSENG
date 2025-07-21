@@ -160,6 +160,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
     view.backgroundColor = .systemBackground
+    scrollView.showsVerticalScrollIndicator = false
 
     setupUI()
     setupConstraints()
@@ -221,7 +222,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     let height: CGFloat = 48
 
     appLogoImageView.snp.makeConstraints {
-      $0.top.equalTo(view.safeAreaLayoutGuide).offset(30)
+      $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
       $0.centerX.equalToSuperview()
       $0.trailing.leading.equalToSuperview()
       $0.width.equalTo(30)
@@ -229,7 +230,7 @@ class SignViewController: UIViewController, UITextFieldDelegate {
     }
 
     scrollView.snp.makeConstraints {
-      $0.top.equalTo(appLogoImageView.snp.bottom).offset(30)
+      $0.top.equalTo(appLogoImageView.snp.bottom).offset(10)
       $0.leading.trailing.equalToSuperview()
       $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top)
     }
