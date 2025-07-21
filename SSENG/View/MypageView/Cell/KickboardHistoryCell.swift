@@ -9,8 +9,14 @@ import SnapKit
 import Then
 import UIKit
 
+protocol KickboardHistoryCellDelegate: AnyObject {
+  func didTapReportButton(_ cell: KickboardHistoryCell)
+}
+
 class KickboardHistoryCell: UITableViewCell {
   static let identifier = "KickboardHistoryCell"
+
+  weak var delegate: KickboardHistoryCellDelegate?
 
   private let containerView = UIView()
 
@@ -28,6 +34,11 @@ class KickboardHistoryCell: UITableViewCell {
     $0.font = .systemFont(ofSize: 13)
     $0.textColor = .secondaryLabel
     $0.numberOfLines = 0
+  }
+
+  private let reportButton = UIButton().then {
+    $0.setImage(UIImage(systemName: "exclamationmark.triangle"), for: .normal)
+    $0.tintColor = .systemRed
   }
 
   private lazy var stackView = UIStackView(arrangedSubviews: [dateLabel, timeRangeLabel]).then {
@@ -61,7 +72,8 @@ class KickboardHistoryCell: UITableViewCell {
     selectionStyle = .none
 
     contentView.addSubview(containerView)
-    [kickboardImageView, stackView].forEach { containerView.addSubview($0) }
+    [kickboardImageView, stackView, reportButton].forEach { containerView.addSubview($0) }
+    reportButton.addTarget(self, action: #selector(reportButtonTapped), for: .touchUpInside)
   }
 
   // MARK: - configureLayout
@@ -86,6 +98,11 @@ class KickboardHistoryCell: UITableViewCell {
       $0.centerY.equalToSuperview()
       $0.leading.equalTo(kickboardImageView.snp.trailing).offset(12)
       $0.trailing.equalToSuperview().offset(-16)
+    }
+
+    reportButton.snp.makeConstraints {
+      $0.trailing.equalToSuperview().inset(16)
+      $0.bottom.equalToSuperview().inset(8)
     }
   }
 
@@ -143,5 +160,9 @@ class KickboardHistoryCell: UITableViewCell {
       // 최종!! "22시00분00초 ~ 23시01분05초 (1시간1분5초)" 으로 표시됨!!
       timeRangeLabel.text = "\(timeRange) (\(durationString))"
     }
+  }
+
+  @objc private func reportButtonTapped() {
+    delegate?.didTapReportButton(self)
   }
 }
