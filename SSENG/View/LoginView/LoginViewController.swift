@@ -111,6 +111,8 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     dismissKeyboardController()
 
     [idTextField, pwTextField].forEach { $0.delegate = self }
+
+    prepareForTransition()
   }
 
   func setupUI() {
