@@ -15,16 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     window = UIWindow(windowScene: windowScene)
 
-    let rootVC: UIViewController
-    let loggedUserID = UserDefaults.standard.string(forKey: "loggedUserID")
-    let isAutoLogin = UserDefaults.standard.bool(forKey: "isAutoLogin")
-
-    if isAutoLogin == true, loggedUserID != nil {
-      rootVC = MapViewController()
-    } else {
-      rootVC = LoginViewController()
-    }
-
+    let rootVC = SplashViewController()
     let navController = UINavigationController(rootViewController: rootVC)
 
     window?.rootViewController = navController
