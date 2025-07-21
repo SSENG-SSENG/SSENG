@@ -259,7 +259,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
   }
 
   func navigationController(
-    _ navigationController: UINavigationController,
+    _: UINavigationController,
     animationControllerFor operation: UINavigationController.Operation,
     from fromVC: UIViewController,
     to toVC: UIViewController
@@ -321,11 +321,11 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
       pwStackView,
       autoLoginStackView,
       loginButton,
-      signUpBUtton,
+      signUpBUtton
     ]
     let baseDelay: TimeInterval = 0.05
     let animationDuration: TimeInterval = 0.25
-    let initialTranslationY: CGFloat = 20  // 아래쪽에서 20pt 만큼 시작
+    let initialTranslationY: CGFloat = 20 // 아래쪽에서 20pt 만큼 시작
 
     for (index, component) in components.enumerated() {
       component.alpha = 0
