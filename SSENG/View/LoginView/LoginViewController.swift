@@ -92,11 +92,6 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     $0.layer.cornerRadius = 8
   }
 
-  private let debugButton = UIButton().then {
-    $0.setTitle("주의! 디버그!", for: .normal)
-    $0.setTitleColor(.main, for: .normal)
-  }
-
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     animateContentAppearance()
@@ -120,7 +115,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
 
   func setupUI() {
     [
-      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton, debugButton
+      appLogoImageView, idStackView, pwStackView, autoLoginStackView, loginButton, signUpBUtton
     ].forEach {
       view.addSubview($0)
 
@@ -187,18 +182,11 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
       $0.height.equalTo(height)
       $0.centerX.equalToSuperview()
     }
-
-    debugButton.snp.makeConstraints {
-      $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(10)
-      $0.leading.trailing.equalToSuperview().inset(padding)
-      $0.centerX.equalToSuperview()
-    }
   }
 
   private func setupButtonActions() {
     loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
     signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
-    debugButton.addTarget(self, action: #selector(donttouchthis), for: .touchUpInside)
     autoLoginAgreeCheckBox.addTarget(self, action: #selector(didTapAutoLoginAgree), for: .touchUpInside)
   }
 
