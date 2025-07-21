@@ -16,7 +16,7 @@ class MapViewController: UIViewController {
   private let searchService = SearchService()
   private var places: [Place] = []
 
-  // 선택된 마커
+  // 필터링 선택된 마커
   var selected: SelectedMarkerModel = .all
 
   // UserDefaults 값
@@ -31,7 +31,7 @@ class MapViewController: UIViewController {
   private var bikeMarkers: [NMFMarker] = []
   private var selectedKickBoard: Kickboard?
   private var riddingKickBoard: Kickboard?
-
+  private var searchMarker: NMFMarker?
   // 타이머
   private var timer: Timer?
   private var secondsElapsed: Int = 0
@@ -806,6 +806,11 @@ extension MapViewController {
     return marker
   }
 
+  // 검색 후 다른곳 터치시 마커 삭제
+  private func removeMarker(marker: NMFMarker) {
+    marker.mapView = nil
+  }
+
   // 배터리 상태에 따라 아이콘과 텍스트를 반환하는 메서드
   private func batteryStatusText(for batteryLevel: Int, batteryTime: String) -> NSAttributedString {
     let imageAttachment = NSTextAttachment()
@@ -1151,8 +1156,16 @@ extension MapViewController: UICollectionViewDelegate {
 
       print("\(place.address)로 이동합니다")
       print("위도: \(lat) 경도: \(lng)")
+      if let searchMarker {
+        removeMarker(marker: searchMarker)
+      }
 
+      let marker = NMFMarker()
+      marker.position = NMGLatLng(lat: lat, lng: lng)
+      marker.mapView = mapView
+      searchMarker = marker
       let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
+
       mapView.moveCamera(cameraUpdate)
     }
   }
@@ -1226,8 +1239,12 @@ extension MapViewController: NMFMapViewTouchDelegate {
   // 지도를 짧게 눌렀을때
   func mapView(_: NMFMapView, didTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("숏 탭: \(latlng.lat), \(latlng.lng)")
+
     hiddenCollectionView()
     hiddenKickBoardView()
+    if let serchMarker = searchMarker {
+      removeMarker(marker: serchMarker)
+    }
   }
 }
 
