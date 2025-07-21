@@ -41,7 +41,6 @@ class MapViewController: UIViewController {
 
   // 위치
   let locationManager = CLLocationManager()
-  private var isLocationAlertPresented = false
 
   // 검색창
   private let searchBar = UISearchBar().then {
@@ -320,12 +319,21 @@ class MapViewController: UIViewController {
   // 화면이 켜졌을때
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
+    allKickBoardMarker()
     // 네이게이션바 안보이게 설정
     navigationController?.setNavigationBarHidden(true, animated: false)
 
     // 위치 권한 상태를 확인
-    checkLocationAuthorization()
+    // 킥보드 등록하고 왔을때 현재 위치가아닌 킥보드 등록한 위치로 이동 되게
+    if let searchMarker {
+      let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: searchMarker.position.lat, lng: searchMarker.position.lng), zoomTo: 16)
+      cameraUpdate.animation = .fly
+      cameraUpdate.animationDuration = 0.5
+      mapView.moveCamera(cameraUpdate)
+
+    } else {
+      checkLocationAuthorization()
+    }
   }
 
   // 화면이 꺼질때 네비게이션바 보이게 설정
@@ -1064,7 +1072,6 @@ extension MapViewController {
     switch status {
     case .authorizedAlways, .authorizedWhenInUse:
       print("권한 있음")
-      isLocationAlertPresented = false
       locationMove(nowLocation: locationManager)
 
     case .denied, .restricted:
@@ -1165,8 +1172,8 @@ extension MapViewController: UICollectionViewDelegate {
       marker.mapView = mapView
       searchMarker = marker
       let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
-
       mapView.moveCamera(cameraUpdate)
+      allKickBoardMarker()
     }
   }
 }
@@ -1182,7 +1189,6 @@ extension MapViewController: CLLocationManagerDelegate {
       locationMove(nowLocation: manager)
     case .denied, .restricted:
       print("위치 권한 거부됨")
-//      showLocationSettingsAlert()
     case .notDetermined:
       break
     @unknown default:
@@ -1211,6 +1217,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
     print("카메라 이동: \(reason)")
     hiddenCollectionView()
     locationManager.stopUpdatingLocation()
+    updateVisibleMarkers()
   }
 }
 
