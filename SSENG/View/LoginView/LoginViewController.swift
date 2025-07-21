@@ -1,4 +1,5 @@
 import AVFoundation
+
 //
 //  ViewController.swift
 //  SSENG
@@ -90,11 +91,6 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     $0.layer.borderColor = UIColor.main.cgColor
     $0.layer.borderWidth = 3
     $0.layer.cornerRadius = 8
-  }
-
-  private let debugButton = UIButton().then {
-    $0.setTitle("주의! 디버그!", for: .normal)
-    $0.setTitleColor(.main, for: .normal)
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -199,7 +195,6 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
   private func setupButtonActions() {
     loginButton.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
     signUpBUtton.addTarget(self, action: #selector(didTapSignUp), for: .touchUpInside)
-    debugButton.addTarget(self, action: #selector(donttouchthis), for: .touchUpInside)
     autoLoginAgreeCheckBox.addTarget(self, action: #selector(didTapAutoLoginAgree), for: .touchUpInside)
   }
 
@@ -207,6 +202,15 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, UIT
     [idTextField, pwTextField].forEach {
       $0.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
     }
+  }
+
+  func createDefaultUser(id: String) {
+    if isAgreed {
+      UserDefaults.standard.set(true, forKey: "isAutoLogin")
+    } else {
+      UserDefaults.standard.set(false, forKey: "isAutoLogin")
+    }
+    UserDefaults.standard.set(id, forKey: "loggedUserID")
   }
 
   func createDefaultUser(id: String) {

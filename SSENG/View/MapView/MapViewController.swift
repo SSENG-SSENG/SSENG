@@ -16,7 +16,7 @@ class MapViewController: UIViewController {
   private let searchService = SearchService()
   private var places: [Place] = []
 
-  // 선택된 마커
+  // 필터링 선택된 마커
   var selected: SelectedMarkerModel = .all
 
   // UserDefaults 값
@@ -31,7 +31,7 @@ class MapViewController: UIViewController {
   private var bikeMarkers: [NMFMarker] = []
   private var selectedKickBoard: Kickboard?
   private var riddingKickBoard: Kickboard?
-
+  private var searchMarker: NMFMarker?
   // 타이머
   private var timer: Timer?
   private var secondsElapsed: Int = 0
@@ -41,7 +41,6 @@ class MapViewController: UIViewController {
 
   // 위치
   let locationManager = CLLocationManager()
-  private var isLocationAlertPresented = false
 
   // 검색창
   private let searchBar = UISearchBar().then {
@@ -320,12 +319,21 @@ class MapViewController: UIViewController {
   // 화면이 켜졌을때
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
+    allKickBoardMarker()
     // 네이게이션바 안보이게 설정
     navigationController?.setNavigationBarHidden(true, animated: false)
 
     // 위치 권한 상태를 확인
-    checkLocationAuthorization()
+    // 킥보드 등록하고 왔을때 현재 위치가아닌 킥보드 등록한 위치로 이동 되게
+    if let searchMarker {
+      let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: searchMarker.position.lat, lng: searchMarker.position.lng), zoomTo: 16)
+      cameraUpdate.animation = .fly
+      cameraUpdate.animationDuration = 0.5
+      mapView.moveCamera(cameraUpdate)
+
+    } else {
+      checkLocationAuthorization()
+    }
   }
 
   // 화면이 꺼질때 네비게이션바 보이게 설정
@@ -806,6 +814,11 @@ extension MapViewController {
     return marker
   }
 
+  // 검색 후 다른곳 터치시 마커 삭제
+  private func removeMarker(marker: NMFMarker) {
+    marker.mapView = nil
+  }
+
   // 배터리 상태에 따라 아이콘과 텍스트를 반환하는 메서드
   private func batteryStatusText(for batteryLevel: Int, batteryTime: String) -> NSAttributedString {
     let imageAttachment = NSTextAttachment()
@@ -1059,7 +1072,6 @@ extension MapViewController {
     switch status {
     case .authorizedAlways, .authorizedWhenInUse:
       print("권한 있음")
-      isLocationAlertPresented = false
       locationMove(nowLocation: locationManager)
 
     case .denied, .restricted:
@@ -1151,9 +1163,17 @@ extension MapViewController: UICollectionViewDelegate {
 
       print("\(place.address)로 이동합니다")
       print("위도: \(lat) 경도: \(lng)")
+      if let searchMarker {
+        removeMarker(marker: searchMarker)
+      }
 
+      let marker = NMFMarker()
+      marker.position = NMGLatLng(lat: lat, lng: lng)
+      marker.mapView = mapView
+      searchMarker = marker
       let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 16)
       mapView.moveCamera(cameraUpdate)
+      allKickBoardMarker()
     }
   }
 }
@@ -1169,7 +1189,6 @@ extension MapViewController: CLLocationManagerDelegate {
       locationMove(nowLocation: manager)
     case .denied, .restricted:
       print("위치 권한 거부됨")
-//      showLocationSettingsAlert()
     case .notDetermined:
       break
     @unknown default:
@@ -1198,6 +1217,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
     print("카메라 이동: \(reason)")
     hiddenCollectionView()
     locationManager.stopUpdatingLocation()
+    updateVisibleMarkers()
   }
 }
 
@@ -1226,8 +1246,12 @@ extension MapViewController: NMFMapViewTouchDelegate {
   // 지도를 짧게 눌렀을때
   func mapView(_: NMFMapView, didTapMap latlng: NMGLatLng, point _: CGPoint) {
     print("숏 탭: \(latlng.lat), \(latlng.lng)")
+
     hiddenCollectionView()
     hiddenKickBoardView()
+    if let serchMarker = searchMarker {
+      removeMarker(marker: serchMarker)
+    }
   }
 }
 

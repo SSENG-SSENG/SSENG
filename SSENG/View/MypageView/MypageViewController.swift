@@ -19,7 +19,7 @@ class MypageViewController: UIViewController {
   }
 
   private var section1ToggleButton: UIButton?
-  private var isKickboardSectionExpanded = true // 나중에 삭제 예정
+  private var isKickboardSectionExpanded = false
 
   private var user: User? // CoreData에서 가져온 유저 정보
   private let userRepository = UserRepository() // User 정보 가져올 때 사용
@@ -37,97 +37,16 @@ class MypageViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    //    signAndLoginTest() // 테스트 데이터 생성
-    //    registerKickboardTest() // 테스트 데이터 생성
-    //    registerHistoryTest() // 테스트 이용내역 생성
     configureUI()
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    isKickboardSectionExpanded = UserDefaults.standard.bool(forKey: "isKickboardSectionExpanded")
     fetchUserData()
     fetchKickboardData()
     fetchHistoryData()
   }
-
-  //  // MARK: - 회원가입/로그인 임시 테스트 (작동 확인함)
-  //
-  //  private func signAndLoginTest() {
-  //    let userID = "Mori"
-  //    if userRepository.readUser(by: userID) == nil {
-  //      userRepository.createUser(id: userID, name: "서광용", password: "1234")
-  //    }
-  //
-  //    // 임시 로그인
-  //    UserDefaults.standard.set(userID, forKey: "loggedUserID")
-  //  }
-
-  //  // MARK: - 등록한 킥보드 임시 테스트 (테스트 완료)
-  //
-  //  private func registerKickboardTest() {
-  //    let context = CoreDataStack.shared.context
-  //
-  //    // 킥보드 1 (bike 타입)
-  //    let kickboard1 = Kickboard(context: context)
-  //    kickboard1.type = KickboardType.bike.rawValue
-  //    kickboard1.registerDate = "2025-07-18 17:00:00"
-  //    kickboard1.id = UUID().uuidString
-  //
-  //    // 킥보드 2 (kickboard 타입)
-  //    let kickboard2 = Kickboard(context: context)
-  //    kickboard2.type = KickboardType.kickboard.rawValue
-  //    kickboard2.registerDate = "2025-07-18 17:10:00"
-  //    kickboard2.id = UUID().uuidString
-  //
-  //    // 킥보드 3 (bike 타입)
-  //    let kickboard3 = Kickboard(context: context)
-  //    kickboard3.type = KickboardType.bike.rawValue
-  //    kickboard3.registerDate = "2025-07-18 17:20:00"
-  //    kickboard3.id = UUID().uuidString
-  //
-  //    // 공통: 현재 로그인된 사용자 ID 설정
-  //    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
-  //      print("로그인된 사용자 ID가 없습니다.")
-  //      return
-  //    }
-  //    for item in [kickboard1, kickboard2, kickboard3] {
-  //      item.registerId = userID
-  //    }
-  //
-  //    CoreDataStack.shared.saveContext()
-  //    print("테스트 킥보드 3개 등록 완료")
-  //  }
-
-  //  // MARK: - 이용 내역 임시 테스트 (테스트 완료)
-  //
-  //  private func registerHistoryTest() {
-  //    let context = CoreDataStack.shared.context
-  //    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else { return }
-  //
-  //    let formatter = DateFormatter()
-  //    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-  //
-  //    let history1 = History(context: context)
-  //    history1.userId = userID
-  //    history1.type = KickboardType.kickboard.rawValue
-  //    history1.startTime = "2025-07-18 20:00:00"
-  //    history1.duration = 40
-  //
-  //    let history2 = History(context: context)
-  //    history2.userId = userID
-  //    history2.type = KickboardType.bike.rawValue
-  //    history2.startTime = "2025-07-17 21:10:00"
-  //    history2.duration = 25
-  //
-  //    let history3 = History(context: context)
-  //    history3.userId = userID
-  //    history3.type = KickboardType.kickboard.rawValue
-  //    history3.startTime = "2025-07-18 22:00:00"
-  //    history3.duration = 60
-  //
-  //    CoreDataStack.shared.saveContext()
-  //    print("이용내역 3개 등록 완료")
-  //  }
 
   // MARK: - 유저 데이터 불러오기
 
@@ -195,6 +114,7 @@ class MypageViewController: UIViewController {
   // 등록한 킥보드 섹션을 열거나 접는 동작
   @objc private func toggleSection() {
     isKickboardSectionExpanded.toggle() // 확장 상태 토글
+    UserDefaults.standard.set(isKickboardSectionExpanded, forKey: "isKickboardSectionExpanded")
 
     let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 현재 섹션의 셀 위치들을 미리 만듦
     if isKickboardSectionExpanded {
@@ -213,6 +133,7 @@ class MypageViewController: UIViewController {
     alert.addAction(UIAlertAction(title: "취소", style: .cancel))
     alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
       UserDefaults.standard.removeObject(forKey: "loggedUserID") // 로그인한 id를 임시 저장한 UserDefaults에서 삭제
+      UserDefaults.standard.removeObject(forKey: "isAutoLogin") // 자동 로그인 UserDefaults에서 삭제
 
       // 메인 화면을 로그인 화면으로 변경
       guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, // 연결된 scene중 첫 번째를 가져옴
@@ -251,9 +172,12 @@ extension MypageViewController: UITableViewDataSource {
 
   // 각 섹션에 맞는 헤더 타이틀 설정
   func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    let registeredCount = kickboards.count
+    // 팀원과 상의하여 "등록한 킥보드"는 개수까지, "킥보드 이용 내역"은 개수를 제거하기로 결정
+
     let title: String
     switch section {
-    case 1: title = "등록한 킥보드"
+    case 1: title = "등록한 킥보드 (\(registeredCount)개)"
     case 2: title = "킥보드 이용 내역"
     default: return nil
     }
@@ -333,10 +257,36 @@ extension MypageViewController: UITableViewDataSource {
       }
       let history = histories[indexPath.row]
       cell.configure(history)
+      cell.delegate = self
       return cell
 
     default:
       return UITableViewCell()
     }
+  }
+}
+
+// MARK: - 킥보드 상태 이상 신고 Alert
+
+extension MypageViewController: KickboardHistoryCellDelegate {
+  func didTapReportButton(_: KickboardHistoryCell) {
+    let alert = UIAlertController(title: "문제 신고", message: "문제 내용을 입력해주세요.", preferredStyle: .alert)
+    alert.addTextField { $0.placeholder = "예: 고장/침수/잠금 해제 불가" }
+
+    let submitAction = UIAlertAction(title: "신고하기", style: .destructive) { _ in
+      if let text = alert.textFields?.first?.text, text.trimmingCharacters(in: .whitespaces).count >= 2 { // 2글자 이상 입력된 경우만
+        let confirm = UIAlertController(title: "신고 완료", message: "신고가 접수되었습니다.", preferredStyle: .alert)
+        confirm.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(confirm, animated: true)
+      } else { // 2글자 이하로 입력한 경우 Alert
+        let error = UIAlertController(title: "오류", message: "2글자 이상 입력해주세요.", preferredStyle: .alert)
+        error.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(error, animated: true)
+      }
+    }
+
+    alert.addAction(submitAction)
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+    present(alert, animated: true)
   }
 }
