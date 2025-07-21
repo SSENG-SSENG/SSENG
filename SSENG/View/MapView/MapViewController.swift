@@ -385,7 +385,7 @@ class MapViewController: UIViewController {
     }
 
     heightConstraint = searchCollectionView.snp.prepareConstraints {
-      $0.height.equalTo(250)
+      $0.height.equalToSuperview().multipliedBy(0.25)
     }
 
     myPageButton.snp.makeConstraints {
@@ -1223,6 +1223,7 @@ extension MapViewController: NMFMapViewCameraDelegate {
     hiddenCollectionView()
     locationManager.stopUpdatingLocation()
     updateVisibleMarkers()
+    dismissKeyboard()
   }
 }
 
