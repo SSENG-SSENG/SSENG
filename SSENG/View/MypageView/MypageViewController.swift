@@ -213,7 +213,8 @@ class MypageViewController: UIViewController {
     alert.addAction(UIAlertAction(title: "취소", style: .cancel))
     alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
       UserDefaults.standard.removeObject(forKey: "loggedUserID") // 로그인한 id를 임시 저장한 UserDefaults에서 삭제
-
+      UserDefaults.standard.removeObject(forKey: "isAutoLogin") // 자동 로그인 UserDefaults에서 삭제
+      
       // 메인 화면을 로그인 화면으로 변경
       guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, // 연결된 scene중 첫 번째를 가져옴
             let sceneDelegate = windowScene.delegate as? SceneDelegate else { return } // 그 화면을 관리하는 SceneDelegate
