@@ -10,6 +10,7 @@
 		E70E5FA32E262DFA00F6F2D9 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = E70E5FA22E262DFA00F6F2D9 /* Then */; };
 		E70E5FA62E262E0600F6F2D9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E70E5FA52E262E0600F6F2D9 /* SnapKit */; };
 		E70E5FA92E262E1100F6F2D9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E70E5FA82E262E1100F6F2D9 /* Alamofire */; };
+		E73E19442E269CFA00287735 /* NMapsMap in Frameworks */ = {isa = PBXBuildFile; productRef = E73E19432E269CFA00287735 /* NMapsMap */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E70E5FA92E262E1100F6F2D9 /* Alamofire in Frameworks */,
+				E73E19442E269CFA00287735 /* NMapsMap in Frameworks */,
 				E70E5FA32E262DFA00F6F2D9 /* Then in Frameworks */,
 				E70E5FA62E262E0600F6F2D9 /* SnapKit in Frameworks */,
 			);
@@ -80,7 +82,7 @@
 				E70E5F652E26187400F6F2D9 /* Sources */,
 				E70E5F662E26187400F6F2D9 /* Frameworks */,
 				E70E5F672E26187400F6F2D9 /* Resources */,
-				E70E60242E265FB400F6F2D9 /* SwiftFormat */,
+				E766F9E62E2C210E00EE32D8 /* SwiftFormat */,
 			);
 			buildRules = (
 			);
@@ -94,6 +96,7 @@
 				E70E5FA22E262DFA00F6F2D9 /* Then */,
 				E70E5FA52E262E0600F6F2D9 /* SnapKit */,
 				E70E5FA82E262E1100F6F2D9 /* Alamofire */,
+				E73E19432E269CFA00287735 /* NMapsMap */,
 			);
 			productName = SSENG;
 			productReference = E70E5F692E26187400F6F2D9 /* SSENG.app */;
@@ -127,6 +130,7 @@
 				E70E5FA12E262DFA00F6F2D9 /* XCRemoteSwiftPackageReference "Then" */,
 				E70E5FA42E262E0600F6F2D9 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				E70E5FA72E262E1100F6F2D9 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				E73E19422E269CFA00287735 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E70E5F6A2E26187400F6F2D9 /* Products */;
@@ -149,7 +153,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		E70E60242E265FB400F6F2D9 /* SwiftFormat */ = {
+		E766F9E62E2C210E00EE32D8 /* SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -166,7 +170,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftformat > /dev/null; then\n  swiftformat .\nelse\n  echo \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
+			shellScript = "export PATH=\"/opt/homebrew/bin:$PATH\"\n\nif which swiftformat > /dev/null; then\n  swiftformat --config \"${PROJECT_DIR}/.swiftformat\" .\nelse\n  echo \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -188,13 +192,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LZ2ACY54Z6;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SSENG/Application/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 위치를 받습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -220,13 +226,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LZ2ACY54Z6;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SSENG/Application/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 위치를 받습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -412,6 +420,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		E73E19422E269CFA00287735 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/navermaps/SPM-NMapsMap";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.22.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -429,6 +445,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E70E5FA72E262E1100F6F2D9 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		E73E19432E269CFA00287735 /* NMapsMap */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E73E19422E269CFA00287735 /* XCRemoteSwiftPackageReference "SPM-NMapsMap" */;
+			productName = NMapsMap;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

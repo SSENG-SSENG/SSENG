@@ -1,0 +1,292 @@
+//
+//  MypageViewcontroller.swift
+//  SSENG
+//
+//  Created by 이태윤 on 7/15/25.
+//
+import SnapKit
+import Then
+import UIKit
+
+class MypageViewController: UIViewController {
+  private lazy var tableView = UITableView(frame: .zero, style: .insetGrouped).then {
+    $0.backgroundColor = .systemBackground
+    $0.delegate = self
+    $0.dataSource = self
+    $0.register(UserInfoCell.self, forCellReuseIdentifier: UserInfoCell.identifier)
+    $0.register(KickboardRegisterCell.self, forCellReuseIdentifier: KickboardRegisterCell.identifier)
+    $0.register(KickboardHistoryCell.self, forCellReuseIdentifier: KickboardHistoryCell.identifier)
+  }
+
+  private var section1ToggleButton: UIButton?
+  private var isKickboardSectionExpanded = false
+
+  private var user: User? // CoreData에서 가져온 유저 정보
+  private let userRepository = UserRepository() // User 정보 가져올 때 사용
+
+  private var kickboards: [Kickboard] = [] // CoreData에서 가져온 킥보드 리스트
+  private let kickboardRepository = KickboardRepository() // CoreData에서 킥보드 정보 가져올 때 사용
+
+  private var histories: [History] = [] // 이용내역 리스트
+  private let historyRepository = HistoryRepository() // 이용내역 정보
+
+  // 등록된 킥보드 개수
+  private var kickboardsCount: Int {
+    kickboards.count
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    configureUI()
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    isKickboardSectionExpanded = UserDefaults.standard.bool(forKey: "isKickboardSectionExpanded")
+    fetchUserData()
+    fetchKickboardData()
+    fetchHistoryData()
+  }
+
+  // MARK: - 유저 데이터 불러오기
+
+  private func fetchUserData() {
+    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else { // forKey값은 바뀌면 수정. 임시임
+      print("로그인이 잘 되지 않았습니다.")
+      return
+    }
+
+    user = userRepository.readUser(by: userID) // userID를 통해 CoreData에서 읽어옴
+
+    if user == nil {
+      print("CoreData에 해당 ID를 가진 사용자는 없는걸요..? 어찌 로그인 하셨담.. 해커세요?")
+    } else {
+      print("CoreData에 해당 ID를 가진 사용자가 있네요! \(user?.name ?? "")님 환영합니다~")
+    }
+  }
+
+  // MARK: - 등록된 킥보드 데이터 불러오기
+
+  private func fetchKickboardData() {
+    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
+      print("등록된 킥보드를 불러오지 못했습니다.")
+      return
+    }
+
+    kickboards = kickboardRepository.readRegistedKickboard(by: userID)
+      .sorted { // 내림차순 정렬 (최신순)가자
+        guard let date1 = $0.registerDate?.toDate(),
+              let date2 = $1.registerDate?.toDate() else { return false }
+        return date1 > date2
+      }
+    print("불러온 킥보드 개수: \(kickboards.count)")
+  }
+
+  // MARK: - 이용내역 데이터 불러오기
+
+  private func fetchHistoryData() {
+    guard let userID = UserDefaults.standard.string(forKey: "loggedUserID") else {
+      print("히스토리 불러오지 못했습니다.")
+      return
+    }
+
+    histories = historyRepository.readHistory(by: userID)
+      .sorted {
+        guard let date1 = $0.startTime?.toDate(),
+              let date2 = $1.startTime?.toDate() else { return false }
+        return date1 > date2
+      }
+    print("불러온 킥보드 개수: \(histories.count)")
+  }
+
+  // MARK: - configureUI
+
+  private func configureUI() {
+    view.addSubview(tableView)
+    view.backgroundColor = .systemBackground
+    tableView.separatorStyle = .none
+
+    tableView.snp.makeConstraints {
+      $0.directionalEdges.equalTo(view.safeAreaLayoutGuide)
+    }
+  }
+
+  // 등록한 킥보드 섹션을 열거나 접는 동작
+  @objc private func toggleSection() {
+    isKickboardSectionExpanded.toggle() // 확장 상태 토글
+    UserDefaults.standard.set(isKickboardSectionExpanded, forKey: "isKickboardSectionExpanded")
+
+    let indexPaths = (0 ..< kickboardsCount).map { IndexPath(row: $0, section: 1) } // 현재 섹션의 셀 위치들을 미리 만듦
+    if isKickboardSectionExpanded {
+      tableView.insertRows(at: indexPaths, with: .fade)
+    } else {
+      tableView.deleteRows(at: indexPaths, with: .fade)
+    }
+
+    let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.right"
+    section1ToggleButton?.setImage(UIImage(systemName: iconName), for: .normal)
+  }
+
+  @objc private func handleLogout() {
+    print("로그아웃 버튼 눌림")
+    let alert = UIAlertController(title: "로그아웃", message: "정말 로그아웃 하시겠습니까?", preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+    alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { _ in
+      UserDefaults.standard.removeObject(forKey: "loggedUserID") // 로그인한 id를 임시 저장한 UserDefaults에서 삭제
+      UserDefaults.standard.removeObject(forKey: "isAutoLogin") // 자동 로그인 UserDefaults에서 삭제
+
+      // 메인 화면을 로그인 화면으로 변경
+      guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, // 연결된 scene중 첫 번째를 가져옴
+            let sceneDelegate = windowScene.delegate as? SceneDelegate else { return } // 그 화면을 관리하는 SceneDelegate
+
+      let loginVC = LoginViewController()
+      let nav = UINavigationController(rootViewController: loginVC)
+      sceneDelegate.window?.rootViewController = nav // 앱의 메인 창의 rootVC를 nav로 완전 교체
+      sceneDelegate.window?.makeKeyAndVisible()
+    }))
+    present(alert, animated: true)
+  }
+}
+
+// MARK: - UITableViewDelegate
+
+extension MypageViewController: UITableViewDelegate {
+  // 0번째 섹션 헤더 높이 설정(0으로)
+  func tableView(_: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    section == 0 ? 0 : 32
+  }
+}
+
+// MARK: - UITableViewDataSource
+
+extension MypageViewController: UITableViewDataSource {
+  // 셀 높이는 자동으로 계산되도록 (AutoLayout 기반)
+  func tableView(_: UITableView, heightForRowAt _: IndexPath) -> CGFloat {
+    UITableView.automaticDimension
+  }
+
+  // 섹션의 개수를 반환 (유저 정보 / 등록한 킥보드 / 이용 내역)
+  func numberOfSections(in _: UITableView) -> Int {
+    3
+  }
+
+  // 각 섹션에 맞는 헤더 타이틀 설정
+  func tableView(_: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    let registeredCount = kickboards.count
+    // 팀원과 상의하여 "등록한 킥보드"는 개수까지, "킥보드 이용 내역"은 개수를 제거하기로 결정
+
+    let title: String
+    switch section {
+    case 1: title = "등록한 킥보드 (\(registeredCount)개)"
+    case 2: title = "킥보드 이용 내역"
+    default: return nil
+    }
+
+    let label = UILabel().then {
+      $0.text = title
+      $0.font = .systemFont(ofSize: 17, weight: .semibold)
+      $0.textColor = .secondaryLabel
+    }
+
+    let container = UIView()
+    container.addSubview(label)
+
+    label.snp.makeConstraints {
+      $0.leading.equalToSuperview()
+      $0.bottom.equalToSuperview().inset(4)
+    }
+
+    // 등록한 킥보드 섹션에만 토글 버튼 추가
+    if section == 1 {
+      let toggleButton = UIButton(type: .system)
+      let iconName = isKickboardSectionExpanded ? "chevron.down" : "chevron.right"
+      toggleButton.setImage(UIImage(systemName: iconName), for: .normal)
+      toggleButton.tintColor = .secondaryLabel
+      toggleButton.addTarget(self, action: #selector(toggleSection), for: .touchUpInside)
+
+      section1ToggleButton = toggleButton // 상태 저장
+
+      container.addSubview(toggleButton)
+
+      toggleButton.snp.makeConstraints {
+        $0.trailing.equalToSuperview()
+        $0.centerY.equalTo(label)
+      }
+    }
+
+    return container
+  }
+
+  // 각 섹션에 몇 개의 row(셀)이 들어갈지 결정하는 메서드
+  func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
+    switch section {
+    case 0: return 1
+    case 1: return isKickboardSectionExpanded ? kickboardsCount : 0
+    case 2: return histories.count
+    default: return 0
+    }
+  }
+
+  // 각 섹션에 맞는 셀을 반환
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    switch indexPath.section {
+    case 0:
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: UserInfoCell.identifier, for: indexPath) as? UserInfoCell else {
+        return UITableViewCell()
+      }
+      if let user {
+        let isRiding = kickboards.contains { $0.isRented }
+        cell.configure(user: user, isRiding: isRiding)
+      }
+
+      cell.logoutButton.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
+
+      return cell
+
+    case 1:
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: KickboardRegisterCell.identifier, for: indexPath) as? KickboardRegisterCell else {
+        return UITableViewCell()
+      }
+      let kickboard = kickboards[indexPath.row] // 현재 row에 맞는 데이터 가져오기
+      cell.configure(kickboard)
+      return cell
+
+    case 2:
+      guard let cell = tableView.dequeueReusableCell(withIdentifier: KickboardHistoryCell.identifier, for: indexPath) as? KickboardHistoryCell else {
+        return UITableViewCell()
+      }
+      let history = histories[indexPath.row]
+      cell.configure(history)
+      cell.delegate = self
+      return cell
+
+    default:
+      return UITableViewCell()
+    }
+  }
+}
+
+// MARK: - 킥보드 상태 이상 신고 Alert
+
+extension MypageViewController: KickboardHistoryCellDelegate {
+  func didTapReportButton(_: KickboardHistoryCell) {
+    let alert = UIAlertController(title: "문제 신고", message: "문제 내용을 입력해 주세요.", preferredStyle: .alert)
+    alert.addTextField { $0.placeholder = "예: 고장/침수/잠금 해제 불가" }
+
+    let submitAction = UIAlertAction(title: "신고하기", style: .destructive) { _ in
+      if let text = alert.textFields?.first?.text, text.trimmingCharacters(in: .whitespaces).count >= 2 { // 2글자 이상 입력된 경우만
+        let confirm = UIAlertController(title: "신고 완료", message: "신고가 접수되었습니다.", preferredStyle: .alert)
+        confirm.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(confirm, animated: true)
+      } else { // 2글자 이하로 입력한 경우 Alert
+        let error = UIAlertController(title: "오류", message: "2글자 이상 입력해 주세요.", preferredStyle: .alert)
+        error.addAction(UIAlertAction(title: "확인", style: .default))
+        self.present(error, animated: true)
+      }
+    }
+
+    alert.addAction(submitAction)
+    alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+    present(alert, animated: true)
+  }
+}
